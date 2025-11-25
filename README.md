@@ -1,17 +1,17 @@
 > [!IMPORTANT]
-> License and Scope of Use for MCP Essentials
+> License and Scope of Use for Commerce MCP
 
-MCP Essentials is provided under a dual-tier usage model based on the highly permissive MIT License with specific limitations on commercial use.
+Commerce MCP is provided under a dual-tier usage model based on the highly permissive MIT License with specific limitations on commercial use.
 
 Permitted Use
-Access to and use of MCP Essentials is governed by the following terms:
-Non-Commercial Use (No Charge): The use of MCP Essentials is permitted for development, evaluation, and testing purposes at no charge. This non-commercial use is subject to a hard cap of 1,000,000 (one million) total tool invocations.
+Access to and use of Commerce MCP is governed by the following terms:
+Non-Commercial Use (No Charge): The use of Commerce MCP is permitted for development, evaluation, and testing purposes at no charge. This non-commercial use is subject to a hard cap of 1,000,000 (one million) total tool invocations.
 Commercial/Production Use (Required License): Any use of Commerce MCP in a production environment or for any other commercial purpose requires a paid license or subscription.
 
 License Enforcement
-While the underlying code adheres to the principles of the MIT License, the terms above constitute the binding agreement for utilizing MCP Essentials. commercetools reserves the right to review how customers are using MCP Essentials and to restrict or terminate access for unlicensed production use or for any non-commercial use that exceeds the stated 1,000,000 invocation limit.
+While the underlying code adheres to the principles of the MIT License, the terms above constitute the binding agreement for utilizing Commerce MCP. commercetools reserves the right to review how customers are using Commerce MCP and to restrict or terminate access for unlicensed production use or for any non-commercial use that exceeds the stated 1,000,000 invocation limit.
 
-# commercetools MCP Essentials
+# commercetools Commerce MCP
 
 This repository contains both a MCP server (which you can integrate with many MCP clients) and agent essentials that can be used from within agent frameworks.
 
@@ -276,9 +276,9 @@ npx -y @commercetools/mcp-essentials --tools=all --clientId=CLIENT_ID --clientSe
 }
 ```
 
-# MCP Essentials
+# Commerce MCP
 
-The commercetools MCP Essentials enables popular agent frameworks including LangChain, Vercel's AI SDK, and Model Context Protocol (MCP) to integrate with APIs through function calling. The library is not exhaustive of the entire commercetools API. It includes support for TypeScript and is built directly on top of the [Node][node-sdk] SDK.
+The commercetools Commerce MCP enables popular agent frameworks including LangChain, Vercel's AI SDK, and Model Context Protocol (MCP) to integrate with APIs through function calling. The library is not exhaustive of the entire commercetools API. It includes support for TypeScript and is built directly on top of the [Node][node-sdk] SDK.
 
 Included below are basic instructions, but refer to the [TypeScript](/typescript) package for more information.
 
@@ -383,7 +383,7 @@ const agentExecutor = new AgentExecutor({
 
 ## Model Context Protocol
 
-The commercetools MCP Essentials also supports setting up your own MCP server. For example:
+The commercetools Commerce MCP also supports setting up your own MCP server. For example:
 
 ```typescript
 import { CommercetoolsAgentEssentials } from "@commercetools/agent-essentials/modelcontextprotocol";
@@ -434,7 +434,7 @@ const tools = commercetoolsAgentEssentials.getTools();
 
 #### Custom Tools
 
-The self managed `@commercetools/agent-essentials` includes supports for custom tools. A list of custom tools implementations can be passed over and registered at runtime by the bootstrapping MCP server. This is especially useful when the intended tool is not yet implemented into the MCP essentials or to give users complete control and customization of their tools behaviour and how it interact with the underlying LLM.
+The self managed `@commercetools/agent-essentials` includes supports for custom tools. A list of custom tools implementations can be passed over and registered at runtime by the bootstrapping MCP server. This is especially useful when the intended tool is not yet implemented into the Commerce MCP or to give users complete control and customization of their tools behaviour and how it interact with the underlying LLM.
 
 usage
 
