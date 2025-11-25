@@ -42,7 +42,7 @@
 
 ### Minor Changes
 
-- [#25](https://github.com/commercetools/mcp-essentials/pull/25) [`b16df24`](https://github.com/commercetools/mcp-essentials/commit/b16df24a9d81c384fbb37b0c9cccaafc8c5616dc) Thanks [@ajimae](https://github.com/ajimae)! - [Feat] Add User Agent to Commerce MCP
+- [#25](https://github.com/commercetools/mcp-essentials/pull/25) [`b16df24`](https://github.com/commercetools/mcp-essentials/commit/b16df24a9d81c384fbb37b0c9cccaafc8c5616dc) Thanks [@ajimae](https://github.com/ajimae)! - [Feat] Add User Agent to MCP Essentials.
 
 - [#22](https://github.com/commercetools/mcp-essentials/pull/22) [`733f7fc`](https://github.com/commercetools/mcp-essentials/commit/733f7fc382fe1e87b3009f978201190f1fb198d2) Thanks [@islam3zzat](https://github.com/islam3zzat)! - Add dynamic tool loading feature.
   In this feature, if the number available tools exceeded `DYNAMIC_TOOL_LOADING_THRESHOLD` we'll only expose 5 tools:
@@ -167,4 +167,4 @@
 
 ### Major Changes
 
-- [#3](https://github.com/commercetools/mcp-essentials/pull/3) [`5bd6b14`](https://github.com/commercetools/mcp-essentials/commit/5bd6b14c61ca0bd333f9a152575aae79885adee9) Thanks [@tdeekens](https://github.com/tdeekens)! - This is the initial release of the commerce Commerce MCP and Commerce Agent. This is an [Early access](https://docs.commercetools.com/offering/api-compatibility#early-access) release and we'd love to hear your feedback!
+- [#3](https://github.com/commercetools/mcp-essentials/pull/3) [`5bd6b14`](https://github.com/commercetools/mcp-essentials/commit/5bd6b14c61ca0bd333f9a152575aae79885adee9) Thanks [@tdeekens](https://github.com/tdeekens)! - This is the initial release of the commerce MCP essentials and Agent essentials. This is an [Early access](https://docs.commercetools.com/offering/api-compatibility#early-access) release and we'd love to hear your feedback!
