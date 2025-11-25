@@ -28,7 +28,7 @@ Supported entity types:
 =======
 - shopping-lists
 <<<<<<< Updated upstream
->>>>>>> 500162a (feat(mcp-essentials): add additional tools)
+>>>>>>> 500162a (feat(commerce-mcp): add additional tools)
 =======
 - transactions
 >>>>>>> Stashed changes

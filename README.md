@@ -25,29 +25,29 @@ To run the commercetools MCP server using npx, use the following command:
 
 ```bash
 # To set up all available tools (authType is optional, defaults to client_credentials)
-npx -y @commercetools/mcp-essentials --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 # Explicitly specify client_credentials (optional)
-npx -y @commercetools/mcp-essentials --tools=all --authType=client_credentials --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --authType=client_credentials --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 # To set up all read-only tools
-npx -y @commercetools/mcp-essentials --tools=all.read --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all.read --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 ```
 
 ```bash
 # To set up specific tools
-npx -y @commercetools/mcp-essentials --tools=products.read,products.create --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=products.read,products.create --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 ### Access Token Authentication
 
 ```bash
 # To set up all available tools with access token
-npx -y @commercetools/mcp-essentials --tools=all --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 # To set up all read-only tools with access token
-npx -y @commercetools/mcp-essentials --tools=all.read --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all.read --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 Make sure to replace `CLIENT_ID`, `CLIENT_SECRET`, `PROJECT_KEY`, `AUTH_URL`, `API_URL`, and `ACCESS_TOKEN` with your actual values. If using the customerId parameter, replace `CUSTOMER_ID` with the actual customer ID. Alternatively, you could set the API_KEY in your environment variables.
@@ -74,7 +74,7 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
       "command": "npx",
       "args": [
         "-y",
-        "@commercetools/mcp-essentials@latest",
+        "@commercetools/commerce-mcp@latest",
         "--tools=all",
         "--clientId=CLIENT_ID",
         "--clientSecret=CLIENT_SECRET",
@@ -99,7 +99,7 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
       "command": "npx",
       "args": [
         "-y",
-        "@commercetools/mcp-essentials@latest",
+        "@commercetools/commerce-mcp@latest",
         "--tools=all",
         "--authType=auth_token",
         "--accessToken=ACCESS_TOKEN",
@@ -243,14 +243,14 @@ You can configure the dynamic tool loading threshold in two ways:
 #### Command Line Argument
 
 ```bash
-npx -y @commercetools/mcp-essentials --tools=all --dynamicToolLoadingThreshold=50 --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --dynamicToolLoadingThreshold=50 --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 #### Environment Variable
 
 ```bash
 export DYNAMIC_TOOL_LOADING_THRESHOLD=50
-npx -y @commercetools/mcp-essentials --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 ### Example with Claude Desktop
@@ -262,7 +262,7 @@ npx -y @commercetools/mcp-essentials --tools=all --clientId=CLIENT_ID --clientSe
       "command": "npx",
       "args": [
         "-y",
-        "@commercetools/mcp-essentials@latest",
+        "@commercetools/commerce-mcp@latest",
         "--tools=all",
         "--clientId=CLIENT_ID",
         "--clientSecret=CLIENT_SECRET",
@@ -477,10 +477,10 @@ const server = await CommercetoolsCommerceAgent.create({
 
 ### Streamable HTTP MCP server
 
-As of version `v2.0.0` of the `@commercetools/mcp-essentials` MCP server now supports Streamable HTTP (remote) server.
+As of version `v2.0.0` of the `@commercetools/commerce-mcp` MCP server now supports Streamable HTTP (remote) server.
 
 ```typescript
-npx -y @commercetools/mcp-essentials \
+npx -y @commercetools/commerce-mcp \
   --tools=all \
   --authType=client_credentials \
   --clientId=CLIENT_ID \

@@ -1,7 +1,7 @@
 {
   "name": "@commercetools/commerce-agent",
   "version": "3.5.0",
-  "homepage": "https://github.com/commercetools/mcp-essentials",
+  "homepage": "https://github.com/commercetools/commerce-mcp",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "dev": "tsup --env.NODE_ENV dev",

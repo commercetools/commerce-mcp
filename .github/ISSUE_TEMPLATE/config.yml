@@ -3,6 +3,6 @@ contact_links:
   - name: commercetools support
     url: https://support.commercetools.com/
     about: |
-      Please only file issues here that you believe represent actual bugs or feature requests for the commercetools MCP Essentials library.
+      Please only file issues here that you believe represent actual bugs or feature requests for the commercetools commerce MCP library.
 
       If you're having general trouble with your commercetools integration, please reach out to support.

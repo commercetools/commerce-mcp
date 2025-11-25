@@ -22,10 +22,10 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Lint - TypeScript
-        run: pnpm --filter @commercetools/agent-essentials run lint
+        run: pnpm --filter @commercetools/commerce-agent run lint
 
       - name: Lint - Model Context Protocol
-        run: pnpm --filter @commercetools/mcp-essentials run lint
+        run: pnpm --filter @commercetools/commerce-mcp run lint
 
   formatting:
     name: Formatting
@@ -39,10 +39,10 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Prettier - TypeScript
-        run: pnpm --filter @commercetools/agent-essentials run prettier-check
+        run: pnpm --filter @commercetools/commerce-agent run prettier-check
 
       - name: Prettier - Model Context Protocol
-        run: pnpm --filter @commercetools/mcp-essentials run prettier-check
+        run: pnpm --filter @commercetools/commerce-mcp run prettier-check
 
   testing:
     name: Testing
@@ -56,13 +56,13 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Test - TypeScript
-        run: pnpm --filter @commercetools/agent-essentials run test
+        run: pnpm --filter @commercetools/commerce-agent run test
 
       - name: Test - Model Context Protocol
         run: |
           # Builds types which are neededin tests
-          pnpm --filter @commercetools/agent-essentials run build
-          pnpm --filter @commercetools/mcp-essentials run test
+          pnpm --filter @commercetools/commerce-agent run build
+          pnpm --filter @commercetools/commerce-mcp run test
 
   building:
     name: Building
@@ -77,10 +77,10 @@ jobs:
 
       - name: Test - TypeScript
         run: |
-          pnpm --filter @commercetools/agent-essentials run build
-          pnpm --filter @commercetools/agent-essentials run clean
+          pnpm --filter @commercetools/commerce-agent run build
+          pnpm --filter @commercetools/commerce-agent run clean
 
       - name: Test - Model Context Protocol
         run: |
-          pnpm --filter @commercetools/mcp-essentials run build
-          pnpm --filter @commercetools/mcp-essentials run clean
+          pnpm --filter @commercetools/commerce-mcp run build
+          pnpm --filter @commercetools/commerce-mcp run clean
