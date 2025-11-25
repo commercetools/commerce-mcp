@@ -1,4 +1,4 @@
-# @commercetools/commerce-agent
+# @commercetools/agent-essentials
 
 ## 3.5.0
 
@@ -83,7 +83,7 @@
   Example:
 
   ```ts
-  const commercetoolsCommerceAgent = new CommercetoolsCommerceAgent({
+  const commercetoolsAgentEssentials = new CommercetoolsAgentEssentials({
     authConfig: {
       type: 'auth_token',
       accessToken: process.env.ACCESS_TOKEN!,
@@ -106,12 +106,12 @@
   });
   ```
 
-  **BREAKING CHANGE**: The constructor signature of `CommercetoolsCommerceAgent` has changed to support more authentication types. See example below to learn what changed.
+  **BREAKING CHANGE**: The constructor signature of `CommercetoolsAgentEssentials` has changed to support more authentication types. See example below to learn what changed.
 
   Example:
 
   ```diff
-  - const commercetoolsCommerceAgent = new CommercetoolsCommerceAgent({
+  - const commercetoolsAgentEssentials = new CommercetoolsAgentEssentials({
   -   clientId: process.env.CLIENT_ID!,
   -   clientSecret: process.env.CLIENT_SECRET!,
   -   projectKey: process.env.PROJECT_KEY!,
@@ -131,7 +131,7 @@
   -   },
   - });
 
-  + const commercetoolsCommerceAgent = new CommercetoolsCommerceAgent({
+  + const commercetoolsAgentEssentials = new CommercetoolsAgentEssentials({
   +   authConfig: {
   +     type: 'client_credentials',
   +     clientId: process.env.CLIENT_ID!,
@@ -161,7 +161,7 @@
 
 ### Patch Changes
 
-- [#11](https://github.com/commercetools/mcp-essentials/pull/11) [`3c53c39`](https://github.com/commercetools/mcp-essentials/commit/3c53c3908ed3f69f79b3df8bd709f215654de2c5) Thanks [@martinw-ct](https://github.com/martinw-ct)! - Fixes being able to import `import { CommercetoolsCommerceAgent } from "@commercetools/commerce-agent/langchain"` by adding the correct exports to the `package.json`.
+- [#11](https://github.com/commercetools/mcp-essentials/pull/11) [`3c53c39`](https://github.com/commercetools/mcp-essentials/commit/3c53c3908ed3f69f79b3df8bd709f215654de2c5) Thanks [@martinw-ct](https://github.com/martinw-ct)! - Fixes being able to import `import { CommercetoolsAgentEssentials } from "@commercetools/agent-essentials/langchain"` by adding the correct exports to the `package.json`.
 
 ## 1.0.0
 
