@@ -15,7 +15,7 @@ import {contextToBulkTools} from '../shared/bulk/tools';
 import {DYNAMIC_TOOL_LOADING_THRESHOLD} from '../shared/constants';
 import {transformToolOutput} from './transform';
 
-class CommercetoolsAgentEssentials extends McpServer {
+class CommercetoolsCommerceAgent extends McpServer {
   private authConfig: AuthConfig;
   private configuration: Configuration = {};
   private commercetoolsAPI: CommercetoolsAPI;
@@ -48,14 +48,14 @@ class CommercetoolsAgentEssentials extends McpServer {
     configuration: Configuration;
   }) {
     try {
-      const instance = new CommercetoolsAgentEssentials(option);
+      const instance = new CommercetoolsCommerceAgent(option);
       await instance.init();
 
       return instance;
     } catch (err: unknown) {
       throw new Error(
         (err as Error).message ??
-          'Unable to initialze `CommercetoolsAgentEssentials`'
+          'Unable to initialze `CommercetoolsCommerceAgent`'
       );
     }
   }
@@ -286,4 +286,4 @@ class CommercetoolsAgentEssentials extends McpServer {
   }
 }
 
-export default CommercetoolsAgentEssentials;
+export default CommercetoolsCommerceAgent;

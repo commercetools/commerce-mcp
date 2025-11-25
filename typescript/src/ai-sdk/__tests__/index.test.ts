@@ -1,7 +1,7 @@
-import {CommercetoolsAgentEssentials} from '../index';
+import {CommercetoolsCommerceAgent} from '../index';
 
 describe('AI SDK Index', () => {
-  it('should export CommercetoolsAgentEssentials', () => {
-    expect(CommercetoolsAgentEssentials).toBeDefined();
+  it('should export CommercetoolsCommerceAgent', () => {
+    expect(CommercetoolsCommerceAgent).toBeDefined();
   });
 });

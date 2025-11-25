@@ -1,4 +1,4 @@
-import CommercetoolsAgentEssentials from '../essentials';
+import CommercetoolsCommerceAgent from '../agent';
 import CommercetoolsAPI from '../../shared/api';
 import CommercetoolsTool from '../tool';
 import {isToolAllowed} from '../../shared/configuration';
@@ -43,7 +43,7 @@ jest.mock('../../shared/tools', () => {
 
 const tools = contextToTools({});
 
-describe('CommercetoolsAgentEssentials with Admin tools', () => {
+describe('CommercetoolsCommerceAgent with Admin tools', () => {
   const toolFormat = 'json';
   const mockConfiguration = {
     context: {isAdmin: true, toolOutputFormat: toolFormat},
@@ -70,7 +70,7 @@ describe('CommercetoolsAgentEssentials with Admin tools', () => {
   });
 
   it('should initialize CommercetoolsAPI with constructor arguments', () => {
-    const agentEssentials = new CommercetoolsAgentEssentials({
+    const commerceAgent = new CommercetoolsCommerceAgent({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -104,7 +104,7 @@ describe('CommercetoolsAgentEssentials with Admin tools', () => {
       }
     );
 
-    const agentEssentials = new CommercetoolsAgentEssentials({
+    const commerceAgent = new CommercetoolsCommerceAgent({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -144,14 +144,14 @@ describe('CommercetoolsAgentEssentials with Admin tools', () => {
       toolFormat
     );
 
-    expect(Object.keys(agentEssentials.getTools())).toContain('tool1');
-    expect(Object.keys(agentEssentials.getTools())).toContain('tool2');
-    expect(Object.keys(agentEssentials.getTools())).not.toContain('tool3');
+    expect(Object.keys(commerceAgent.getTools())).toContain('tool1');
+    expect(Object.keys(commerceAgent.getTools())).toContain('tool2');
+    expect(Object.keys(commerceAgent.getTools())).not.toContain('tool3');
   });
 
   it('should return all created tools via getTools method', () => {
     (isToolAllowed as jest.Mock).mockReturnValue(true); // Allow all tools for this test
-    const agentEssentials = new CommercetoolsAgentEssentials({
+    const commerceAgent = new CommercetoolsCommerceAgent({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -166,7 +166,7 @@ describe('CommercetoolsAgentEssentials with Admin tools', () => {
       } as any, // Enable all
     });
 
-    const returnedTools = agentEssentials.getTools();
+    const returnedTools = commerceAgent.getTools();
     expect(Object.keys(returnedTools).length).toBe(tools.length);
     expect(returnedTools.tool1).toBeDefined();
     expect(returnedTools.tool2).toBeDefined();
@@ -176,7 +176,7 @@ describe('CommercetoolsAgentEssentials with Admin tools', () => {
   it('should handle empty configuration correctly (no tools enabled)', () => {
     (isToolAllowed as jest.Mock).mockReturnValue(false); // No tools allowed
 
-    const agentEssentials = new CommercetoolsAgentEssentials({
+    const commerceAgent = new CommercetoolsCommerceAgent({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -193,6 +193,6 @@ describe('CommercetoolsAgentEssentials with Admin tools', () => {
 
     expect(isToolAllowed).toHaveBeenCalledTimes(tools.length);
     expect(CommercetoolsTool).not.toHaveBeenCalled();
-    expect(Object.keys(agentEssentials.getTools()).length).toBe(0);
+    expect(Object.keys(commerceAgent.getTools()).length).toBe(0);
   });
 });

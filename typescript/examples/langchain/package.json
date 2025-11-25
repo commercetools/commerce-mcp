@@ -1,5 +1,5 @@
 {
-  "name": "commercetools-agent-essentials-examples-langchain",
+  "name": "commercetools-commerce-agent-examples-langchain",
   "version": "0.1.0",
   "description": "",
   "scripts": {
@@ -10,7 +10,7 @@
   "dependencies": {
     "@langchain/core": "^0.3.6",
     "@langchain/openai": "^0.3.5",
-    "@commercetools/agent-essentials": "latest",
+    "@commercetools/commerce-agent": "latest",
     "dotenv": "^16.4.5",
     "langchain": "^0.3.2"
   },

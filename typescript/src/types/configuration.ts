@@ -2,7 +2,7 @@ import {StreamableHTTPServerTransportOptions} from '@modelcontextprotocol/sdk/se
 import {Client} from '@commercetools/ts-client';
 import {
   AuthConfig,
-  CommercetoolsAgentEssentials,
+  CommercetoolsCommerceAgent,
 } from '../modelcontextprotocol';
 import {AvailableNamespaces, Tool} from './tools';
 import {IncomingMessage, ServerResponse} from 'node:http';
@@ -76,7 +76,7 @@ export interface IApp {
 type IWithServerInstance = {
   authConfig?: AuthConfig;
   configuration?: Configuration;
-  server: (sessionId?: string) => Promise<CommercetoolsAgentEssentials>;
+  server: (sessionId?: string) => Promise<CommercetoolsCommerceAgent>;
   stateless?: boolean;
   streamableHttpOptions: StreamableHTTPServerTransportOptions;
   app?: IApp;

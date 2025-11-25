@@ -1,9 +1,9 @@
-import {CommercetoolsAgentEssentials} from '../../src/mastra/index';
+import {CommercetoolsCommerceAgent} from '../../src/mastra/index';
 import {Agent} from '@mastra/core/agent';
 
 require('dotenv').config();
 
-const essentials = new CommercetoolsAgentEssentials(
+const commerceAgent = new CommercetoolsCommerceAgent(
   {
     type: 'client_credentials',
     clientId: process.env.CLIENT_ID!,
@@ -31,7 +31,7 @@ const agent = new Agent({
   name: 'CommercetoolsAgent',
   instructions:
     'You are a helpful agent that can manage products and product types in commercetools. Use the available tools to help users with their commerce operations.',
-  tools: essentials.getTools(),
+  tools: commerceAgent.getTools(),
 });
 
 (async () => {

@@ -5,7 +5,7 @@
 ### Patch Changes
 
 - Updated dependencies [[`b88f1bd`](https://github.com/commercetools/mcp-essentials/commit/b88f1bd21c5d7bb9b063e1c8e6e2c0b4137ae81f)]:
-  - @commercetools/agent-essentials@3.5.0
+  - @commercetools/commerce-agent@3.5.0
 
 ## 2.4.0
 
@@ -20,7 +20,7 @@
 ### Patch Changes
 
 - Updated dependencies [[`e854cc4`](https://github.com/commercetools/mcp-essentials/commit/e854cc4a775a866e64d8bd012aebe409aedd716d), [`6eb40d5`](https://github.com/commercetools/mcp-essentials/commit/6eb40d55f36452e65a67b3d53d8017c6e76ec125), [`1e66969`](https://github.com/commercetools/mcp-essentials/commit/1e669696e619b496231c8449e87086f4f556b87a)]:
-  - @commercetools/agent-essentials@3.4.0
+  - @commercetools/commerce-agent@3.4.0
 
 ## 2.3.0
 
@@ -35,14 +35,14 @@
 ### Patch Changes
 
 - Updated dependencies [[`a82601b`](https://github.com/commercetools/mcp-essentials/commit/a82601b8ffe345d83db0c9d93bb70c411ba89f3d), [`e21e319`](https://github.com/commercetools/mcp-essentials/commit/e21e3193baa3a2d83eafcea22d5c9181d8fea2f1), [`1971f11`](https://github.com/commercetools/mcp-essentials/commit/1971f11cc5a5a702c055615e2804ccf4d996e08c), [`7736450`](https://github.com/commercetools/mcp-essentials/commit/773645010a8006b5f952fbbbc0c729d95ab45c4f)]:
-  - @commercetools/agent-essentials@3.3.0
+  - @commercetools/commerce-agent@3.3.0
 
 ## 2.2.1
 
 ### Patch Changes
 
 - Updated dependencies [[`899d731`](https://github.com/commercetools/mcp-essentials/commit/899d7319cd5c7f29bcefb45e5db5aa88c38bfe3c)]:
-  - @commercetools/agent-essentials@3.2.0
+  - @commercetools/commerce-agent@3.2.0
 
 ## 2.2.0
 
@@ -61,7 +61,7 @@
 ### Patch Changes
 
 - Updated dependencies [[`b16df24`](https://github.com/commercetools/mcp-essentials/commit/b16df24a9d81c384fbb37b0c9cccaafc8c5616dc), [`733f7fc`](https://github.com/commercetools/mcp-essentials/commit/733f7fc382fe1e87b3009f978201190f1fb198d2)]:
-  - @commercetools/agent-essentials@3.1.0
+  - @commercetools/commerce-agent@3.1.0
 
 ## 2.1.0
 
@@ -82,7 +82,7 @@
 - [#18](https://github.com/commercetools/mcp-essentials/pull/18) [`9a205aa`](https://github.com/commercetools/mcp-essentials/commit/9a205aae5289e712ebcc8241a161fbeb4caeabc8) Thanks [@islam3zzat](https://github.com/islam3zzat)! - Suppress dotenv logs to avoid pushing messages to the stdio.
 
 - Updated dependencies [[`80996f0`](https://github.com/commercetools/mcp-essentials/commit/80996f0469a23fba77c2ddaccfda397adc3884b6), [`f56607f`](https://github.com/commercetools/mcp-essentials/commit/f56607fceb37af6f1d9c21585cf9241d722847e2), [`3c5e8a9`](https://github.com/commercetools/mcp-essentials/commit/3c5e8a96d282135aa65d0cd02c208bb76b2d1cd7)]:
-  - @commercetools/agent-essentials@3.0.0
+  - @commercetools/commerce-agent@3.0.0
 
 ## 2.0.0
 
@@ -93,7 +93,7 @@
   Example:
 
   ```ts
-  const commercetoolsAgentEssentials = new CommercetoolsAgentEssentials({
+  const commercetoolsCommerceAgent = new CommercetoolsCommerceAgent({
     authConfig: {
       type: 'auth_token',
       accessToken: process.env.ACCESS_TOKEN!,
@@ -116,12 +116,12 @@
   });
   ```
 
-  **BREAKING CHANGE**: The constructor signature of `CommercetoolsAgentEssentials` has changed to support more authentication types. See example below to learn what changed.
+  **BREAKING CHANGE**: The constructor signature of `CommercetoolsCommerceAgent` has changed to support more authentication types. See example below to learn what changed.
 
   Example:
 
   ```diff
-  - const commercetoolsAgentEssentials = new CommercetoolsAgentEssentials({
+  - const commercetoolsCommerceAgent = new CommercetoolsCommerceAgent({
   -   clientId: process.env.CLIENT_ID!,
   -   clientSecret: process.env.CLIENT_SECRET!,
   -   projectKey: process.env.PROJECT_KEY!,
@@ -141,7 +141,7 @@
   -   },
   - });
 
-  + const commercetoolsAgentEssentials = new CommercetoolsAgentEssentials({
+  + const commercetoolsCommerceAgent = new CommercetoolsCommerceAgent({
   +   authConfig: {
   +     type: 'client_credentials',
   +     clientId: process.env.CLIENT_ID!,
@@ -172,15 +172,15 @@
 ### Patch Changes
 
 - Updated dependencies [[`c78c032`](https://github.com/commercetools/mcp-essentials/commit/c78c032a9fcdbfd3598d16774cdc449f146cc9b1), [`3c53c39`](https://github.com/commercetools/mcp-essentials/commit/3c53c3908ed3f69f79b3df8bd709f215654de2c5), [`8afdf31`](https://github.com/commercetools/mcp-essentials/commit/8afdf317ec92397e5a4b51d87bf2936135d25941)]:
-  - @commercetools/agent-essentials@2.0.0
+  - @commercetools/commerce-agent@2.0.0
 
 ## 1.0.0
 
 ### Major Changes
 
-- [#3](https://github.com/commercetools/mcp-essentials/pull/3) [`5bd6b14`](https://github.com/commercetools/mcp-essentials/commit/5bd6b14c61ca0bd333f9a152575aae79885adee9) Thanks [@tdeekens](https://github.com/tdeekens)! - This is the initial release of the commerce Commerce MCP and Agent essentials. This is an [Early access](https://docs.commercetools.com/offering/api-compatibility#early-access) release and we'd love to hear your feedback!
+- [#3](https://github.com/commercetools/mcp-essentials/pull/3) [`5bd6b14`](https://github.com/commercetools/mcp-essentials/commit/5bd6b14c61ca0bd333f9a152575aae79885adee9) Thanks [@tdeekens](https://github.com/tdeekens)! - This is the initial release of the commerce Commerce MCP and Commerce Agent. This is an [Early access](https://docs.commercetools.com/offering/api-compatibility#early-access) release and we'd love to hear your feedback!
 
 ### Patch Changes
 
 - Updated dependencies [[`5bd6b14`](https://github.com/commercetools/mcp-essentials/commit/5bd6b14c61ca0bd333f9a152575aae79885adee9)]:
-  - @commercetools/agent-essentials@1.0.0
+  - @commercetools/commerce-agent@1.0.0

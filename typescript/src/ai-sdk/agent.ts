@@ -9,7 +9,7 @@ import type {Configuration} from '../types/configuration';
 import CommercetoolsTool from './tool';
 import {AuthConfig} from '../types/auth';
 
-class CommercetoolsAgentEssentials {
+class CommercetoolsCommerceAgent {
   private _commercetools: CommercetoolsAPI;
 
   tools: {[key: string]: Tool};
@@ -51,4 +51,4 @@ class CommercetoolsAgentEssentials {
   }
 }
 
-export default CommercetoolsAgentEssentials;
+export default CommercetoolsCommerceAgent;

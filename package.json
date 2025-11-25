@@ -1,15 +1,15 @@
 {
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "validate": "pnpm --filter @commercetools/agent-essentials run validate && pnpm --filter @commercetools/mcp-essentials run validate",
-    "build": "pnpm --filter @commercetools/agent-essentials run build && pnpm --filter @commercetools/mcp-essentials run build",
+    "validate": "pnpm --filter @commercetools/commerce-agent run validate && pnpm --filter @commercetools/commerce-mcp run validate",
+    "build": "pnpm --filter @commercetools/commerce-agent run build && pnpm --filter @commercetools/commerce-mcp run build",
     "changeset": "changeset",
     "changeset:version": "changeset version"
   },
   "dependencies": {
     "@changesets/changelog-github": "0.5.1",
     "@changesets/cli": "^2.29.4",
-    "@commercetools/agent-essentials": "workspace:*",
+    "@commercetools/commerce-agent": "workspace:*",
     "@commercetools/platform-sdk": "^8.13.0",
     "@commercetools/ts-client": "^4.2.0",
     "@types/pluralize": "^0.0.33"

@@ -1,4 +1,4 @@
-import CommercetoolsAgentEssentials from '../essentials';
+import CommercetoolsCommerceAgent from '../agent';
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 import CommercetoolsAPI from '../../shared/api';
 import {isToolAllowed} from '../../shared/configuration';
@@ -51,7 +51,7 @@ jest.mock('../../shared/tools', () => {
 
 let mockSharedToolsData: any[]; // To hold the data for assertions
 
-describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
+describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
   jest.mock('../../utils/scopes', () => {
     return {
       scopesToActions: jest.fn(),
@@ -90,7 +90,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
     // Setup mockToolMethod for the McpServer's tool method
     mockToolMethod = jest.fn();
 
-    // Set up McpServer mock to handle the fact that CommercetoolsAgentEssentials extends it
+    // Set up McpServer mock to handle the fact that CommercetoolsCommerceAgent extends it
     (McpServer as jest.Mock).mockImplementation(function (this: any) {
       this.tool = mockToolMethod;
     });
@@ -129,7 +129,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
   });
 
   it('should call McpServer constructor with correct parameters', () => {
-    CommercetoolsAgentEssentials.create({
+    CommercetoolsCommerceAgent.create({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -147,7 +147,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
   });
 
   it('should initialize CommercetoolsAPI', () => {
-    CommercetoolsAgentEssentials.create({
+    CommercetoolsCommerceAgent.create({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -172,7 +172,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
   });
 
   it('should filter tools and register allowed tools with McpServer when registerAdminTools is called', async () => {
-    CommercetoolsAgentEssentials.create({
+    CommercetoolsCommerceAgent.create({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -204,7 +204,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
   });
 
   it('handler function should call commercetoolsAPI.run and format result', async () => {
-    CommercetoolsAgentEssentials.create({
+    CommercetoolsCommerceAgent.create({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -245,7 +245,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
 
   it('should correctly handle no tools being allowed', async () => {
     (isToolAllowed as jest.Mock).mockReturnValue(false); // Disallow all tools
-    CommercetoolsAgentEssentials.create({
+    CommercetoolsCommerceAgent.create({
       authConfig: {
         clientId: 'id',
         clientSecret: 'secret',
@@ -264,7 +264,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
 
   describe('::scopeToActions [filter configured actions based on token scopes]', () => {
     it('should introspect a token on initialization', () => {
-      CommercetoolsAgentEssentials.create({
+      CommercetoolsCommerceAgent.create({
         authConfig: {
           clientId: 'id',
           clientSecret: 'secret',
@@ -384,7 +384,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
     });
 
     it('should not call introspect if `clientId` and `clientSecret` are not provided', () => {
-      CommercetoolsAgentEssentials.create({
+      CommercetoolsCommerceAgent.create({
         authConfig: {
           type: 'auth_token',
           accessToken: 'access-token',
@@ -399,7 +399,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
     });
   });
 
-  describe('::CommercetoolsAgentEssentials []', () => {
+  describe('::CommercetoolsCommerceAgent []', () => {
     let _mockToolMethod: jest.Mock;
     let _mockCommercetoolsAPIInstance: jest.Mocked<CommercetoolsAPI>;
 
@@ -432,7 +432,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
       // Setup mockToolMethod for the McpServer's tool method
       _mockToolMethod = jest.fn();
 
-      // Set up McpServer mock to handle the fact that CommercetoolsAgentEssentials extends it
+      // Set up McpServer mock to handle the fact that CommercetoolsCommerceAgent extends it
       (McpServer as jest.Mock).mockImplementation(function (this: any) {
         this.tool = _mockToolMethod;
       });
@@ -473,7 +473,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
 
     afterEach(() => {
       (McpServer as jest.Mock).mockClear();
-      (CommercetoolsAgentEssentials as unknown as jest.Mock).mockClear();
+      (CommercetoolsCommerceAgent as unknown as jest.Mock).mockClear();
       _mockCommercetoolsAPIInstance.introspect = jest
         .fn()
         .mockImplementation(function () {
@@ -481,8 +481,8 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
         });
     });
 
-    it('init commercetoolsAgentEssentials', () => {
-      const agentEssentials = CommercetoolsAgentEssentials.create({
+    it('init commercetoolsCommerceAgent', () => {
+      const commerceAgent = CommercetoolsCommerceAgent.create({
         authConfig: {
           clientId: 'id',
           clientSecret: 'secret',
@@ -502,9 +502,9 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
         new Error('Simulated error in the instropsect method')
       );
 
-      jest.spyOn(CommercetoolsAgentEssentials, 'create');
+      jest.spyOn(CommercetoolsCommerceAgent, 'create');
       expect(
-        CommercetoolsAgentEssentials.create({
+        CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -516,13 +516,13 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
           configuration: _mockConfiguration,
         })
       ).rejects.toThrow(/Simulated error in the instropsect method/);
-      expect(CommercetoolsAgentEssentials.create).toHaveBeenCalled();
+      expect(CommercetoolsCommerceAgent.create).toHaveBeenCalled();
     });
 
     describe('::CustomTools', () => {
       it(`should not register custom tools if 'customTools' is not provided`, async () => {
         const config = getConfig({});
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -558,7 +558,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
 
         const config = getConfig({customTools});
 
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -584,11 +584,11 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
         const customTools = {};
         const config = getConfig({customTools});
 
-        jest.spyOn(CommercetoolsAgentEssentials, 'create');
+        jest.spyOn(CommercetoolsCommerceAgent, 'create');
 
-        expect(CommercetoolsAgentEssentials.create).toHaveBeenCalled();
+        expect(CommercetoolsCommerceAgent.create).toHaveBeenCalled();
         expect(
-          CommercetoolsAgentEssentials.create({
+          CommercetoolsCommerceAgent.create({
             authConfig: {
               clientId: 'id',
               clientSecret: 'secret',
@@ -617,11 +617,11 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
         const getConfig = (opt: object) => ({..._mockConfiguration, ...opt});
         const config = getConfig({customTools});
 
-        jest.spyOn(CommercetoolsAgentEssentials, 'create');
+        jest.spyOn(CommercetoolsCommerceAgent, 'create');
 
-        expect(CommercetoolsAgentEssentials.create).toHaveBeenCalled();
+        expect(CommercetoolsCommerceAgent.create).toHaveBeenCalled();
         expect(
-          CommercetoolsAgentEssentials.create({
+          CommercetoolsCommerceAgent.create({
             authConfig: {
               clientId: 'id',
               clientSecret: 'secret',
@@ -651,11 +651,11 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
         const getConfig = (opt: object) => ({..._mockConfiguration, ...opt});
         const config = getConfig({customTools});
 
-        jest.spyOn(CommercetoolsAgentEssentials, 'create');
+        jest.spyOn(CommercetoolsCommerceAgent, 'create');
 
-        expect(CommercetoolsAgentEssentials.create).toHaveBeenCalled();
+        expect(CommercetoolsCommerceAgent.create).toHaveBeenCalled();
         expect(
-          CommercetoolsAgentEssentials.create({
+          CommercetoolsCommerceAgent.create({
             authConfig: {
               clientId: 'id',
               clientSecret: 'secret',
@@ -687,7 +687,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
       // Setup mockToolMethod for the McpServer's tool method
       mockToolMethod = jest.fn();
 
-      // Set up McpServer mock to handle the fact that CommercetoolsAgentEssentials extends it
+      // Set up McpServer mock to handle the fact that CommercetoolsCommerceAgent extends it
       (McpServer as jest.Mock).mockImplementation(function (this: any) {
         this.tool = mockToolMethod;
       });
@@ -738,7 +738,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
           context: {},
         };
 
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -780,7 +780,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
           context: {},
         };
 
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -810,7 +810,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
           },
         };
 
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -841,7 +841,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
           },
         };
 
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -893,7 +893,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
           context: {},
         };
 
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -933,7 +933,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
           },
         };
 
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
@@ -973,7 +973,7 @@ describe('CommercetoolsAgentEssentials (ModelContextProtocol)', () => {
           },
         };
 
-        await CommercetoolsAgentEssentials.create({
+        await CommercetoolsCommerceAgent.create({
           authConfig: {
             clientId: 'id',
             clientSecret: 'secret',
