@@ -1,15 +1,5 @@
 > [!IMPORTANT]
-> License and Scope of Use for Commerce MCP
-
-Commerce MCP is provided under a dual-tier usage model based on the highly permissive MIT License with specific limitations on commercial use.
-
-Permitted Use
-Access to and use of Commerce MCP is governed by the following terms:
-Non-Commercial Use (No Charge): The use of Commerce MCP is permitted for development, evaluation, and testing purposes at no charge. This non-commercial use is subject to a hard cap of 1,000,000 (one million) total tool invocations.
-Commercial/Production Use (Required License): Any use of Commerce MCP in a production environment or for any other commercial purpose requires a paid license or subscription.
-
-License Enforcement
-While the underlying code adheres to the principles of the MIT License, the terms above constitute the binding agreement for utilizing Commerce MCP. commercetools reserves the right to review how customers are using Commerce MCP and to restrict or terminate access for unlicensed production use or for any non-commercial use that exceeds the stated 1,000,000 invocation limit.
+> Commerce MCP is provided free of charge as an early access service. Our Service Level Agreement do not apply to Commerce MCP, and it is provided on an "as-is" basis.
 
 # commercetools Commerce MCP
 
