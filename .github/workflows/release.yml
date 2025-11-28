@@ -42,10 +42,10 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Build - TypeScript
-        run: pnpm --filter @commercetools/agent-essentials run build
+        run: pnpm --filter @commercetools/commerce-agent run build
 
       - name: Build - Model Context Protocol
-        run: pnpm --filter @commercetools/mcp-essentials run build
+        run: pnpm --filter @commercetools/commerce-mcp run build
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets

@@ -1,10 +1,10 @@
 /* eslint-disable no-new */
 import {randomUUID} from 'node:crypto';
 import express, {Express, Request, Response} from 'express';
-import CommercetoolsAgentEssentialsStreamable from '../streamable';
+import CommercetoolsCommerceAgentStreamable from '../streamable';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
-import {CommercetoolsAgentEssentials} from '../../modelcontextprotocol';
+import {CommercetoolsCommerceAgent} from '../../modelcontextprotocol';
 
 jest.mock('node:crypto', () => ({
   randomUUID: jest.fn(),
@@ -32,12 +32,12 @@ jest.mock('@modelcontextprotocol/sdk/types.js', () => ({
 }));
 
 jest.mock('../../modelcontextprotocol', () => ({
-  CommercetoolsAgentEssentials: {
+  CommercetoolsCommerceAgent: {
     create: jest.fn(),
   },
 }));
 
-describe('CommercetoolsAgentEssentialsStreamable', () => {
+describe('CommercetoolsCommerceAgentStreamable', () => {
   let mockApp: any;
   let mockServer: jest.MockedFunction<() => Promise<any>>;
   let mockCommercetoolsServer: any;
@@ -85,7 +85,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
       () => mockTransport
     );
 
-    (CommercetoolsAgentEssentials.create as jest.Mock).mockResolvedValue(
+    (CommercetoolsCommerceAgent.create as jest.Mock).mockResolvedValue(
       mockCommercetoolsServer
     );
 
@@ -94,7 +94,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
 
   describe('Constructor', () => {
     test('should initialize with default express app when none provided', () => {
-      new CommercetoolsAgentEssentialsStreamable({
+      new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -108,7 +108,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
 
     test('should use provided express app', () => {
       const customApp = {...mockApp};
-      new CommercetoolsAgentEssentialsStreamable({
+      new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -120,7 +120,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
     });
 
     test('should setup middleware and routes', () => {
-      new CommercetoolsAgentEssentialsStreamable({
+      new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -133,13 +133,13 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
   });
 
   describe('POST /mcp endpoint - Stateless mode (default)', () => {
-    let instance: CommercetoolsAgentEssentialsStreamable;
+    let instance: CommercetoolsCommerceAgentStreamable;
     let postHandler: (req: any, res: any) => void;
     let mockReq: Partial<Request>;
     let mockRes: Partial<Response>;
 
     beforeEach(() => {
-      instance = new CommercetoolsAgentEssentialsStreamable({
+      instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -236,13 +236,13 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
   });
 
   describe('POST /mcp endpoint - Stateful mode', () => {
-    let instance: CommercetoolsAgentEssentialsStreamable;
+    let instance: CommercetoolsCommerceAgentStreamable;
     let postHandler: (req: any, res: any) => void;
     let mockReq: Partial<Request>;
     let mockRes: Partial<Response>;
 
     beforeEach(() => {
-      instance = new CommercetoolsAgentEssentialsStreamable({
+      instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -288,7 +288,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
     });
 
     test('should use randomUUID when sessionIdGenerator not provided', async () => {
-      instance = new CommercetoolsAgentEssentialsStreamable({
+      instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -359,7 +359,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
 
   describe('getServer method (private)', () => {
     test('should return provided server', async () => {
-      const instance = new CommercetoolsAgentEssentialsStreamable({
+      const instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -375,7 +375,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
       const _mockServer = jest
         .fn()
         .mockImplementation((sessionId: string) => mockServer);
-      const instance = new CommercetoolsAgentEssentialsStreamable({
+      const instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: _mockServer,
@@ -389,7 +389,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
     });
 
     test('should return provided server with session ID', async () => {
-      const instance = new CommercetoolsAgentEssentialsStreamable({
+      const instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -402,7 +402,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
     });
 
     test('should create server when not provided', async () => {
-      const instance = new CommercetoolsAgentEssentialsStreamable({
+      const instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         stateless: false,
@@ -410,7 +410,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
 
       const result = await (instance as any).getServer('session-123');
 
-      expect(CommercetoolsAgentEssentials.create).toHaveBeenCalledWith({
+      expect(CommercetoolsCommerceAgent.create).toHaveBeenCalledWith({
         authConfig: mockAuthConfig,
         configuration: {
           ...mockConfiguration,
@@ -425,7 +425,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
     });
 
     test('should create server with stateless mode', async () => {
-      const instance = new CommercetoolsAgentEssentialsStreamable({
+      const instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         stateless: true,
@@ -433,7 +433,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
 
       const result = await (instance as any).getServer();
 
-      expect(CommercetoolsAgentEssentials.create).toHaveBeenCalledWith({
+      expect(CommercetoolsCommerceAgent.create).toHaveBeenCalledWith({
         authConfig: mockAuthConfig,
         configuration: {
           ...mockConfiguration,
@@ -450,7 +450,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
 
   describe('listen method', () => {
     test('should call app.listen with port and callback', () => {
-      const instance = new CommercetoolsAgentEssentialsStreamable({
+      const instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -463,7 +463,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
     });
 
     test('should call app.listen with port only', () => {
-      const instance = new CommercetoolsAgentEssentialsStreamable({
+      const instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -477,7 +477,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
 
   describe('GET /mcp endpoint', () => {
     test('should register GET endpoint', () => {
-      new CommercetoolsAgentEssentialsStreamable({
+      new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -491,7 +491,7 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
     });
 
     test('should handle GET requests (noop)', async () => {
-      new CommercetoolsAgentEssentialsStreamable({
+      new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
@@ -507,11 +507,11 @@ describe('CommercetoolsAgentEssentialsStreamable', () => {
   });
 
   describe('Authorization token handling', () => {
-    let instance: CommercetoolsAgentEssentialsStreamable;
+    let instance: CommercetoolsCommerceAgentStreamable;
     let postHandler: (req: any, res: any) => void;
 
     beforeEach(() => {
-      instance = new CommercetoolsAgentEssentialsStreamable({
+      instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: {...mockAuthConfig, accessToken: 'original-token'},
         configuration: mockConfiguration,
         server: mockServer,

@@ -65,7 +65,7 @@ class CommercetoolsAPI {
       .withConcurrentModificationMiddleware()
       .withCorrelationIdMiddleware()
       .withUserAgentMiddleware({
-        libraryName: 'mcp-essentials',
+        libraryName: 'commerce-mcp',
         libraryVersion: pkg.version,
       })
       .withLoggerMiddleware({
@@ -134,7 +134,7 @@ class CommercetoolsAPI {
   private getAuthClient(): Client {
     return new ClientBuilder()
       .withUserAgentMiddleware({
-        libraryName: 'mcp-essentials',
+        libraryName: 'commerce-mcp',
         libraryVersion: pkg.version,
       })
       .withHttpMiddleware({

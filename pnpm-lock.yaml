@@ -14,7 +14,7 @@ importers:
       '@changesets/cli':
         specifier: ^2.29.4
         version: 2.29.6(@types/node@24.3.0)
-      '@commercetools/agent-essentials':
+      '@commercetools/commerce-agent':
         specifier: workspace:*
         version: link:typescript
       '@commercetools/platform-sdk':
@@ -29,7 +29,7 @@ importers:
 
   modelcontextprotocol:
     dependencies:
-      '@commercetools/agent-essentials':
+      '@commercetools/commerce-agent':
         specifier: workspace:*
         version: link:../typescript
       '@modelcontextprotocol/sdk':
@@ -1665,6 +1665,7 @@ packages:
   '@smithy/core@3.18.4':
     resolution: {integrity: sha512-o5tMqPZILBvvROfC8vC+dSVnWJl9a0u9ax1i1+Bq8515eYjUJqqk5XjjEsDLoeL5dSqGSh6WGdVx1eJ1E/Nwhw==}
     engines: {node: '>=18.0.0'}
+    deprecated: Please upgrade your lockfile to use the latest 3.x version of @smithy/core for various fixes, see https://github.com/smithy-lang/smithy-typescript/blob/main/packages/core/CHANGELOG.md
 
   '@smithy/credential-provider-imds@4.2.5':
     resolution: {integrity: sha512-BZwotjoZWn9+36nimwm/OLIcVe+KYRwzMjfhd4QT7QxPm9WY0HiOV8t/Wlh+HVUif0SBVV7ksq8//hPaBC/okQ==}
@@ -3669,7 +3670,6 @@ packages:
 
   libsql@0.4.7:
     resolution: {integrity: sha512-T9eIRCs6b0J1SHKYIvD8+KCJMcWZ900iZyxdnSCdqxN12Z1ijzT+jY5nrk72Jw4B0HGzms2NgpryArlJqvc3Lw==}
-    cpu: [x64, arm64, wasm32]
     os: [darwin, linux, win32]
 
   lilconfig@3.1.3:

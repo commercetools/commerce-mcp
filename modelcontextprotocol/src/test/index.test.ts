@@ -1,12 +1,12 @@
 import {ACCEPTED_TOOLS, parseArgs} from '../index';
 import {
-  CommercetoolsAgentEssentials,
+  CommercetoolsCommerceAgent,
   Configuration,
   AvailableNamespaces,
-} from '@commercetools/agent-essentials/modelcontextprotocol';
+} from '@commercetools/commerce-agent/modelcontextprotocol';
 
-// Mock the CommercetoolsAgentEssentials and transport
-jest.mock('@commercetools/agent-essentials/modelcontextprotocol');
+// Mock the CommercetoolsCommerceAgent and transport
+jest.mock('@commercetools/commerce-agent/modelcontextprotocol');
 jest.mock('@modelcontextprotocol/sdk/server/stdio.js');
 
 describe('parseArgs function', () => {
@@ -360,13 +360,13 @@ describe('parseArgs function', () => {
     });
 
     it('should build configuration with only read operations for all.read', () => {
-      // Mock the CommercetoolsAgentEssentials constructor
-      const mockCommercetoolsAgentEssentials = jest.mocked(
-        CommercetoolsAgentEssentials
+      // Mock the CommercetoolsCommerceAgent constructor
+      const mockCommercetoolsCommerceAgent = jest.mocked(
+        CommercetoolsCommerceAgent
       );
       let capturedConfiguration: Configuration;
 
-      mockCommercetoolsAgentEssentials.create.mockImplementation(
+      mockCommercetoolsCommerceAgent.create.mockImplementation(
         (options: any) => {
           capturedConfiguration = options.configuration;
           return {

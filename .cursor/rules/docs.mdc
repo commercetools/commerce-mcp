@@ -4,7 +4,7 @@ globs:
 alwaysApply: false
 ---
 
-# Creating a New namespace tool Function in @commercetools/agent-essentials
+# Creating a New namespace tool Function in @commercetools/commerce-agent
 
 # Updating the README.md file in the project root with the newly added feature or namespaces
 

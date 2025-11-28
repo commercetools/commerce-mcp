@@ -2,7 +2,7 @@ import {randomUUID} from 'node:crypto';
 import express from 'express';
 import {
   AuthConfig,
-  CommercetoolsAgentEssentials,
+  CommercetoolsCommerceAgent,
   Configuration,
 } from '../modelcontextprotocol';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -10,10 +10,10 @@ import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
 import {IApp, IStreamServerOptions} from '../types/configuration';
 import {ExistingTokenAuth as E} from '../types/auth';
 
-export default class CommercetoolsAgentEssentialsStreamable {
+export default class CommercetoolsCommerceAgentStreamable {
   private app: IApp;
   private authConfig: AuthConfig;
-  private server: (sessionId?: string) => Promise<CommercetoolsAgentEssentials>;
+  private server: (sessionId?: string) => Promise<CommercetoolsCommerceAgent>;
   private transports: {[sessionId: string]: StreamableHTTPServerTransport} = {};
   private stateless: boolean;
 
@@ -142,9 +142,9 @@ export default class CommercetoolsAgentEssentialsStreamable {
   }
 
   // eslint-disable-next-line require-await
-  private async getServer(id?: string): Promise<CommercetoolsAgentEssentials> {
+  private async getServer(id?: string): Promise<CommercetoolsCommerceAgent> {
     if (this.server) return this.server(id);
-    return CommercetoolsAgentEssentials.create({
+    return CommercetoolsCommerceAgent.create({
       authConfig: this.authConfig,
       configuration: {
         ...this.configuration,

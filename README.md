@@ -13,9 +13,9 @@ Access to and use of Commerce MCP is governed by the following terms:
 
 While the underlying code adheres to the principles of the MIT License, the terms above constitute the binding agreement for utilizing Commerce MCP. commercetools reserves the right to review how customers are using Commerce MCP and to restrict or terminate access for unlicensed production use or for any non-commercial use that exceeds the stated 1,000,000 invocation limit.
 
-# commercetools MCP Essentials
+# commercetools Commerce MCP
 
-This repository contains both a MCP server (which you can integrate with many MCP clients) and agent essentials that can be used from within agent frameworks.
+This repository contains both an MCP server (which you can integrate with many MCP clients) and commerce agent that can be used from within agent frameworks.
 
 # commercetools Model Context Protocol
 
@@ -27,29 +27,29 @@ To run the commercetools MCP server using npx, use the following command:
 
 ```bash
 # To set up all available tools (authType is optional, defaults to client_credentials)
-npx -y @commercetools/mcp-essentials --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 # Explicitly specify client_credentials (optional)
-npx -y @commercetools/mcp-essentials --tools=all --authType=client_credentials --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --authType=client_credentials --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 # To set up all read-only tools
-npx -y @commercetools/mcp-essentials --tools=all.read --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all.read --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 ```
 
 ```bash
 # To set up specific tools
-npx -y @commercetools/mcp-essentials --tools=products.read,products.create --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=products.read,products.create --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 ### Access Token Authentication
 
 ```bash
 # To set up all available tools with access token
-npx -y @commercetools/mcp-essentials --tools=all --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 # To set up all read-only tools with access token
-npx -y @commercetools/mcp-essentials --tools=all.read --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all.read --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 Make sure to replace `CLIENT_ID`, `CLIENT_SECRET`, `PROJECT_KEY`, `AUTH_URL`, `API_URL`, and `ACCESS_TOKEN` with your actual values. If using the customerId parameter, replace `CUSTOMER_ID` with the actual customer ID. Alternatively, you could set the API_KEY in your environment variables.
@@ -76,7 +76,7 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
       "command": "npx",
       "args": [
         "-y",
-        "@commercetools/mcp-essentials@latest",
+        "@commercetools/commerce-mcp@latest",
         "--tools=all",
         "--clientId=CLIENT_ID",
         "--clientSecret=CLIENT_SECRET",
@@ -101,7 +101,7 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
       "command": "npx",
       "args": [
         "-y",
-        "@commercetools/mcp-essentials@latest",
+        "@commercetools/commerce-mcp@latest",
         "--tools=all",
         "--authType=auth_token",
         "--accessToken=ACCESS_TOKEN",
@@ -245,14 +245,14 @@ You can configure the dynamic tool loading threshold in two ways:
 #### Command Line Argument
 
 ```bash
-npx -y @commercetools/mcp-essentials --tools=all --dynamicToolLoadingThreshold=50 --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --dynamicToolLoadingThreshold=50 --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 #### Environment Variable
 
 ```bash
 export DYNAMIC_TOOL_LOADING_THRESHOLD=50
-npx -y @commercetools/mcp-essentials --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 ### Example with Claude Desktop
@@ -264,7 +264,7 @@ npx -y @commercetools/mcp-essentials --tools=all --clientId=CLIENT_ID --clientSe
       "command": "npx",
       "args": [
         "-y",
-        "@commercetools/mcp-essentials@latest",
+        "@commercetools/commerce-mcp@latest",
         "--tools=all",
         "--clientId=CLIENT_ID",
         "--clientSecret=CLIENT_SECRET",
@@ -278,9 +278,9 @@ npx -y @commercetools/mcp-essentials --tools=all --clientId=CLIENT_ID --clientSe
 }
 ```
 
-# MCP Essentials
+# Commerce MCP
 
-The commercetools MCP Essentials enables popular agent frameworks including LangChain, Vercel's AI SDK, and Model Context Protocol (MCP) to integrate with APIs through function calling. The library is not exhaustive of the entire commercetools API. It includes support for TypeScript and is built directly on top of the [Node][node-sdk] SDK.
+The commercetools Commerce MCP enables popular agent frameworks including LangChain, Vercel's AI SDK, and Model Context Protocol (MCP) to integrate with APIs through function calling. The library is not exhaustive of the entire commercetools API. It includes support for TypeScript and is built directly on top of the [Node][node-sdk] SDK.
 
 Included below are basic instructions, but refer to the [TypeScript](/typescript) package for more information.
 
@@ -292,7 +292,7 @@ You don't need this source code unless you want to modify the package. If you ju
 want to use the package run:
 
 ```
-npm install @commercetools/agent-essentials
+npm install @commercetools/commerce-agent
 ```
 
 #### Requirements
@@ -302,15 +302,15 @@ npm install @commercetools/agent-essentials
 ### Usage
 
 The library needs to be configured with your commercetools project credentials which are available in your [Merchant center](https://docs.commercetools.com/getting-started/create-api-client).
-**Important**: Ensure that the API client credentials have the necessary scopes aligned with the actions you configure in the agent essentials. For example, if you configure `products: { read: true }`, your API client must have the `view_products` scope.
-Additionally, `configuration` enables you to specify the types of actions that can be taken using the agent essentials.
+**Important**: Ensure that the API client credentials have the necessary scopes aligned with the actions you configure in the commerce agent. For example, if you configure `products: { read: true }`, your API client must have the `view_products` scope.
+Additionally, `configuration` enables you to specify the types of actions that can be taken using the commerce agent.
 
 ### Client Credentials Authentication (Default)
 
 ```typescript
-import { CommercetoolsAgentEssentials } from "@commercetools/agent-essentials/langchain";
+import { CommercetoolsCommerceAgent } from "@commercetools/commerce-agent/langchain";
 
-const commercetoolsAgentEssentials = await CommercetoolsAgentEssentials.create({
+const commercetoolsCommerceAgent = await CommercetoolsCommerceAgent.create({
   authConfig: {
     type: 'client_credentials',
     clientId: process.env.CLIENT_ID!,,
@@ -337,9 +337,9 @@ const commercetoolsAgentEssentials = await CommercetoolsAgentEssentials.create({
 ### Access Token Authentication
 
 ```typescript
-import { CommercetoolsAgentEssentials } from "@commercetools/agent-essentials/langchain";
+import { CommercetoolsCommerceAgent } from "@commercetools/commerce-agent/langchain";
 
-const commercetoolsAgentEssentials = await CommercetoolsAgentEssentials.create({
+const commercetoolsCommerceAgent = await CommercetoolsCommerceAgent.create({
   authConfig: {
     type: "auth_token",
     accessToken: process.env.ACCESS_TOKEN!,
@@ -364,12 +364,12 @@ const commercetoolsAgentEssentials = await CommercetoolsAgentEssentials.create({
 
 #### Tools
 
-The agent essentials work with LangChain and Vercel's AI SDK and can be passed as a list of tools. For example:
+The commerce agent works with LangChain and Vercel's AI SDK and can be passed as a list of tools. For example:
 
 ```typescript
 import { AgentExecutor, createStructuredChatAgent } from "langchain/agents";
 
-const tools = commercetoolsAgentEssentials.getTools();
+const tools = commercetoolsCommerceAgent.getTools();
 
 const agent = await createStructuredChatAgent({
   llm,
@@ -385,13 +385,13 @@ const agentExecutor = new AgentExecutor({
 
 ## Model Context Protocol
 
-The commercetools MCP Essentials also supports setting up your own MCP server. For example:
+The commercetools Commerce MCP also supports setting up your own MCP server. For example:
 
 ```typescript
-import { CommercetoolsAgentEssentials } from "@commercetools/agent-essentials/modelcontextprotocol";
+import { CommercetoolsCommerceAgent } from "@commercetools/commerce-agent/modelcontextprotocol";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
-const server = await CommercetoolsAgentEssentials.create({
+const server = await CommercetoolsCommerceAgent.create({
   authConfig: {
     type: 'client_credentials',
     clientId: process.env.CLIENT_ID!,,
@@ -431,20 +431,20 @@ main().catch((error) => {
 Returns the current set of available tools that can be used with LangChain, AI SDK, or other agent frameworks:
 
 ```typescript
-const tools = commercetoolsAgentEssentials.getTools();
+const tools = commercetoolsCommerceAgent.getTools();
 ```
 
 #### Custom Tools
 
-The self managed `@commercetools/agent-essentials` includes supports for custom tools. A list of custom tools implementations can be passed over and registered at runtime by the bootstrapping MCP server. This is especially useful when the intended tool is not yet implemented into the MCP essentials or to give users complete control and customization of their tools behaviour and how it interact with the underlying LLM.
+The self managed `@commercetools/commerce-agent` includes supports for custom tools. A list of custom tools implementations can be passed over and registered at runtime by the bootstrapping MCP server. This is especially useful when the intended tool is not yet implemented into the Commerce MCP or to give users complete control and customization of their tools behaviour and how it interact with the underlying LLM.
 
 usage
 
 ```typescript
-import { CommercetoolsAgentEssentials } from "@commercetools/agent-essentials/modelcontextprotocol";
+import { CommercetoolsCommerceAgent } from "@commercetools/commerce-agent/modelcontextprotocol";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
-const server = await CommercetoolsAgentEssentials.create({
+const server = await CommercetoolsCommerceAgent.create({
   authConfig: {...},
   configuration: {
     customTools: [
@@ -479,10 +479,10 @@ const server = await CommercetoolsAgentEssentials.create({
 
 ### Streamable HTTP MCP server
 
-As of version `v2.0.0` of the `@commercetools/mcp-essentials` MCP server now supports Streamable HTTP (remote) server.
+As of version `v2.0.0` of the `@commercetools/commerce-mcp` MCP server now supports Streamable HTTP (remote) server.
 
 ```typescript
-npx -y @commercetools/mcp-essentials \
+npx -y @commercetools/commerce-mcp \
   --tools=all \
   --authType=client_credentials \
   --clientId=CLIENT_ID \
@@ -508,19 +508,19 @@ You can connect to the running remote server using Claude by specifying the belo
 }
 ```
 
-You can also use the Streamable HTTP server with the Agent Essentials like an SDK and develop on it.
+You can also use the Streamable HTTP server with the Commerce Agent like an SDK and develop on it.
 
 ```typescript
 import express from "express";
 import {
-  CommercetoolsAgentEssentials,
-  CommercetoolsAgentEssentialsStreamable,
-} from "@commercetools/agent-essentials/modelcontextprotocol";
+  CommercetoolsCommerceAgent,
+  CommercetoolsCommerceAgentStreamable,
+} from "@commercetools/commerce-agent/modelcontextprotocol";
 
 const expressApp = express();
 
 const getAgentServer = async () => {
-  return CommercetoolsAgentEssentials.create({
+  return CommercetoolsCommerceAgent.create({
     authConfig: {
       type: "client_credentials",
       clientId: process.env.CLIENT_ID!,
@@ -544,7 +544,7 @@ const getAgentServer = async () => {
   });
 };
 
-const serverStreamable = new CommercetoolsAgentEssentialsStreamable({
+const serverStreamable = new CommercetoolsCommerceAgentStreamable({
   stateless: false, // make the MCP server stateless/stateful
   server: getAgentServer,
   app: expressApp, // optional express app instance
@@ -558,15 +558,15 @@ serverStreamable.listen(8888, function () {
 });
 ```
 
-Without using the `CommercetoolsAgentEssentials`, you can directly use only the `CommercetoolsAgentEssentialsStreamable` class and the agent server will be bootstrapped internally.
+Without using the `CommercetoolsCommerceAgent`, you can directly use only the `CommercetoolsCommerceAgentStreamable` class and the agent server will be bootstrapped internally.
 
 ```typescript
-import { CommercetoolsAgentEssentialsStreamable } from "@commercetools/agent-essentials/modelcontextprotocol";
+import { CommercetoolsCommerceAgentStreamable } from "@commercetools/commerce-agent/modelcontextprotocol";
 import express from "express";
 
 const expressApp = express();
 
-const server = new CommercetoolsAgentEssentialsStreamable({
+const server = new CommercetoolsCommerceAgentStreamable({
   authConfig: {
     type: "client_credentials",
     clientId: process.env.CLIENT_ID!,

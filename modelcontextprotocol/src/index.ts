@@ -3,10 +3,10 @@
 import {
   Configuration,
   AvailableNamespaces,
-  CommercetoolsAgentEssentials,
-  CommercetoolsAgentEssentialsStreamable,
+  CommercetoolsCommerceAgent,
+  CommercetoolsCommerceAgentStreamable,
   AuthConfig,
-} from '@commercetools/agent-essentials/modelcontextprotocol';
+} from '@commercetools/commerce-agent/modelcontextprotocol';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {red, yellow} from 'colors';
 
@@ -365,7 +365,7 @@ export async function main() {
   });
   const {options, env} = parseArgs(process.argv.slice(2));
 
-  // Create the CommercetoolsAgentEssentials instance
+  // Create the CommercetoolsCommerceAgent instance
   const selectedTools = options.tools!;
   const configuration: Configuration = {
     actions: {},
@@ -423,14 +423,14 @@ export async function main() {
 
   // eslint-disable-next-line require-await
   async function getServer() {
-    return CommercetoolsAgentEssentials.create({
+    return CommercetoolsCommerceAgent.create({
       authConfig,
       configuration,
     });
   }
 
   if (env.remote) {
-    const streamServer = new CommercetoolsAgentEssentialsStreamable({
+    const streamServer = new CommercetoolsCommerceAgentStreamable({
       authConfig,
       configuration,
       stateless: env.stateless,

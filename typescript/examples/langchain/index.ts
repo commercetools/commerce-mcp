@@ -1,4 +1,4 @@
-import {CommercetoolsAgentEssentials} from '../../src/langchain/index';
+import {CommercetoolsCommerceAgent} from '../../src/langchain/index';
 import {ChatOpenAI} from '@langchain/openai';
 import type {ChatPromptTemplate} from '@langchain/core/prompts';
 import {pull} from 'langchain/hub';
@@ -12,7 +12,7 @@ const llm = new ChatOpenAI({
   temperature: 0,
 });
 
-const CommercetoolsAgentEssentials = new CommercetoolsAgentEssentials({
+const commercetoolsCommerceAgent = new CommercetoolsCommerceAgent({
   clientId: process.env.CLIENT_ID!,
   clientSecret: process.env.CLIENT_SECRET!,
   authUrl: process.env.AUTH_URL!,
@@ -42,7 +42,7 @@ const CommercetoolsAgentEssentials = new CommercetoolsAgentEssentials({
     'hwchase17/structured-chat-agent'
   );
 
-  const tools = CommercetoolsAgentEssentials.getTools();
+  const tools = commercetoolsCommerceAgent.getTools();
 
   const agent = await createStructuredChatAgent({
     llm,
