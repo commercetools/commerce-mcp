@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "commercetools/mcp-essentials"
+      "repo": "commercetools/commerce-mcp"
     }
   ],
   "commit": false,
