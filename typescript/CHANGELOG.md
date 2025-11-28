@@ -1,5 +1,11 @@
 # @commercetools/commerce-agent
 
+## 1.0.0
+
+### Major Changes
+
+- [#5](https://github.com/commercetools/commerce-mcp/pull/5) [`9440a1b`](https://github.com/commercetools/commerce-mcp/commit/9440a1b243ded7a418861269dd5ca8e81a77acc9) Thanks [@Trackerchum](https://github.com/Trackerchum)! - First stable major release
+
 ## 0.0.1
 
 ### Patch Changes
