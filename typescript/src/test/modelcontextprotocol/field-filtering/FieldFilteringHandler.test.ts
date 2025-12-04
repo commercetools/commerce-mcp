@@ -555,37 +555,372 @@ describe(FieldFilteringHandler.name, () => {
   });
 
   describe('filterUrlFields', () => {
+    //TODO refactor all props to say filter, not redact
     describe(':type=filter', () => {
       test('filters paths specified and no other properties without case sensitivity', () => {
-        // TODO
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          paths: [
+            {value: 'pathToRedact', caseSensitive: false, type: 'filter'},
+            {
+              value: 'myObject.nestedObject.nestedPathToRedact',
+              caseSensitive: false,
+              type: 'filter',
+            },
+          ],
+        };
+
+        const query = {
+          pathToRedact: 'myPassword',
+          pathToredact: 'caseSensitivityCheck',
+          myObject: {
+            pathToNotRedact: 'myCreditCardNumber',
+            nestedObject: {
+              nestedPathToRedact: 'myHomeAddress', //
+              pathToNotRedact: 'myOtherNestedProperty',
+            },
+          },
+          myobject: {
+            nestedobject: {
+              nestedPathToRedact: 'caseSensitivityCheck', //
+            },
+          },
+        };
+
+        const inputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.pathToNotRedact}&` +
+          `myObject%5BnestedObject%5D%5BnestedPathToRedact%5D=${query.myObject.nestedObject.nestedPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToNotRedact}&` +
+          `myobject%5Bnestedobject%5D%5BnestedPathToRedact%5D=${query.myobject.nestedobject.nestedPathToRedact}`;
+
+        const redactedUrl = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterUrlFields(inputUrl);
+
+        const expectedOutputUrl =
+          `https://localhost/page?myObject%5BmyPathToRedact%5D=${query.myObject.pathToNotRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToNotRedact}`;
+
+        expect(redactedUrl).toBe(expectedOutputUrl);
       });
 
       test('filters paths specified and no other properties with case sensitivity', () => {
-        // TODO
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          paths: [
+            {value: 'pathToRedact', caseSensitive: true, type: 'filter'},
+            {
+              value: 'myObject.nestedObject.nestedPathToRedact',
+              caseSensitive: true,
+              type: 'filter',
+            },
+          ],
+        };
+
+        const query = {
+          pathToRedact: 'myPassword',
+          pathToredact: 'caseSensitivityCheck',
+          myObject: {
+            myPathToRedact: 'myCreditCardNumber',
+            nestedObject: {
+              nestedPathToRedact: 'myHomeAddress',
+              pathToRedact: 'myOtherNestedProperty',
+            },
+          },
+          myobject: {
+            nestedobject: {
+              nestedPathToRedact: 'caseSensitivityCheck',
+            },
+          },
+        };
+
+        const inputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BnestedPathToRedact%5D=${query.myObject.nestedObject.nestedPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToRedact%5D=${query.myobject.nestedobject.nestedPathToRedact}`;
+
+        const redactedUrl = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterUrlFields(inputUrl);
+
+        const expectedOutputUrl =
+          `https://localhost/page?pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToRedact%5D=${query.myobject.nestedobject.nestedPathToRedact}`;
+
+        expect(redactedUrl).toBe(expectedOutputUrl);
       });
 
       test('filters all properties specified and no other properties without case sensitivity', () => {
-        // TODO
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          properties: [
+            {value: 'pathToRedact', caseSensitive: false, type: 'filter'},
+            {value: 'nestedPathToRedact', caseSensitive: false, type: 'filter'},
+          ],
+        };
+
+        const query = {
+          pathToRedact: 'myPassword',
+          pathToredact: 'caseSensitivityCheck',
+          myObject: {
+            myPathToRedact: 'myCreditCardNumber',
+            nestedObject: {
+              nestedPathToRedact: 'myHomeAddress',
+              pathToRedact: 'myOtherNestedProperty',
+            },
+          },
+          myobject: {
+            nestedobject: {
+              nestedPathToredact: 'caseSensitivityCheck',
+            },
+          },
+        };
+
+        const inputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BnestedPathToRedact%5D=${query.myObject.nestedObject.nestedPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToredact%5D=${query.myobject.nestedobject.nestedPathToredact}`;
+
+        const redactedUrl = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterUrlFields(inputUrl);
+
+        const expectedOutputUrl = `https://localhost/page?myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}`;
+
+        expect(redactedUrl).toBe(expectedOutputUrl);
       });
 
       test('filters all properties specified and no other properties with case sensitivity', () => {
-        // TODO
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          properties: [
+            {value: 'pathToRedact', caseSensitive: true, type: 'filter'},
+            {value: 'nestedPathToRedact', caseSensitive: true, type: 'filter'},
+          ],
+        };
+
+        const query = {
+          pathToRedact: 'myPassword',
+          pathToredact: 'caseSensitivityCheck',
+          myObject: {
+            myPathToRedact: 'myCreditCardNumber',
+            nestedObject: {
+              nestedPathToRedact: 'myHomeAddress',
+              pathToRedact: 'myOtherNestedProperty',
+            },
+          },
+          myobject: {
+            nestedobject: {
+              nestedPathToredact: 'caseSensitivityCheck',
+            },
+          },
+        };
+
+        const inputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BnestedPathToRedact%5D=${query.myObject.nestedObject.nestedPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToredact%5D=${query.myobject.nestedobject.nestedPathToredact}`;
+
+        const redactedUrl = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterUrlFields(inputUrl);
+
+        const expectedOutputUrl =
+          `https://localhost/page?pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToredact%5D=${query.myobject.nestedobject.nestedPathToredact}`;
+
+        expect(redactedUrl).toBe(expectedOutputUrl);
       });
 
       test('filters all properties specified by other config parameters except paths specified by whitelistPaths without case sensitivity', () => {
-        // TODO
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          includes: [{value: 'redact', caseSensitive: false, type: 'filter'}],
+          whitelistPaths: [
+            {value: 'pathToRedact', caseSensitive: false},
+            {
+              value: 'myObject.nestedObject.pathToRedact',
+              caseSensitive: false,
+            },
+          ],
+        };
+
+        const query = {
+          pathToRedact: 'myPassword',
+          pathToredact: 'caseSensitivityCheck',
+          myObject: {
+            myPathToRedact: 'myCreditCardNumber',
+            nestedObject: {
+              pathToRedact: 'myOtherNestedProperty',
+            },
+          },
+          myobject: {
+            nestedobject: {
+              nestedPathToredact: 'caseSensitivityCheck',
+            },
+          },
+        };
+
+        const inputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToredact%5D=${query.myobject.nestedobject.nestedPathToredact}`;
+
+        const redactedUrl = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterUrlFields(inputUrl);
+
+        const expectedOutputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}`;
+
+        expect(redactedUrl).toBe(expectedOutputUrl);
       });
 
       test('filters all properties specified by other config parameters except paths specified by whitelistPaths with case sensitivity', () => {
-        // TODO
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          includes: [{value: 'redact', caseSensitive: false, type: 'filter'}],
+          whitelistPaths: [
+            {value: 'pathToRedact', caseSensitive: true},
+            {
+              value: 'myObject.nestedObject.pathToRedact',
+              caseSensitive: true,
+            },
+          ],
+        };
+
+        const query = {
+          pathToRedact: 'myPassword',
+          pathToredact: 'caseSensitivityCheck',
+          myObject: {
+            myPathToRedact: 'myCreditCardNumber',
+            nestedObject: {
+              pathToRedact: 'myOtherNestedProperty',
+            },
+          },
+          myobject: {
+            nestedobject: {
+              nestedPathToredact: 'caseSensitivityCheck',
+            },
+          },
+        };
+
+        const inputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToredact%5D=${query.myobject.nestedobject.nestedPathToredact}`;
+
+        const redactedUrl = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterUrlFields(inputUrl);
+
+        const expectedOutputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}`;
+
+        expect(redactedUrl).toBe(expectedOutputUrl);
       });
 
       test('filters all includes specified and no other properties without case sensitivity', () => {
-        // TODO
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          includes: [
+            {value: 'pathToRedact', caseSensitive: false, type: 'filter'},
+            {value: 'NESTED', caseSensitive: false, type: 'filter'},
+          ],
+        };
+
+        const query = {
+          pathToRedact: 'myPassword',
+          pathToredact: 'caseSensitivityCheck',
+          myObject: {
+            myPathNotToRedact: 'myCreditCardNumber',
+            nestedObject: {
+              nestedPathToRedact: 'myHomeAddress',
+              pathToRedact: 'myOtherNestedProperty',
+            },
+          },
+          myobject: {
+            nestedobject: {
+              nestedPathToredact: 'caseSensitivityCheck',
+            },
+          },
+        };
+
+        const inputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathNotToRedact%5D=${query.myObject.myPathNotToRedact}&` +
+          `myObject%5BnestedObject%5D%5BnestedPathToRedact%5D=${query.myObject.nestedObject.nestedPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToredact%5D=${query.myobject.nestedobject.nestedPathToredact}`;
+
+        const redactedUrl = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterUrlFields(inputUrl);
+
+        const expectedOutputUrl = `https://localhost/page?myObject%5BmyPathNotToRedact%5D=${query.myObject.myPathNotToRedact}`;
+
+        expect(redactedUrl).toBe(expectedOutputUrl);
       });
 
       test('filters all includes specified and no other properties with case sensitivity', () => {
-        // TODO
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          includes: [
+            {value: 'pathToRedact', caseSensitive: true, type: 'filter'},
+            {value: 'NESTED', caseSensitive: true, type: 'filter'},
+          ],
+        };
+
+        const query = {
+          pathToRedact: 'myPassword',
+          pathToredact: 'caseSensitivityCheck',
+          myObject: {
+            myPathToRedact: 'myCreditCardNumber',
+            nestedObject: {
+              nestedPathToRedact: 'myHomeAddress',
+              pathToRedact: 'myOtherNestedProperty',
+            },
+          },
+          myobject: {
+            nestedobject: {
+              nestedPathToredact: 'caseSensitivityCheck',
+            },
+          },
+        };
+
+        const inputUrl =
+          `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
+          `pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BnestedPathToRedact%5D=${query.myObject.nestedObject.nestedPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BpathToRedact%5D=${query.myObject.nestedObject.pathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToredact%5D=${query.myobject.nestedobject.nestedPathToredact}`;
+
+        const redactedUrl = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterUrlFields(inputUrl);
+
+        const expectedOutputUrl =
+          `https://localhost/page?pathToredact=${query.pathToredact}&` +
+          `myObject%5BmyPathToRedact%5D=${query.myObject.myPathToRedact}&` +
+          `myObject%5BnestedObject%5D%5BnestedPathToRedact%5D=${query.myObject.nestedObject.nestedPathToRedact}&` +
+          `myobject%5D%5Bnestedobject%5D%5BnestedPathToredact%5D=${query.myobject.nestedobject.nestedPathToredact}`;
+
+        expect(redactedUrl).toBe(expectedOutputUrl);
       });
     });
     describe(':type=redact', () => {
@@ -793,11 +1128,10 @@ describe(FieldFilteringHandler.name, () => {
         const customOverrideRules: FieldFilteringManagerConfig = {
           includes: [{value: 'redact', caseSensitive: false, type: 'redact'}],
           whitelistPaths: [
-            {value: 'pathToRedact', caseSensitive: false, type: 'redact'},
+            {value: 'pathToRedact', caseSensitive: false},
             {
               value: 'myObject.nestedObject.pathToRedact',
               caseSensitive: false,
-              type: 'redact',
             },
           ],
         };
@@ -843,11 +1177,10 @@ describe(FieldFilteringHandler.name, () => {
         const customOverrideRules: FieldFilteringManagerConfig = {
           includes: [{value: 'redact', caseSensitive: false, type: 'redact'}],
           whitelistPaths: [
-            {value: 'pathToRedact', caseSensitive: true, type: 'redact'},
+            {value: 'pathToRedact', caseSensitive: true},
             {
               value: 'myObject.nestedObject.pathToRedact',
               caseSensitive: true,
-              type: 'redact',
             },
           ],
         };

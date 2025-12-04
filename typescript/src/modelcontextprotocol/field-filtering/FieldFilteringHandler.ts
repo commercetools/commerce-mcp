@@ -12,7 +12,7 @@ class FieldFilteringHandler implements FieldFilteringManager {
   redactPaths: FieldFilteringRule[];
   filterProperties: FieldFilteringRule[];
   redactProperties: FieldFilteringRule[];
-  whitelistPaths: FieldFilteringRule[];
+  whitelistPaths: Omit<FieldFilteringRule, 'type'>[];
   filterIncludes: FieldFilteringRule[];
   redactIncludes: FieldFilteringRule[];
   jsonRedactionText: string;
@@ -75,6 +75,7 @@ class FieldFilteringHandler implements FieldFilteringManager {
   }
 
   private filterConditionMet(path: string, type: 'redact' | 'filter'): boolean {
+    // if path is whitelisted, do not filter
     let ruleIsSatisfied = this.testFilterRules(path, this.whitelistPaths);
     if (ruleIsSatisfied) {
       return false;
@@ -111,7 +112,10 @@ class FieldFilteringHandler implements FieldFilteringManager {
   }
 
   // checks regardless of "filter" | "redact"
-  private testFilterRules(path: string, rules: FieldFilteringRule[]): boolean {
+  private testFilterRules(
+    path: string,
+    rules: Omit<FieldFilteringRule, 'type'>[]
+  ): boolean {
     let ruleIsSatisfied = false;
     for (let n = 0; n < rules.length; n++) {
       if (
@@ -129,13 +133,21 @@ class FieldFilteringHandler implements FieldFilteringManager {
   filterUrlFields(inputUrl: string): string {
     const url = new URL(inputUrl);
     const urlParams = new URLSearchParams(url.search);
-    for (let [key] of urlParams.entries()) {
+    console.log('urlParams.entries(): ', urlParams.entries());
+    let keysToDelete: string[] = [];
+    for (let [key, _] of urlParams.entries()) {
       if (
+        this.filterConditionMet(this.urlQueryKeyToObjectPath(key), 'filter')
+      ) {
+        // must be added to an array and deleted after loop for case sensitivity support
+        keysToDelete.push(key);
+      } else if (
         this.filterConditionMet(this.urlQueryKeyToObjectPath(key), 'redact')
       ) {
         urlParams.set(key, this.urlRedactionText);
       }
     }
+    keysToDelete.forEach((key) => urlParams.delete(key));
 
     url.search = urlParams.toString();
 
@@ -165,6 +177,8 @@ class FieldFilteringHandler implements FieldFilteringManager {
           }
         }
       });
+      // console.log('urlQueryKey: ', urlQueryKey);
+      // console.log('objectPath: ', objectPath);
       return objectPath;
     }
   }

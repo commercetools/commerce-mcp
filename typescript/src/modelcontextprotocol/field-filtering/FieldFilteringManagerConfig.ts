@@ -19,7 +19,7 @@ interface FieldFilteringManagerConfig {
   /**
    * An optional array of explicit object paths to properties to retain, overriding all other rules. For example "account.users.passwordHint".
    */
-  whitelistPaths?: FieldFilteringRule[];
+  whitelistPaths?: Omit<FieldFilteringRule, 'type'>[];
   /**
    *  An optional array of strings, all properties containing these strings will be redacted. For example, "password" would redact "password", "oldPassword" if case-insensitive etc...
    */
