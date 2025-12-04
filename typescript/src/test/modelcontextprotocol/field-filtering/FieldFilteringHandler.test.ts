@@ -12,7 +12,488 @@ describe(FieldFilteringHandler.name, () => {
 
   describe('filterFields', () => {
     describe(':type=filter', () => {
-      // TODO
+      test('filters all paths specified and no other properties without case sensitivity', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          paths: [
+            {value: 'pathToFilter', caseSensitive: false, type: 'filter'},
+            {
+              value: 'myObject.myPathToFilter',
+              caseSensitive: false,
+              type: 'filter',
+            },
+            {
+              value: 'myObject.nestedObject.nestedPathToFilter',
+              caseSensitive: false,
+              type: 'filter',
+            },
+          ],
+        };
+
+        const data = {
+          pathToFilter: 'my password',
+          otherProperty: 'some string',
+          myObject: {
+            myPathToFilter: 'my credit card number',
+            otherProperty: 'my other property',
+            nestedObject: {
+              nestedPathToFilter: 'my home address',
+              myOtherNestedProperty: 'my other nested property',
+            },
+          },
+          myobject: {
+            mypathToFilter: 'case sensitivity check',
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.pathToFilter).toBeUndefined();
+        expect(returnedData.myObject.myPathToFilter).toBeUndefined();
+        expect(
+          returnedData.myObject.nestedObject.nestedPathToFilter
+        ).toBeUndefined();
+        expect(returnedData.myobject.mypathToFilter).toBeUndefined();
+
+        expect(returnedData.otherProperty).toBe(data.otherProperty);
+        expect(returnedData.myObject.otherProperty).toBe(
+          data.myObject.otherProperty
+        );
+        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+          data.myObject.nestedObject.myOtherNestedProperty
+        );
+      });
+
+      test('filters all paths specified and no other properties with case sensitivity', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          paths: [
+            {value: 'pathToFilter', caseSensitive: true, type: 'filter'},
+            {
+              value: 'myObject.myPathToFilter',
+              caseSensitive: true,
+              type: 'filter',
+            },
+            {
+              value: 'myObject.nestedObject.nestedPathToFilter',
+              caseSensitive: true,
+              type: 'filter',
+            },
+          ],
+        };
+
+        const data = {
+          pathToFilter: 'my password',
+          otherProperty: 'some string',
+          myObject: {
+            myPathToFilter: 'my credit card number',
+            otherProperty: 'my other property',
+            nestedObject: {
+              nestedPathToFilter: 'my home address',
+              myOtherNestedProperty: 'my other nested property',
+            },
+          },
+          myobject: {
+            mypathToFilter: 'case sensitivity check',
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.pathToFilter).toBeUndefined();
+        expect(returnedData.myObject.myPathToFilter).toBeUndefined();
+        expect(
+          returnedData.myObject.nestedObject.nestedPathToFilter
+        ).toBeUndefined();
+
+        expect(returnedData.otherProperty).toBe(data.otherProperty);
+        expect(returnedData.myObject.otherProperty).toBe(
+          data.myObject.otherProperty
+        );
+        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+          data.myObject.nestedObject.myOtherNestedProperty
+        );
+        expect(returnedData.myobject.mypathToFilter).toBe(
+          data.myobject.mypathToFilter
+        );
+      });
+
+      test('filters all properties specified and no other properties without case sensitivity', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          properties: [
+            {value: 'myPropertyToFilter', caseSensitive: false, type: 'filter'},
+            {
+              value: 'nestedPropertyToFilter',
+              caseSensitive: false,
+              type: 'filter',
+            },
+          ],
+        };
+
+        const data = {
+          myPropertyToFilter: 'my password',
+          otherProperty: 'some string',
+          myObject: {
+            myPropertyToFilter: 'my credit card number',
+            otherProperty: 'my other property',
+            nestedObject: {
+              nestedPropertyToFilter: 'my home address',
+              myOtherNestedProperty: 'my other nested property',
+            },
+          },
+          myobject: {
+            mypropertytoFilter: 'case sensitivity check',
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.myObject.myPropertyToFilter).toBeUndefined();
+        expect(
+          returnedData.myObject.nestedObject.nestedPropertyToFilter
+        ).toBeUndefined();
+        expect(returnedData.myobject.mypropertytoFilter).toBeUndefined();
+
+        expect(returnedData.otherProperty).toBe(data.otherProperty);
+        expect(returnedData.myObject.otherProperty).toBe(
+          data.myObject.otherProperty
+        );
+        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+          data.myObject.nestedObject.myOtherNestedProperty
+        );
+      });
+
+      test('filters all properties specified and no other properties with case sensitivity', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          properties: [
+            {value: 'myPropertyToFilter', caseSensitive: true, type: 'filter'},
+            {
+              value: 'nestedPropertyToFilter',
+              caseSensitive: true,
+              type: 'filter',
+            },
+          ],
+        };
+
+        const data = {
+          myPropertyToFilter: 'my password',
+          otherProperty: 'some string',
+          myObject: {
+            myPropertyToFilter: 'my credit card number',
+            otherProperty: 'my other property',
+            nestedObject: {
+              nestedPropertyToFilter: 'my home address',
+              myOtherNestedProperty: 'my other nested property',
+            },
+          },
+          myobject: {
+            mypropertytoFilter: 'case sensitivity check',
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.myObject.myPropertyToFilter).toBeUndefined();
+        expect(
+          returnedData.myObject.nestedObject.nestedPropertyToFilter
+        ).toBeUndefined();
+
+        expect(returnedData.otherProperty).toBe(data.otherProperty);
+        expect(returnedData.myObject.otherProperty).toBe(
+          data.myObject.otherProperty
+        );
+        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+          data.myObject.nestedObject.myOtherNestedProperty
+        );
+        expect(returnedData.myobject.mypropertytoFilter).toBe(
+          data.myobject.mypropertytoFilter
+        );
+      });
+
+      test('filters all properties specified by other config parameters except paths specified by whitelistPaths without case sensitivity', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          paths: [
+            {
+              value: 'myObject.nestedObject.nestedPathToFilter',
+              caseSensitive: false,
+              type: 'filter',
+            },
+          ],
+          properties: [
+            {
+              value: 'myPropertyToNotFilter',
+              caseSensitive: false,
+              type: 'filter',
+            },
+          ],
+          whitelistPaths: [
+            {
+              value: 'myObject.myPropertyToNotFilter',
+              caseSensitive: false,
+            },
+          ],
+          includes: [{value: 'Filter', type: 'filter', caseSensitive: false}],
+        };
+
+        const data = {
+          myPropertyToFilter: 'my password',
+          otherProperty: 'some string',
+          myObject: {
+            myPropertyToNotFilter: 'my credit card number',
+            otherProperty: 'my other property',
+            nestedObject: {
+              nestedPropertyToFilter: 'my home address',
+              myOtherNestedProperty: 'my other nested property',
+            },
+          },
+          myobject: {
+            myPropertyToNotfilter: 'case insensitivity check',
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.otherProperty).toBe(data.otherProperty);
+
+        expect(returnedData.myObject.myPropertyToNotFilter).toBe(
+          data.myObject.myPropertyToNotFilter
+        );
+        expect(returnedData.myObject.otherProperty).toBe(
+          data.myObject.otherProperty
+        );
+
+        expect(
+          returnedData.myObject.nestedObject.nestedPropertyToFilter
+        ).toBeUndefined();
+        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+          data.myObject.nestedObject.myOtherNestedProperty
+        );
+
+        expect(returnedData.myobject.myPropertyToNotfilter).toBe(
+          data.myobject.myPropertyToNotfilter
+        );
+      });
+
+      test('filters all properties specified by other config parameters except paths specified by whitelistPaths with case sensitivity', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          paths: [
+            {
+              value: 'myObject.nestedObject.nestedPathToFilter',
+              caseSensitive: true,
+              type: 'filter',
+            },
+          ],
+          properties: [
+            {
+              value: 'myPropertyToNotFilter',
+              caseSensitive: true,
+              type: 'filter',
+            },
+          ],
+          whitelistPaths: [
+            {
+              value: 'myObject.myPropertyToNotFilter',
+              caseSensitive: true,
+            },
+          ],
+          includes: [{value: 'Filter', caseSensitive: true, type: 'filter'}],
+        };
+
+        const data = {
+          myPropertyToFilter: 'my password',
+          otherProperty: 'some string',
+          myObject: {
+            myPropertyToNotFilter: 'my credit card number',
+            otherProperty: 'my other property',
+            nestedObject: {
+              nestedPropertyToFilter: 'my home address',
+              myOtherNestedProperty: 'my other nested property',
+            },
+          },
+          myobject: {
+            myPropertyToNotfilter: 'case sensitivity check',
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.otherProperty).toBe(data.otherProperty);
+
+        expect(returnedData.myObject.myPropertyToNotFilter).toBe(
+          data.myObject.myPropertyToNotFilter
+        );
+        expect(returnedData.myObject.otherProperty).toBe(
+          data.myObject.otherProperty
+        );
+
+        expect(
+          returnedData.myObject.nestedObject.nestedPropertyToFilter
+        ).toBeUndefined();
+        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+          data.myObject.nestedObject.myOtherNestedProperty
+        );
+
+        expect(returnedData.myobject.myPropertyToNotfilter).toBe(
+          data.myobject.myPropertyToNotfilter
+        );
+      });
+
+      test('filters all includes specified for all matching properties and no others, with case sensitivity', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          includes: [
+            {value: 'Filter', caseSensitive: true, type: 'filter'},
+            {value: 'AlsoRed', caseSensitive: true, type: 'filter'},
+          ],
+        };
+
+        const data = {
+          myPropertyToFilter: 'my password',
+          otherProperty: 'some string',
+          myObject: {
+            myPropertyToFilter: 'my credit card number',
+            myPropertyToAlsoRed: 'my email address',
+            otherProperty: 'my other property',
+            nestedObject: {
+              nestedPropertyToFilter: 'my home address',
+              myOtherNestedProperty: 'my other nested property',
+            },
+          },
+          myobject: {
+            myPropertytofilter: 'case sensitivity check',
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.otherProperty).toBe(data.otherProperty);
+
+        expect(returnedData.myObject.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.myObject.myPropertyToAlsoRed).toBeUndefined();
+        expect(returnedData.myObject.otherProperty).toBe(
+          data.myObject.otherProperty
+        );
+
+        expect(
+          returnedData.myObject.nestedObject.nestedPropertyToFilter
+        ).toBeUndefined();
+        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+          data.myObject.nestedObject.myOtherNestedProperty
+        );
+
+        expect(returnedData.myobject.myPropertytofilter).toBe(
+          data.myobject.myPropertytofilter
+        );
+      });
+
+      test('filters all includes specified for all matching properties and no others, without case sensitivity', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          includes: [
+            {value: 'Filter', caseSensitive: false, type: 'filter'},
+            {value: 'alsored', caseSensitive: false, type: 'filter'},
+          ],
+        };
+
+        const data = {
+          myPropertyToFilter: 'my password',
+          otherProperty: 'some string',
+          myObject: {
+            myPropertyToFilter: 'my credit card number',
+            myPropertyToAlsoRed: 'my email address',
+            otherProperty: 'my other property',
+            nestedObject: {
+              nestedPropertyToFilter: 'my home address',
+              myOtherNestedProperty: 'my other nested property',
+            },
+          },
+          myobject: {
+            myPropertytofilter: 'case insensitivity check',
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.myObject.myPropertyToFilter).toBeUndefined();
+        expect(
+          returnedData.myObject.nestedObject.nestedPropertyToFilter
+        ).toBeUndefined();
+        expect(returnedData.myobject.myPropertytofilter).toBeUndefined();
+
+        expect(returnedData.otherProperty).toBe(data.otherProperty);
+        expect(returnedData.myObject.otherProperty).toBe(
+          data.myObject.otherProperty
+        );
+        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+          data.myObject.nestedObject.myOtherNestedProperty
+        );
+      });
+
+      test('filters queries in all url formatted JSON properties by rules passed', () => {
+        const customOverrideRules: FieldFilteringManagerConfig = {
+          includes: [{value: 'Filter', caseSensitive: false, type: 'filter'}],
+        };
+
+        const httpUrl =
+          'http://mywebsite/page/?toFilter=tofilter&' +
+          'prop=myProperty&nestedObject%5BdeeperNestedObject%5D%5BpasswordToFilter%5D=5BpasswordToFilter';
+        const filteredHttpUrl = `http://mywebsite/page/?prop=myProperty`;
+
+        const httpsUrl =
+          'https://someothersite?nestedObject%5BnestedArray%5D%5B1%5D%5BfilterArrayPassword%5D=sometext';
+        const filteredHttpsUrl = `https://someothersite/`;
+
+        const websocketUrl =
+          'ws://somewebsocketurl/?somePropToFilter=2dfg3yuk4d&' +
+          'nestedObject%5BdeeperNestedObject%5D%5BtoFilter%5D=lorem+ipsum';
+        const filteredWebsocketUrl = `ws://somewebsocketurl/`;
+
+        const ftpUrl =
+          'ftp://somewebsocketurl/?somePropToFilter=2dfg3yuk4d&' +
+          'nestedObject%5BdeeperNestedObject%5D%5BtoFilter%5D=lorem+ipsum';
+        const filteredFtpUrl = `ftp://somewebsocketurl/`;
+
+        const data = {
+          httpUrl,
+          myObject: {
+            httpsUrl,
+            nestedObject: {
+              websocketUrl,
+              ftpUrl,
+            },
+          },
+        };
+
+        const returnedData = new FieldFilteringHandler(
+          customOverrideRules
+        ).filterFields(data);
+
+        expect(returnedData.httpUrl).toBe(filteredHttpUrl);
+        expect(returnedData.myObject.httpsUrl).toBe(filteredHttpsUrl);
+        expect(returnedData.myObject.nestedObject.websocketUrl).toBe(
+          filteredWebsocketUrl
+        );
+
+        expect(returnedData.myObject.nestedObject.ftpUrl).toBe(filteredFtpUrl);
+      });
     });
 
     describe(':type=redact', () => {

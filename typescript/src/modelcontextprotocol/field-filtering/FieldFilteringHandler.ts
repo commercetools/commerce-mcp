@@ -42,9 +42,8 @@ class FieldFilteringHandler implements FieldFilteringManager {
     data: T,
     currentPath?: string
   ): T extends number | boolean ? string | T : T {
-    // if should be filtered/redacted, do so regardless of type
+    // if should be redacted, do so regardless of type. Filtered object properties are handled one loop up
     if (this.filterConditionMet(currentPath ?? '', 'redact')) {
-      // TODO FILTER
       return this.jsonRedactionText as any;
     }
     if (typeof data === 'string') {
@@ -56,17 +55,21 @@ class FieldFilteringHandler implements FieldFilteringManager {
     }
 
     if (typeof data === 'object') {
-      // TODO CHECK TO BE FILTERED AND REMOVE/CENSOR
       if (Array.isArray(data)) {
         return data.map((datum) =>
           this.filterFields(datum, currentPath)
         ) as any;
       } else if (data) {
         Object.keys(data).forEach((key) => {
-          (data as any)[key] = this.filterFields(
-            data[key as keyof T],
-            currentPath ? `${currentPath}.${key}` : key
-          );
+          const newPath = currentPath ? `${currentPath}.${key}` : key;
+          if (this.filterConditionMet(newPath, 'filter')) {
+            delete data[key as keyof T];
+          } else {
+            (data as any)[key] = this.filterFields(
+              data[key as keyof T],
+              newPath
+            );
+          }
         });
         return data as any;
       }
@@ -139,7 +142,7 @@ class FieldFilteringHandler implements FieldFilteringManager {
       if (
         this.filterConditionMet(this.urlQueryKeyToObjectPath(key), 'filter')
       ) {
-        // must be added to an array and deleted after loop for case sensitivity support
+        // must be added to an array and deleted after loop for case sensitivity
         keysToDelete.push(key);
       } else if (
         this.filterConditionMet(this.urlQueryKeyToObjectPath(key), 'redact')
