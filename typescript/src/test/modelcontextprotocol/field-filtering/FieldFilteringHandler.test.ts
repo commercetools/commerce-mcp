@@ -10,7 +10,7 @@ describe(FieldFilteringHandler.name, () => {
     jest.resetAllMocks();
   });
 
-  describe('filter', () => {
+  describe('filterFields', () => {
     describe(':type=filter', () => {
       // TODO
     });
@@ -51,7 +51,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.pathToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.myObject.myPathToRedact).toBe(
@@ -108,7 +108,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.pathToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.myObject.myPathToRedact).toBe(
@@ -160,7 +160,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.myObject.myPropertyToRedact).toBe(
@@ -212,7 +212,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.myObject.myPropertyToRedact).toBe(
@@ -278,7 +278,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.otherProperty).toBe(data.otherProperty);
@@ -346,7 +346,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.otherProperty).toBe(data.otherProperty);
@@ -397,7 +397,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.otherProperty).toBe(data.otherProperty);
@@ -451,7 +451,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.myObject.myPropertyToRedact).toBe(
@@ -491,7 +491,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.propertyToRedact).toBe(customJsonRedactionText);
         expect(returnedData.myObject.nestedObject.nestedPropertyToRedact).toBe(
@@ -542,7 +542,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const returnedData = new FieldFilteringHandler(
           customOverrideRules
-        ).filter(data);
+        ).filterFields(data);
 
         expect(returnedData.httpUrl).toBe(redactedHttpUrl);
         expect(returnedData.myObject.httpsUrl).toBe(redactedHttpsUrl);
@@ -554,9 +554,39 @@ describe(FieldFilteringHandler.name, () => {
     });
   });
 
-  describe('filterUrl', () => {
+  describe('filterUrlFields', () => {
     describe(':type=filter', () => {
-      // TODO
+      test('filters paths specified and no other properties without case sensitivity', () => {
+        // TODO
+      });
+
+      test('filters paths specified and no other properties with case sensitivity', () => {
+        // TODO
+      });
+
+      test('filters all properties specified and no other properties without case sensitivity', () => {
+        // TODO
+      });
+
+      test('filters all properties specified and no other properties with case sensitivity', () => {
+        // TODO
+      });
+
+      test('filters all properties specified by other config parameters except paths specified by whitelistPaths without case sensitivity', () => {
+        // TODO
+      });
+
+      test('filters all properties specified by other config parameters except paths specified by whitelistPaths with case sensitivity', () => {
+        // TODO
+      });
+
+      test('filters all includes specified and no other properties without case sensitivity', () => {
+        // TODO
+      });
+
+      test('filters all includes specified and no other properties with case sensitivity', () => {
+        // TODO
+      });
     });
     describe(':type=redact', () => {
       test('redacts paths specified and no other properties without case sensitivity', () => {
@@ -598,7 +628,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${defaultUrlRedactionText}&` +
@@ -650,7 +680,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${defaultUrlRedactionText}&` +
@@ -698,7 +728,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${defaultUrlRedactionText}&` +
@@ -746,7 +776,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${defaultUrlRedactionText}&` +
@@ -797,7 +827,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
@@ -847,7 +877,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${query.pathToRedact}&` +
@@ -894,7 +924,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${defaultUrlRedactionText}&` +
@@ -942,7 +972,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${defaultUrlRedactionText}&` +
@@ -977,7 +1007,7 @@ describe(FieldFilteringHandler.name, () => {
 
         const redactedUrl = new FieldFilteringHandler(
           customOverrideRules
-        ).filterUrl(inputUrl);
+        ).filterUrlFields(inputUrl);
 
         const expectedOutputUrl =
           `https://localhost/page?pathToRedact=${customUrlRedactionText}&` +

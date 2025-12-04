@@ -8,38 +8,49 @@ import {FieldFilteringManagerConfig} from './FieldFilteringManagerConfig';
 import {FieldFilteringRule} from './FieldFilteringRule';
 
 class FieldFilteringHandler implements FieldFilteringManager {
-  paths: FieldFilteringRule[];
-  properties: FieldFilteringRule[];
+  filterPaths: FieldFilteringRule[];
+  redactPaths: FieldFilteringRule[];
+  filterProperties: FieldFilteringRule[];
+  redactProperties: FieldFilteringRule[];
   whitelistPaths: FieldFilteringRule[];
-  includes: FieldFilteringRule[];
+  filterIncludes: FieldFilteringRule[];
+  redactIncludes: FieldFilteringRule[];
   jsonRedactionText: string;
   urlRedactionText: string;
 
   constructor(config: FieldFilteringManagerConfig) {
-    this.paths = config.paths ?? [];
-    this.properties = config.properties ?? [];
+    this.filterPaths =
+      config.paths?.filter((path) => path.type === 'filter') ?? [];
+    this.redactPaths =
+      config.paths?.filter((path) => path.type === 'redact') ?? [];
+    this.filterProperties =
+      config.properties?.filter((path) => path.type === 'filter') ?? [];
+    this.redactProperties =
+      config.properties?.filter((path) => path.type === 'redact') ?? [];
     this.whitelistPaths = config.whitelistPaths ?? [];
-    this.includes = config.includes ?? [];
+    this.filterIncludes =
+      config.includes?.filter((path) => path.type === 'filter') ?? [];
+    this.redactIncludes =
+      config.includes?.filter((path) => path.type === 'redact') ?? [];
+
     this.jsonRedactionText =
       config.jsonRedactionText ?? defaultJsonRedactionText;
     this.urlRedactionText = config.urlRedactionText ?? defaultUrlRedactionText;
   }
 
-  filter<T>(
+  filterFields<T>(
     data: T,
     currentPath?: string
   ): T extends number | boolean ? string | T : T {
-    if (
-      typeof data === 'string' ||
-      typeof data === 'number' ||
-      typeof data === 'boolean' ||
-      typeof data === 'bigint'
-    ) {
-      if (this.shouldRedact(currentPath ?? '')) {
-        return this.jsonRedactionText as any;
-      }
-      if (typeof data === 'string' && isValidUrl(data)) {
-        return this.filterUrl(data) as any;
+    // if should be filtered/redacted, do so regardless of type
+    if (this.filterConditionMet(currentPath ?? '', 'redact')) {
+      // TODO FILTER
+      return this.jsonRedactionText as any;
+    }
+    if (typeof data === 'string') {
+      // if string, check if value is url, is so check the params
+      if (isValidUrl(data)) {
+        return this.filterUrlFields(data) as any;
       }
       return data as any;
     }
@@ -47,10 +58,12 @@ class FieldFilteringHandler implements FieldFilteringManager {
     if (typeof data === 'object') {
       // TODO CHECK TO BE FILTERED AND REMOVE/CENSOR
       if (Array.isArray(data)) {
-        return data.map((datum) => this.filter(datum, currentPath)) as any;
+        return data.map((datum) =>
+          this.filterFields(datum, currentPath)
+        ) as any;
       } else if (data) {
         Object.keys(data).forEach((key) => {
-          (data as any)[key] = this.filter(
+          (data as any)[key] = this.filterFields(
             data[key as keyof T],
             currentPath ? `${currentPath}.${key}` : key
           );
@@ -61,11 +74,65 @@ class FieldFilteringHandler implements FieldFilteringManager {
     return data as any;
   }
 
-  filterUrl(inputUrl: string): string {
+  private filterConditionMet(path: string, type: 'redact' | 'filter'): boolean {
+    let ruleIsSatisfied = this.testFilterRules(path, this.whitelistPaths);
+    if (ruleIsSatisfied) {
+      return false;
+    }
+
+    ruleIsSatisfied = this.testFilterRules(path, this[`${type}Paths`]);
+    if (ruleIsSatisfied) {
+      return true;
+    }
+
+    const properties = path.split('.');
+    const propertyName = properties[properties.length - 1];
+
+    ruleIsSatisfied = this.testFilterRules(
+      propertyName,
+      this[`${type}Properties`]
+    );
+    if (ruleIsSatisfied) {
+      return true;
+    }
+
+    const includes = this[`${type}Includes`];
+    for (let n = 0; n < includes.length; n++) {
+      if (
+        propertyName.includes(includes[n].value) ||
+        (!includes[n].caseSensitive &&
+          propertyName.toLowerCase().includes(includes[n].value.toLowerCase()))
+      ) {
+        n = includes.length;
+        ruleIsSatisfied = true;
+      }
+    }
+    return ruleIsSatisfied;
+  }
+
+  // checks regardless of "filter" | "redact"
+  private testFilterRules(path: string, rules: FieldFilteringRule[]): boolean {
+    let ruleIsSatisfied = false;
+    for (let n = 0; n < rules.length; n++) {
+      if (
+        path === rules[n].value ||
+        (!rules[n].caseSensitive &&
+          path.toLowerCase() === rules[n].value.toLowerCase())
+      ) {
+        n = rules.length;
+        ruleIsSatisfied = true;
+      }
+    }
+    return ruleIsSatisfied;
+  }
+
+  filterUrlFields(inputUrl: string): string {
     const url = new URL(inputUrl);
     const urlParams = new URLSearchParams(url.search);
     for (let [key] of urlParams.entries()) {
-      if (this.shouldRedact(this.urlQueryKeyToObjectPath(key))) {
+      if (
+        this.filterConditionMet(this.urlQueryKeyToObjectPath(key), 'redact')
+      ) {
         urlParams.set(key, this.urlRedactionText);
       }
     }
@@ -100,56 +167,6 @@ class FieldFilteringHandler implements FieldFilteringManager {
       });
       return objectPath;
     }
-  }
-
-  private shouldRedact(path: string): boolean {
-    let ruleIsSatisfied = this.testFilterRules(path, this.whitelistPaths);
-    if (ruleIsSatisfied) {
-      return false;
-    }
-
-    ruleIsSatisfied = this.testFilterRules(path, this.paths);
-    if (ruleIsSatisfied) {
-      return true;
-    }
-
-    const properties = path.split('.');
-    const propertyName = properties[properties.length - 1];
-
-    ruleIsSatisfied = this.testFilterRules(propertyName, this.properties);
-    if (ruleIsSatisfied) {
-      return true;
-    }
-
-    for (let n = 0; n < this.includes.length; n++) {
-      if (
-        propertyName.includes(this.includes[n].value) ||
-        (!this.includes[n].caseSensitive &&
-          propertyName
-            .toLowerCase()
-            .includes(this.includes[n].value.toLowerCase()))
-      ) {
-        n = this.includes.length;
-        ruleIsSatisfied = true;
-      }
-    }
-    return ruleIsSatisfied;
-  }
-
-  // checks regardless of "filter" | "redact"
-  private testFilterRules(path: string, rules: FieldFilteringRule[]): boolean {
-    let ruleIsSatisfied = false;
-    for (let n = 0; n < rules.length; n++) {
-      if (
-        path === rules[n].value ||
-        (!rules[n].caseSensitive &&
-          path.toLowerCase() === rules[n].value.toLowerCase())
-      ) {
-        n = rules.length;
-        ruleIsSatisfied = true;
-      }
-    }
-    return ruleIsSatisfied;
   }
 }
 
