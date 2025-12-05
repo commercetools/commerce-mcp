@@ -13,8 +13,8 @@ type AcceptedQueryTypes = {
   [key: string]: AcceptedQueryValueTypes;
 };
 
-const normaliseUrl = function (url: string): string {
-  let protocolSplit = url.split('//');
+const normaliseUrl = (url: string): string => {
+  const protocolSplit = url.split('//');
   let normalisedUrl = '';
   if (
     protocolSplit[0] &&
@@ -28,7 +28,7 @@ const normaliseUrl = function (url: string): string {
   }
 
   let query = '';
-  let querySplit = protocolSplit.join('//').split('?');
+  const querySplit = protocolSplit.join('//').split('?');
   if (querySplit.length > 1) {
     query = `?${querySplit.slice(1, querySplit.length).join('?')}`;
   }
@@ -44,16 +44,16 @@ const normaliseUrl = function (url: string): string {
   return normalisedUrl + query;
 };
 
-const toQueryObject = function (
+const toQueryObject = (
   key: string,
   value: AcceptedQueryValueTypes
-): AcceptedQueryTypes {
-  let obj: any = {};
+): AcceptedQueryTypes => {
+  const obj: any = {};
   obj[key] = value;
   return obj;
 };
 
-const toQueryString = function (obj: AcceptedQueryTypes): string {
+const toQueryString = (obj: AcceptedQueryTypes): string => {
   return qs.stringify(obj, {
     arrayFormat: 'indices',
     encodeValuesOnly: true,
@@ -61,11 +61,11 @@ const toQueryString = function (obj: AcceptedQueryTypes): string {
   });
 };
 
-const generateQueryString = function (query: AcceptedQueryTypes): string {
+const generateQueryString = (query: AcceptedQueryTypes): string => {
   let queryString = '?';
 
   Object.keys(query).forEach((key) => {
-    let value = query[key];
+    const value = query[key];
     if (value !== undefined && typeof value !== 'function') {
       if (value === null) {
         queryString += `${key}=null&`;
@@ -80,7 +80,7 @@ const generateQueryString = function (query: AcceptedQueryTypes): string {
   return queryString;
 };
 
-const isValidUrl = function (urlLike: string): boolean {
+const isValidUrl = (urlLike: string): boolean => {
   let url: URL;
   try {
     url = new URL(urlLike);

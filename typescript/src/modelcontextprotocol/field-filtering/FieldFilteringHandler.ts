@@ -137,8 +137,8 @@ class FieldFilteringHandler implements FieldFilteringManager {
     const url = new URL(inputUrl);
     const urlParams = new URLSearchParams(url.search);
     console.log('urlParams.entries(): ', urlParams.entries());
-    let keysToDelete: string[] = [];
-    for (let [key, _] of urlParams.entries()) {
+    const keysToDelete: string[] = [];
+    for (const [key, _] of urlParams.entries()) {
       if (
         this.filterConditionMet(this.urlQueryKeyToObjectPath(key), 'filter')
       ) {
@@ -159,7 +159,7 @@ class FieldFilteringHandler implements FieldFilteringManager {
 
   // assumes keys of string only
   private urlQueryKeyToObjectPath(urlQueryKey: string): string {
-    let urlQueryKeyOpenBracketSplit = urlQueryKey.split('[');
+    const urlQueryKeyOpenBracketSplit = urlQueryKey.split('[');
     if (urlQueryKeyOpenBracketSplit.length === 1) {
       return urlQueryKey;
     } else {
@@ -171,17 +171,12 @@ class FieldFilteringHandler implements FieldFilteringManager {
           console.warn(
             `Object in URL params in incorrect format: [${urlQueryKeyOpenBracketSplit[n]}`
           );
-          return;
         } else {
-          if (closeBracketSplit[0].match(/^-?\d+$/)) {
-            return;
-          } else {
+          if (!closeBracketSplit[0].match(/^-?\d+$/)) {
             objectPath += `.${closeBracketSplit[0]}`;
           }
         }
       });
-      // console.log('urlQueryKey: ', urlQueryKey);
-      // console.log('objectPath: ', objectPath);
       return objectPath;
     }
   }
