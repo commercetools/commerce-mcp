@@ -72,7 +72,11 @@ export const createChannelParameters = z.object({
   geoLocation: z
     .object({
       type: z.literal('Point'),
-      coordinates: z.tuple([z.number(), z.number()]),
+      coordinates: z
+        .array(z.number())
+        .min(2)
+        .max(2)
+        .describe('Array of two numbers: [longitude, latitude]'),
     })
     .optional()
     .describe('GeoJSON Point encoding the geo location of the Channel.'),
