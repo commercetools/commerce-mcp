@@ -5,15 +5,15 @@ import {
 import {FieldFilteringRule} from './FieldFilteringRule';
 
 /**
- * The configuration object to be passed to the default RedactionHandler.
+ * The configuration object to be passed to the default FieldFilteringHandler.
  */
 interface FieldFilteringManagerConfig {
   /**
-   * An optional array of explicit object paths to properties to redact. For example "account.users.token".
+   * An optional array of explicit object paths to properties to filter and/or redact. For example "account.users.token".
    */
   paths?: FieldFilteringRule[];
   /**
-   * An optional array of property names to redact at any object depth. For example "token".
+   * An optional array of property names to filter and/or redact at any object depth. For example "token".
    */
   properties?: FieldFilteringRule[];
   /**
@@ -21,7 +21,7 @@ interface FieldFilteringManagerConfig {
    */
   whitelistPaths?: Omit<FieldFilteringRule, 'type'>[];
   /**
-   *  An optional array of strings, all properties containing these strings will be redacted. For example, "password" would redact "password", "oldPassword" if case-insensitive etc...
+   *  An optional array of strings, all properties containing these strings will be filtered and/or redacted. For example, "password" would apply to "password", "oldPassword" if case-insensitive etc...
    */
   includes?: FieldFilteringRule[];
   /**
