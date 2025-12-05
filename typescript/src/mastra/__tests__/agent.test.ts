@@ -126,7 +126,8 @@ describe('CommercetoolsCommerceAgent with Mastra', () => {
       tools[0].method,
       tools[0].description,
       expect.any(Object),
-      toolFormat
+      toolFormat,
+      undefined
     );
     // Detailed check for tool2
     expect(CommercetoolsTool).toHaveBeenCalledWith(
@@ -134,7 +135,8 @@ describe('CommercetoolsCommerceAgent with Mastra', () => {
       tools[1].method,
       tools[1].description,
       expect.any(Object),
-      toolFormat
+      toolFormat,
+      undefined
     );
     // Ensure tool3 was filtered out
     expect(CommercetoolsTool).not.toHaveBeenCalledWith(
@@ -142,7 +144,8 @@ describe('CommercetoolsCommerceAgent with Mastra', () => {
       tools[2].method,
       expect.anything(),
       expect.anything(),
-      toolFormat
+      toolFormat,
+      undefined
     );
 
     expect(Object.keys(commerceAgent.getTools())).toContain('tool1');
