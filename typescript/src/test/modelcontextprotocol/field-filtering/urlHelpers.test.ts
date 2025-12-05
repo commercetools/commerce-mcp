@@ -57,7 +57,7 @@ describe('urlHelpers', () => {
         myFunc: () => {},
       };
       const expectedQueryString = '';
-      //@ts-expect-error
+      // @ts-expect-error
       const queryString = generateQueryString(query);
 
       expect(queryString).toBe(expectedQueryString);
@@ -68,7 +68,7 @@ describe('urlHelpers', () => {
         val: undefined,
       };
       const expectedQueryString = '';
-      //@ts-expect-error
+      // @ts-expect-error
       const queryString = generateQueryString(query);
 
       expect(queryString).toBe(expectedQueryString);
@@ -79,7 +79,7 @@ describe('urlHelpers', () => {
         val: null,
       };
       const expectedQueryString = '?val=null';
-      //@ts-expect-error
+      // @ts-expect-error
       const queryString = generateQueryString(query);
 
       expect(queryString).toBe(expectedQueryString);
