@@ -14,6 +14,11 @@ import {Tool} from '../types/tools';
 import {contextToBulkTools} from '../shared/bulk/tools';
 import {DYNAMIC_TOOL_LOADING_THRESHOLD} from '../shared/constants';
 import {transformToolOutput} from './transform';
+import {
+  FieldFilteringHandler,
+  FieldFilteringManager,
+  isFieldFilteringManager,
+} from './field-filtering';
 
 class CommercetoolsCommerceAgent extends McpServer {
   private authConfig: AuthConfig;
@@ -172,7 +177,21 @@ class CommercetoolsCommerceAgent extends McpServer {
       tool.description,
       tool.parameters.shape,
       async (args: Record<string, unknown>) => {
-        const result = await this.commercetoolsAPI.run(method, args, execute);
+        let result = await this.commercetoolsAPI.run(method, args, execute);
+
+        if (this.configuration.context?.fieldFiltering) {
+          let fieldFilteringHandler!: FieldFilteringManager;
+          if (
+            isFieldFilteringManager(this.configuration.context?.fieldFiltering)
+          ) {
+            fieldFilteringHandler = this.configuration.context?.fieldFiltering;
+          } else {
+            fieldFilteringHandler = new FieldFilteringHandler(
+              this.configuration.context?.fieldFiltering
+            );
+          }
+          result = fieldFilteringHandler.filterFields(result);
+        }
         return this.createToolResponse(
           transformToolOutput({
             data: result,
@@ -222,10 +241,27 @@ class CommercetoolsCommerceAgent extends McpServer {
       executeTool.parameters.shape,
       async (args: ToolShape) => {
         try {
-          const result = await this.commercetoolsAPI.run(
+          let result = await this.commercetoolsAPI.run(
             args.toolMethod,
             args.arguments || {}
           );
+
+          if (this.configuration.context?.fieldFiltering) {
+            let fieldFilteringHandler!: FieldFilteringManager;
+            if (
+              isFieldFilteringManager(
+                this.configuration.context?.fieldFiltering
+              )
+            ) {
+              fieldFilteringHandler =
+                this.configuration.context?.fieldFiltering;
+            } else {
+              fieldFilteringHandler = new FieldFilteringHandler(
+                this.configuration.context?.fieldFiltering
+              );
+            }
+            result = fieldFilteringHandler.filterFields(result);
+          }
 
           return this.createToolResponse(
             transformToolOutput({
