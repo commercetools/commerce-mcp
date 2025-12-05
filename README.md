@@ -199,9 +199,9 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 | `shipping-methods.read`    | [Read shipping method information](https://docs.commercetools.com/api/projects/shippingMethods#get-shippingmethod-by-id)           |
 | `shipping-methods.create`  | [Create shipping method](https://docs.commercetools.com/api/projects/shippingMethods#create-shippingmethod)                        |
 | `shipping-methods.update`  | [Update shipping method information](https://docs.commercetools.com/api/projects/shippingMethods#update-shippingmethod)            |
-| `zones.read`               | [Read zone information](https://docs.commercetools.com/api/projects/zones#get-zone-by-id)                                          |
-| `zones.create`             | [Create zone](https://docs.commercetools.com/api/projects/zones#create-zone)                                                       |
-| `zones.update`             | [Update zone information](https://docs.commercetools.com/api/projects/zones#update-zone)                                           |
+| `zone.read`                | [Read zone information](https://docs.commercetools.com/api/projects/zones#get-zone-by-id)                                          |
+| `zone.create`              | [Create zone](https://docs.commercetools.com/api/projects/zones#create-zone)                                                       |
+| `zone.update`              | [Update zone information](https://docs.commercetools.com/api/projects/zones#update-zone)                                           |
 | `recurring-orders.read`    | [Read recurring order information](https://docs.commercetools.com/api/projects/recurring-orders#get-recurringorder-by-id)          |
 | `recurring-orders.create`  | [Create recurring order](https://docs.commercetools.com/api/projects/recurring-orders#create-recurringorder)                       |
 | `recurring-orders.update`  | [Update recurring order information](https://docs.commercetools.com/api/projects/recurring-orders#update-recurringorder)           |
