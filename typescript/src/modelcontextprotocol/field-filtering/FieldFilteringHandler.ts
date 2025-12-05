@@ -171,10 +171,9 @@ class FieldFilteringHandler implements FieldFilteringManager {
           console.warn(
             `Object in URL params in incorrect format: [${urlQueryKeyOpenBracketSplit[n]}`
           );
-        } else {
-          if (!closeBracketSplit[0].match(/^-?\d+$/)) {
-            objectPath += `.${closeBracketSplit[0]}`;
-          }
+        }
+        if (!closeBracketSplit[0].match(/^-?\d+$/)) {
+          objectPath += `.${closeBracketSplit[0]}`;
         }
       });
       return objectPath;
