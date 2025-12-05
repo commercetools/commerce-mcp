@@ -36,7 +36,8 @@ class CommercetoolsCommerceAgent {
           tool.method,
           tool.description,
           tool.parameters,
-          configuration.context?.toolOutputFormat
+          configuration.context?.toolOutputFormat,
+          configuration.context?.fieldFiltering
         );
       });
   }
