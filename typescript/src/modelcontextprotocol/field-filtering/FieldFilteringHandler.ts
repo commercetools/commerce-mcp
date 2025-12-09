@@ -17,6 +17,7 @@ class FieldFilteringHandler implements FieldFilteringManager {
   redactIncludes: FieldFilteringRule[];
   jsonRedactionText: string;
   urlRedactionText: string;
+  private hasFilteringRules: boolean = true;
 
   constructor(config: FieldFilteringManagerConfig) {
     this.filterPaths =
@@ -36,12 +37,23 @@ class FieldFilteringHandler implements FieldFilteringManager {
     this.jsonRedactionText =
       config.jsonRedactionText ?? defaultJsonRedactionText;
     this.urlRedactionText = config.urlRedactionText ?? defaultUrlRedactionText;
+
+    if (
+      config.paths?.length === 0 &&
+      config.properties?.length === 0 &&
+      config.includes?.length === 0
+    ) {
+      this.hasFilteringRules = false;
+    }
   }
 
   filterFields<T>(
     data: T,
     currentPath?: string
   ): T extends number | boolean ? string | T : T {
+    if (this.hasFilteringRules === false) {
+      return data as any;
+    }
     // if should be redacted, do so regardless of type. Filtered object properties are handled one loop up
     if (this.filterConditionMet(currentPath ?? '', 'redact')) {
       return this.jsonRedactionText as any;
@@ -134,6 +146,9 @@ class FieldFilteringHandler implements FieldFilteringManager {
   }
 
   filterUrlFields(inputUrl: string): string {
+    if (this.hasFilteringRules === false) {
+      return inputUrl;
+    }
     const url = new URL(inputUrl);
     const urlParams = new URLSearchParams(url.search);
     const keysToDelete: string[] = [];
