@@ -136,7 +136,6 @@ class FieldFilteringHandler implements FieldFilteringManager {
   filterUrlFields(inputUrl: string): string {
     const url = new URL(inputUrl);
     const urlParams = new URLSearchParams(url.search);
-    console.log('urlParams.entries(): ', urlParams.entries());
     const keysToDelete: string[] = [];
     for (const [key, _] of urlParams.entries()) {
       if (
