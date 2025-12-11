@@ -1,5 +1,13 @@
 # @commercetools/commerce-agent
 
+## 1.0.1
+
+### Patch Changes
+
+- [#10](https://github.com/commercetools/commerce-mcp/pull/10) [`fce61a3`](https://github.com/commercetools/commerce-mcp/commit/fce61a3514560bd7a39b5d8e6309b58633cf87b7) Thanks [@behnamt](https://github.com/behnamt)! - Fix Channel input-schema
+
+- [#13](https://github.com/commercetools/commerce-mcp/pull/13) [`6c21409`](https://github.com/commercetools/commerce-mcp/commit/6c214095b4338f9bc5553ee22ae3cbdc0817b75a) Thanks [@ajimae](https://github.com/ajimae)! - [Chore] Clean Up Git Markers
+
 ## 1.0.0
 
 ### Major Changes
