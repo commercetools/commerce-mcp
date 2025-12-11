@@ -173,12 +173,10 @@ export const ACCEPTED_TOOLS = [
   'transactions.create',
 ];
 
-// eslint-disable-next-line complexity
 export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
   const options: Options = {};
   const env: EnvVars = {};
 
-  // eslint-disable-next-line complexity
   args.forEach((arg) => {
     if (arg.startsWith('--')) {
       const [key, value] = arg.slice(2).split('=');

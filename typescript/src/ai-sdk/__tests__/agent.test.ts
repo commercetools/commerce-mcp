@@ -44,9 +44,9 @@ jest.mock('../../shared/tools', () => {
 const tools = contextToTools({});
 
 describe('CommercetoolsCommerceAgent with Admin tools', () => {
-  const toolFormat = 'json';
+  const toolOutputFormat = 'json';
   const mockConfiguration = {
-    context: {isAdmin: true, toolOutputFormat: toolFormat},
+    context: {isAdmin: true, toolOutputFormat},
     actions: {cart: {read: true}, products: {read: true}},
   } as any;
   const mockCommercetoolsAPIInstance = {} as CommercetoolsAPI;
@@ -125,7 +125,8 @@ describe('CommercetoolsCommerceAgent with Admin tools', () => {
       tools[0].method,
       tools[0].description,
       expect.any(Object),
-      toolFormat
+      toolOutputFormat,
+      undefined
     );
     // Detailed check for tool2 (namespace 'product', method 'tool2')
     expect(CommercetoolsTool).toHaveBeenCalledWith(
@@ -133,7 +134,8 @@ describe('CommercetoolsCommerceAgent with Admin tools', () => {
       tools[1].method,
       tools[1].description,
       expect.any(Object),
-      toolFormat
+      toolOutputFormat,
+      undefined
     );
     // Ensure tool3 was filtered out
     expect(CommercetoolsTool).not.toHaveBeenCalledWith(
@@ -141,7 +143,8 @@ describe('CommercetoolsCommerceAgent with Admin tools', () => {
       tools[2].method,
       expect.anything(),
       expect.anything(),
-      toolFormat
+      toolOutputFormat,
+      undefined
     );
 
     expect(Object.keys(commerceAgent.getTools())).toContain('tool1');

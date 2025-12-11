@@ -49,7 +49,6 @@ export default [...compat.extends("plugin:prettier/recommended"), {
         "comma-dangle": "off",
         "comma-spacing": "off",
         "comma-style": ["error", "last"],
-        complexity: "error",
         "computed-property-spacing": ["error", "never"],
         "consistent-return": "off",
         "consistent-this": "off",
