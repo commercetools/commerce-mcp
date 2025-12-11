@@ -1,6 +1,7 @@
 {
   "name": "@commercetools/commerce-mcp",
   "version": "1.0.0",
+  "mcpName": "io.github.commercetools/commerce-mcp",
   "homepage": "https://github.com/commercetools/commerce-mcp",
   "description": "A command line tool for setting up commercetools MCP server",
   "bin": "dist/index.js",
