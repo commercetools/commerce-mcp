@@ -1,5 +1,14 @@
 # @commercetools/commerce-mcp
 
+## 1.0.2
+
+### Patch Changes
+
+- [#14](https://github.com/commercetools/commerce-mcp/pull/14) [`87e679a`](https://github.com/commercetools/commerce-mcp/commit/87e679a68db92a43f92b4f75d415233ba3feb915) Thanks [@ajimae](https://github.com/ajimae)! - release packages
+
+- Updated dependencies [[`87e679a`](https://github.com/commercetools/commerce-mcp/commit/87e679a68db92a43f92b4f75d415233ba3feb915)]:
+  - @commercetools/commerce-agent@1.0.2
+
 ## 1.0.1
 
 ### Patch Changes
