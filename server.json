@@ -1,0 +1,136 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
+  "name": "io.github.commercetools/commerce-mcp",
+  "description": "An MCP server that provides access to commercetools APIs",
+  "repository": {
+    "url": "https://github.com/commercetools/commerce-mcp",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@commercetools/commerce-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "named",
+          "name": "--tools",
+          "value": "{TOOLS}",
+          "description": "Comma-separated list of tools to enable (e.g., 'all', 'all.read', or 'products.read,products.create')",
+          "isRequired": true
+        },
+        {
+          "type": "named",
+          "name": "--authUrl",
+          "value": "{AUTH_URL}",
+          "description": "Commercetools authentication URL",
+          "isRequired": true
+        },
+        {
+          "type": "named",
+          "name": "--apiUrl",
+          "value": "{API_URL}",
+          "description": "Commercetools API URL",
+          "isRequired": true
+        },
+        {
+          "type": "named",
+          "name": "--projectKey",
+          "value": "{PROJECT_KEY}",
+          "description": "Your commercetools project key",
+          "isRequired": true
+        },
+        {
+          "type": "named",
+          "name": "--authType",
+          "value": "{AUTH_TYPE}",
+          "description": "Authentication type: 'client_credentials' (default) or 'auth_token'",
+          "isRequired": false
+        },
+        {
+          "type": "named",
+          "name": "--clientId",
+          "value": "{CLIENT_ID}",
+          "description": "Commercetools client ID (required for client_credentials auth)",
+          "isRequired": false
+        },
+        {
+          "type": "named",
+          "name": "--clientSecret",
+          "value": "{CLIENT_SECRET}",
+          "description": "Commercetools client secret (required for client_credentials auth)",
+          "isRequired": false
+        },
+        {
+          "type": "named",
+          "name": "--accessToken",
+          "value": "{ACCESS_TOKEN}",
+          "description": "Access token (required for auth_token auth)",
+          "isRequired": false
+        }
+      ],
+      "environmentVariables": [
+        {
+          "description": "Commercetools authentication URL (e.g., https://auth.europe-west1.gcp.commercetools.com)",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": false,
+          "name": "AUTH_URL"
+        },
+        {
+          "description": "Commercetools API URL (e.g., https://api.europe-west1.gcp.commercetools.com)",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": false,
+          "name": "API_URL"
+        },
+        {
+          "description": "Your commercetools project key",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": false,
+          "name": "PROJECT_KEY"
+        },
+        {
+          "description": "Authentication type: 'client_credentials' (default) or 'auth_token'",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "AUTH_TYPE"
+        },
+        {
+          "description": "Commercetools client ID (required for client_credentials auth)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "CLIENT_ID"
+        },
+        {
+          "description": "Commercetools client secret (required for client_credentials auth)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "CLIENT_SECRET"
+        },
+        {
+          "description": "Access token (required for auth_token auth)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "ACCESS_TOKEN"
+        },
+        {
+          "description": "Comma-separated list of tools to enable (e.g., 'all', 'all.read', or 'products.read,products.create')",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": false,
+          "name": "TOOLS"
+        }
+      ]
+    }
+  ]
+}
