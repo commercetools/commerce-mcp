@@ -1,5 +1,11 @@
 # @commercetools/commerce-agent
 
+## 1.0.5
+
+### Patch Changes
+
+- [#20](https://github.com/commercetools/commerce-mcp/pull/20) [`37d37b4`](https://github.com/commercetools/commerce-mcp/commit/37d37b44528e7cad5832ff642495b2fac24967c8) Thanks [@ajimae](https://github.com/ajimae)! - Update release workflow to create .npmrc file
+
 ## 1.0.4
 
 ### Patch Changes
