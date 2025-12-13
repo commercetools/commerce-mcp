@@ -46,6 +46,9 @@
     "node": ">=18"
   },
   "author": "commercetools GmbH <info@commercetools.com> (https://commercetools.com)",
+  "repository": {
+    "url": "https://github.com/commercetools/commerce-mcp"
+  },
   "publishConfig": {
     "access": "public"
   },
