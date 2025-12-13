@@ -1,5 +1,14 @@
 # @commercetools/commerce-mcp
 
+## 1.0.3
+
+### Patch Changes
+
+- [#16](https://github.com/commercetools/commerce-mcp/pull/16) [`3999782`](https://github.com/commercetools/commerce-mcp/commit/3999782c7fc030f267d88822228d558133f29118) Thanks [@ajimae](https://github.com/ajimae)! - release packages
+  update npm and node versions
+- Updated dependencies [[`3999782`](https://github.com/commercetools/commerce-mcp/commit/3999782c7fc030f267d88822228d558133f29118)]:
+  - @commercetools/commerce-agent@1.0.3
+
 ## 1.0.2
 
 ### Patch Changes
