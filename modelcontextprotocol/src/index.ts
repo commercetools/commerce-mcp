@@ -7,6 +7,11 @@ import {
   CommercetoolsCommerceAgentStreamable,
   AuthConfig,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
+import {
+  FieldFilteringManagerConfig,
+  FieldFilteringRule,
+  FieldFilteringHandler,
+} from '@commercetools/commerce-agent/modelcontextprotocol';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {red, yellow} from 'colors';
 
@@ -20,6 +25,7 @@ type Options = {
   dynamicToolLoadingThreshold?: number;
   logging?: boolean;
   toolOutputFormat?: 'json' | 'tabular';
+  fieldFiltering?: FieldFilteringManagerConfig;
 };
 
 type EnvVars = {
@@ -213,6 +219,8 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
         if (value === 'json' || value === 'tabular') {
           options.toolOutputFormat = value;
         }
+      } else if (key == 'fieldFiltering') {
+        options.fieldFiltering = tryParseFieldFiltering(value);
       } else if (key == 'logging') {
         options.logging = value == 'true';
       } else if (key == 'cartId') {
@@ -324,6 +332,108 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
   return {options, env};
 }
 
+function tryParseFieldFiltering(
+  fieldFilteringString: string
+): FieldFilteringManagerConfig | never {
+  const example: FieldFilteringManagerConfig = {
+    paths: [],
+  };
+  let fieldFilteringConfig: FieldFilteringManagerConfig;
+  try {
+    fieldFilteringConfig = JSON.parse(fieldFilteringString);
+  } catch (error) {
+    throw new Error(
+      `Invalid argument: fieldFiltering. Error parsing JSON: ${error}`
+    );
+  }
+  if (
+    typeof fieldFilteringConfig !== 'object' ||
+    fieldFilteringConfig === null ||
+    Array.isArray(fieldFilteringConfig)
+  ) {
+    throw new Error(
+      `Invalid argument: fieldFiltering. Value must be a stringified object of type FieldFilteringManagerConfig.`
+    );
+  }
+  if (fieldFilteringConfig.paths) {
+    if (!isFieldFilteringRuleArray(fieldFilteringConfig.paths)) {
+      throw new Error(
+        `Invalid argument: fieldFiltering.paths. Value must be a stringified array of type { type: "filter" | "redact", value: string, value: boolean }`
+      );
+    }
+  }
+  if (fieldFilteringConfig.properties) {
+    if (!isFieldFilteringRuleArray(fieldFilteringConfig.properties)) {
+      throw new Error(
+        `Invalid argument: fieldFiltering.properties. Value must be a stringified array of type { type: "filter" | "redact", value: string, value: boolean }`
+      );
+    }
+  }
+  if (fieldFilteringConfig.whitelistPaths) {
+    if (
+      !isFieldFilteringRuleArray(
+        // add value property to whitelistPaths depsite irrelevance to reuse isFieldFilteringRuleArray logic
+        fieldFilteringConfig.whitelistPaths.map((path) => ({
+          ...path,
+          value: 'filter',
+        }))
+      )
+    ) {
+      throw new Error(
+        `Invalid argument: fieldFiltering.whitelistPaths. Value must be a stringified array of type { value: string, value: boolean }`
+      );
+    }
+  }
+  if (fieldFilteringConfig.includes) {
+    if (!isFieldFilteringRuleArray(fieldFilteringConfig.includes)) {
+      throw new Error(
+        `Invalid argument: fieldFiltering.includes. Value must be a stringified array of type { type: "filter" | "redact", value: string, value: boolean }`
+      );
+    }
+  }
+  if (fieldFilteringConfig.jsonRedactionText) {
+    if (typeof fieldFilteringConfig.jsonRedactionText !== 'string') {
+      throw new Error(
+        `Invalid argument: fieldFiltering.jsonRedactionText. Value must be of type string`
+      );
+    }
+  }
+  if (fieldFilteringConfig.urlRedactionText) {
+    if (typeof fieldFilteringConfig.urlRedactionText !== 'string') {
+      throw new Error(
+        `Invalid argument: fieldFiltering.urlRedactionText. Value must be of type string`
+      );
+    }
+  }
+
+  return fieldFilteringConfig;
+}
+
+function isFieldFilteringRuleArray(
+  possibleRules: any
+): possibleRules is FieldFilteringRule[] {
+  if (!Array.isArray(possibleRules)) {
+    return false;
+  }
+  return (
+    possibleRules
+      .map((rule) => isFieldFilteringRule(rule))
+      .findIndex((bool) => bool === false) === -1
+  );
+}
+
+function isFieldFilteringRule(
+  possibleRule: any
+): possibleRule is FieldFilteringRule {
+  const rule = possibleRule as FieldFilteringRule;
+  return (
+    !!rule.value &&
+    typeof rule.value === 'string' &&
+    typeof rule.caseSensitive === 'boolean' &&
+    (rule.type === 'filter' || rule.type === 'redact')
+  );
+}
+
 function createAuthConfig(env: EnvVars): AuthConfig {
   const baseConfig = {
     authUrl: env.authUrl!,
@@ -376,6 +486,9 @@ export async function main() {
       storeKey: options.storeKey,
       businessUnitKey: options.businessUnitKey,
       logging: options.logging,
+      fieldFiltering: options.fieldFiltering
+        ? new FieldFilteringHandler(options.fieldFiltering)
+        : undefined,
     },
   };
 
