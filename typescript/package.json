@@ -1,6 +1,6 @@
 {
   "name": "@commercetools/commerce-agent",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "homepage": "https://github.com/commercetools/commerce-mcp",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
