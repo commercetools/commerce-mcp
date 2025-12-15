@@ -1,6 +1,7 @@
 import {FieldFilteringManager} from './FieldFilteringManager';
 import {FieldFilteringManagerConfig} from './FieldFilteringManagerConfig';
 import {FieldFilteringHandler} from './FieldFilteringHandler';
+import {FieldFilteringRule} from './FieldFilteringRule';
 
 const isFieldFilteringManager = (
   config?: FieldFilteringManager | FieldFilteringManagerConfig
@@ -14,6 +15,7 @@ const isFieldFilteringManager = (
 export {
   type FieldFilteringManager,
   type FieldFilteringManagerConfig,
+  type FieldFilteringRule,
   FieldFilteringHandler,
   isFieldFilteringManager,
 };
