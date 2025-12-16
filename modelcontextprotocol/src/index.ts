@@ -184,7 +184,7 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
       const [key, value] = arg.slice(2).split('=');
 
       if (key == 'tools') {
-        options.tools = value.split(',');
+        options.tools = value.split(',').map((tool) => tool.trim());
       } else if (key == 'authType') {
         env.authType = value as EnvVars['authType'];
       } else if (key == 'accessToken') {
@@ -238,15 +238,17 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
     if (!process.env.TOOLS) {
       throw new Error('The --tools arguments must be provided.');
     }
-    options.tools = process.env.TOOLS.split(',');
+    options.tools = process.env.TOOLS.split(',').map((tool) => tool.trim());
   }
 
   // Validate tools against accepted enum values
+  // Ensure tools are trimmed before validation
+  options.tools = options.tools.map((tool: string) => tool.trim());
   options.tools.forEach((tool: string) => {
     if (tool == 'all' || tool == 'all.read') {
       return;
     }
-    if (!ACCEPTED_TOOLS.includes(tool.trim())) {
+    if (!ACCEPTED_TOOLS.includes(tool)) {
       throw new Error(
         `Invalid tool: ${tool}. Accepted tools are: ${ACCEPTED_TOOLS.join(
           ', '
@@ -276,7 +278,9 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
     options.businessUnitKey || process.env.BUSINESS_UNIT_KEY;
   options.storeKey = options.storeKey || process.env.STORE_KEY;
   options.customerId = options.customerId || process.env.CUSTOMER_ID;
-  options.isAdmin = options.isAdmin || process.env.IS_ADMIN === 'true';
+  if (options.isAdmin === undefined) {
+    options.isAdmin = process.env.IS_ADMIN === 'true';
+  }
   options.logging = options.logging || process.env.LOGGING == 'true';
   options.dynamicToolLoadingThreshold =
     options.dynamicToolLoadingThreshold ||
@@ -411,7 +415,14 @@ export async function main() {
       if (!configuration.actions) {
         configuration.actions = {};
       }
-      const [namespace, action] = tool.split('.');
+      // Trim the tool string before splitting to handle any remaining whitespace
+      const trimmedTool = tool.trim();
+      const [namespace, action] = trimmedTool.split('.').map((part) => part.trim());
+      if (!namespace || !action) {
+        throw new Error(
+          `Invalid tool format: ${tool}. Expected format: namespace.action (e.g., products.read)`
+        );
+      }
       configuration.actions[namespace as AvailableNamespaces] = {
         ...(configuration.actions[namespace as AvailableNamespaces] || {}),
         [action]: true,

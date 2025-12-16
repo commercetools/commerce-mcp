@@ -31,9 +31,10 @@ class CommercetoolsCommerceAgent {
 
     this.tools = {};
 
-    const filteredTools = contextToTools(processedConfiguration.context).filter(
-      (tool) => isToolAllowed(tool, processedConfiguration)
-    );
+    const filteredTools = contextToTools(
+      processedConfiguration.context,
+      processedConfiguration
+    ).filter((tool) => isToolAllowed(tool, processedConfiguration));
 
     filteredTools.forEach((tool) => {
       this.tools[tool.method] = CommercetoolsTool(
