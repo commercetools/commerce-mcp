@@ -47,12 +47,9 @@ class FieldFilteringHandler implements FieldFilteringManager {
     }
   }
 
-  filterFields<T>(
-    data: T,
-    currentPath?: string
-  ): T extends number | boolean ? string | T : T {
+  filterFields<T>(data: T, currentPath?: string): Partial<T> {
     if (this.hasFilteringRules === false) {
-      return data as any;
+      return data;
     }
     // if should be redacted, do so regardless of type. Filtered object properties are handled one loop up
     if (this.filterConditionMet(currentPath ?? '', 'redact')) {
@@ -63,7 +60,7 @@ class FieldFilteringHandler implements FieldFilteringManager {
       if (isValidUrl(data)) {
         return this.filterUrlFields(data) as any;
       }
-      return data as any;
+      return data;
     }
 
     if (typeof data === 'object') {
@@ -83,10 +80,10 @@ class FieldFilteringHandler implements FieldFilteringManager {
             );
           }
         });
-        return data as any;
+        return data;
       }
     }
-    return data as any;
+    return data;
   }
 
   private filterConditionMet(path: string, type: 'redact' | 'filter'): boolean {
