@@ -417,7 +417,7 @@ export async function main() {
       }
       // Trim the tool string before splitting to handle any remaining whitespace
       const trimmedTool = tool.trim();
-      const [namespace, action] = trimmedTool.split('.').map((part) => part.trim());
+      const [namespace, action] = trimmedTool.split('.').map((part: string) => part.trim());
       if (!namespace || !action) {
         throw new Error(
           `Invalid tool format: ${tool}. Expected format: namespace.action (e.g., products.read)`
