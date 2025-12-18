@@ -178,6 +178,57 @@ describe('parseArgs function', () => {
       expect(options.isAdmin).toBe(false);
     });
 
+    it('should not override isAdmin=false with environment variable', () => {
+      process.env.IS_ADMIN = 'true';
+      const args = [
+        '--tools=all',
+        '--clientId=test_client_id',
+        '--clientSecret=test_client_secret',
+        '--authUrl=https://auth.commercetools.com',
+        '--projectKey=test_project',
+        '--apiUrl=https://api.commercetools.com',
+        '--isAdmin=false',
+      ];
+      const {options} = parseArgs(args);
+      expect(options.isAdmin).toBe(false);
+      delete process.env.IS_ADMIN;
+    });
+
+    it('should trim whitespace from tools in command line arguments', () => {
+      const args = [
+        '--tools=products.read, cart.read , category.read',
+        '--clientId=test_client_id',
+        '--clientSecret=test_client_secret',
+        '--authUrl=https://auth.commercetools.com',
+        '--projectKey=test_project',
+        '--apiUrl=https://api.commercetools.com',
+      ];
+      const {options} = parseArgs(args);
+      expect(options.tools).toEqual([
+        'products.read',
+        'cart.read',
+        'category.read',
+      ]);
+    });
+
+    it('should trim whitespace from tools in environment variable', () => {
+      process.env.TOOLS = 'products.read, cart.read , category.read';
+      const args = [
+        '--clientId=test_client_id',
+        '--clientSecret=test_client_secret',
+        '--authUrl=https://auth.commercetools.com',
+        '--projectKey=test_project',
+        '--apiUrl=https://api.commercetools.com',
+      ];
+      const {options} = parseArgs(args);
+      expect(options.tools).toEqual([
+        'products.read',
+        'cart.read',
+        'category.read',
+      ]);
+      delete process.env.TOOLS;
+    });
+
     it.each([
       {
         authType: undefined,

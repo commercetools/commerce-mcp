@@ -39,7 +39,8 @@ class CommercetoolsCommerceAgent implements BaseToolkit {
     );
 
     const filteredToolDefinitions = contextToTools(
-      processedConfiguration.context
+      processedConfiguration.context,
+      processedConfiguration
     ).filter((tool: ToolDefinition) =>
       isToolAllowed(tool, processedConfiguration)
     );
