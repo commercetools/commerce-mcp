@@ -66,140 +66,137 @@ export const contextToResourceTools = (
     return context;
   };
 
+  // Helper function to reduce complexity by handling the common pattern
+  const getToolsForResource = (
+    namespace: string,
+    toolFunction: (ctx?: Context) => any[],
+    requiresAdmin: boolean = false
+  ): any[] => {
+    if (requiresAdmin) {
+      return hasConfiguredActions(namespace) || context?.isAdmin
+        ? toolFunction(getContextForResource(namespace))
+        : [];
+    }
+    return toolFunction(context);
+  };
+
   return {
-    'business-unit':
-      hasConfiguredActions('business-unit') || context?.isAdmin
-        ? contextToBusinessUnitTools(getContextForResource('business-unit'))
-        : [],
-    cart: contextToCartTools(context),
-    'cart-discount':
-      hasConfiguredActions('cart-discount') || context?.isAdmin
-        ? contextToCartDiscountTools(getContextForResource('cart-discount'))
-        : [],
-    category: contextToCategoryTools(context),
-    channel:
-      hasConfiguredActions('channel') || context?.isAdmin
-        ? contextToChannelTools(getContextForResource('channel'))
-        : [],
-    customer: contextToCustomerTools(context),
-    'customer-group':
-      hasConfiguredActions('customer-group') || context?.isAdmin
-        ? contextToCustomerGroupTools(getContextForResource('customer-group'))
-        : [],
-    'discount-code':
-      hasConfiguredActions('discount-code') || context?.isAdmin
-        ? contextToDiscountCodeTools(getContextForResource('discount-code'))
-        : [],
-    order:
-      hasConfiguredActions('order') || context?.isAdmin
-        ? contextToOrderTools(getContextForResource('order'))
-        : [],
-    inventory:
-      hasConfiguredActions('inventory') || context?.isAdmin
-        ? contextToInventoryTools(getContextForResource('inventory'))
-        : [],
-    products: contextToProductsTools(context),
-    review: contextToReviewTools(context),
-    project: contextToProjectTools(context),
-    'product-search': contextToProductSearchTools(context),
-    'product-selection':
-      hasConfiguredActions('product-selection') || context?.isAdmin
-        ? contextToProductSelectionTools(
-            getContextForResource('product-selection')
-          )
-        : [],
-    quote:
-      hasConfiguredActions('quote') || context?.isAdmin
-        ? contextToQuoteTools(getContextForResource('quote'))
-        : [],
-    'quote-request':
-      hasConfiguredActions('quote-request') || context?.isAdmin
-        ? contextToQuoteRequestTools(getContextForResource('quote-request'))
-        : [],
-    'staged-quote':
-      hasConfiguredActions('staged-quote') || context?.isAdmin
-        ? contextToStagedQuoteTools(getContextForResource('staged-quote'))
-        : [],
-    'standalone-price':
-      hasConfiguredActions('standalone-price') || context?.isAdmin
-        ? contextToStandalonePriceTools(
-            getContextForResource('standalone-price')
-          )
-        : [],
-    'product-discount':
-      hasConfiguredActions('product-discount') || context?.isAdmin
-        ? contextToProductDiscountTools(
-            getContextForResource('product-discount')
-          )
-        : [],
-    'product-type': contextToProductTypeTools(context),
-    store: contextToStoreTools(context),
-    bulk:
-      hasConfiguredActions('bulk') || context?.isAdmin
-        ? contextToBulkTools(getContextForResource('bulk'))
-        : [],
-    payments:
-      hasConfiguredActions('payments') || context?.isAdmin
-        ? contextToPaymentTools(getContextForResource('payments'))
-        : [],
-    'shipping-methods':
-      hasConfiguredActions('shipping-methods') || context?.isAdmin
-        ? contextToShippingMethodTools(
-            getContextForResource('shipping-methods')
-          )
-        : [],
-    'tax-category':
-      hasConfiguredActions('tax-category') || context?.isAdmin
-        ? contextToTaxCategoryTools(getContextForResource('tax-category'))
-        : [],
-    zone:
-      hasConfiguredActions('zone') || context?.isAdmin
-        ? contextToZoneTools(getContextForResource('zone'))
-        : [],
-    'product-tailoring':
-      hasConfiguredActions('product-tailoring') || context?.isAdmin
-        ? contextToProductTailoringTools(
-            getContextForResource('product-tailoring')
-          )
-        : [],
-    'payment-methods':
-      hasConfiguredActions('payment-methods') || context?.isAdmin
-        ? contextToPaymentMethodTools(getContextForResource('payment-methods'))
-        : [],
-    'recurring-orders':
-      hasConfiguredActions('recurring-orders') || context?.isAdmin
-        ? contextToRecurringOrderTools(
-            getContextForResource('recurring-orders')
-          )
-        : [],
-    'shopping-lists':
-      hasConfiguredActions('shopping-lists') || context?.isAdmin
-        ? contextToShoppingListTools(getContextForResource('shopping-lists'))
-        : [],
-    extension:
-      hasConfiguredActions('extension') || context?.isAdmin
-        ? contextToExtensionTools(getContextForResource('extension'))
-        : [],
-    subscription:
-      hasConfiguredActions('subscription') || context?.isAdmin
-        ? contextToSubscriptionTools(getContextForResource('subscription'))
-        : [],
-    'custom-objects':
-      hasConfiguredActions('custom-objects') || context?.isAdmin
-        ? contextToCustomObjectTools(getContextForResource('custom-objects'))
-        : [],
-    types:
-      hasConfiguredActions('types') || context?.isAdmin
-        ? contextToTypeTools(getContextForResource('types'))
-        : [],
-    'payment-intents':
-      hasConfiguredActions('payment-intents') || context?.isAdmin
-        ? contextToPaymentIntentTools(getContextForResource('payment-intents'))
-        : [],
-    transactions:
-      hasConfiguredActions('transactions') || context?.isAdmin
-        ? contextToTransactionTools(getContextForResource('transactions'))
-        : [],
+    'business-unit': getToolsForResource(
+      'business-unit',
+      contextToBusinessUnitTools,
+      true
+    ),
+    cart: getToolsForResource('cart', contextToCartTools),
+    'cart-discount': getToolsForResource(
+      'cart-discount',
+      contextToCartDiscountTools,
+      true
+    ),
+    category: getToolsForResource('category', contextToCategoryTools),
+    channel: getToolsForResource('channel', contextToChannelTools, true),
+    customer: getToolsForResource('customer', contextToCustomerTools),
+    'customer-group': getToolsForResource(
+      'customer-group',
+      contextToCustomerGroupTools,
+      true
+    ),
+    'discount-code': getToolsForResource(
+      'discount-code',
+      contextToDiscountCodeTools,
+      true
+    ),
+    order: getToolsForResource('order', contextToOrderTools, true),
+    inventory: getToolsForResource('inventory', contextToInventoryTools, true),
+    products: getToolsForResource('products', contextToProductsTools),
+    review: getToolsForResource('review', contextToReviewTools),
+    project: getToolsForResource('project', contextToProjectTools),
+    'product-search': getToolsForResource(
+      'product-search',
+      contextToProductSearchTools
+    ),
+    'product-selection': getToolsForResource(
+      'product-selection',
+      contextToProductSelectionTools,
+      true
+    ),
+    quote: getToolsForResource('quote', contextToQuoteTools, true),
+    'quote-request': getToolsForResource(
+      'quote-request',
+      contextToQuoteRequestTools,
+      true
+    ),
+    'staged-quote': getToolsForResource(
+      'staged-quote',
+      contextToStagedQuoteTools,
+      true
+    ),
+    'standalone-price': getToolsForResource(
+      'standalone-price',
+      contextToStandalonePriceTools,
+      true
+    ),
+    'product-discount': getToolsForResource(
+      'product-discount',
+      contextToProductDiscountTools,
+      true
+    ),
+    'product-type': getToolsForResource('product-type', contextToProductTypeTools),
+    store: getToolsForResource('store', contextToStoreTools),
+    bulk: getToolsForResource('bulk', contextToBulkTools, true),
+    payments: getToolsForResource('payments', contextToPaymentTools, true),
+    'shipping-methods': getToolsForResource(
+      'shipping-methods',
+      contextToShippingMethodTools,
+      true
+    ),
+    'tax-category': getToolsForResource(
+      'tax-category',
+      contextToTaxCategoryTools,
+      true
+    ),
+    zone: getToolsForResource('zone', contextToZoneTools, true),
+    'product-tailoring': getToolsForResource(
+      'product-tailoring',
+      contextToProductTailoringTools,
+      true
+    ),
+    'payment-methods': getToolsForResource(
+      'payment-methods',
+      contextToPaymentMethodTools,
+      true
+    ),
+    'recurring-orders': getToolsForResource(
+      'recurring-orders',
+      contextToRecurringOrderTools,
+      true
+    ),
+    'shopping-lists': getToolsForResource(
+      'shopping-lists',
+      contextToShoppingListTools,
+      true
+    ),
+    extension: getToolsForResource('extension', contextToExtensionTools, true),
+    subscription: getToolsForResource(
+      'subscription',
+      contextToSubscriptionTools,
+      true
+    ),
+    'custom-objects': getToolsForResource(
+      'custom-objects',
+      contextToCustomObjectTools,
+      true
+    ),
+    types: getToolsForResource('types', contextToTypeTools, true),
+    'payment-intents': getToolsForResource(
+      'payment-intents',
+      contextToPaymentIntentTools,
+      true
+    ),
+    transactions: getToolsForResource(
+      'transactions',
+      contextToTransactionTools,
+      true
+    ),
   };
 };
 export const contextToTools = (
