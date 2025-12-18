@@ -140,7 +140,10 @@ export const contextToResourceTools = (
       contextToProductDiscountTools,
       true
     ),
-    'product-type': getToolsForResource('product-type', contextToProductTypeTools),
+    'product-type': getToolsForResource(
+      'product-type',
+      contextToProductTypeTools
+    ),
     store: getToolsForResource('store', contextToStoreTools),
     bulk: getToolsForResource('bulk', contextToBulkTools, true),
     payments: getToolsForResource('payments', contextToPaymentTools, true),
