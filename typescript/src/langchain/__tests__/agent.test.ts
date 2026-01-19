@@ -143,14 +143,16 @@ describe('CommercetoolsCommerceAgent (Langchain)', () => {
       mockToolDefinitions[0].method,
       mockToolDefinitions[0].description,
       expect.any(Object),
-      toolOutputFormat
+      toolOutputFormat,
+      undefined
     );
     expect(CommercetoolsTool).toHaveBeenCalledWith(
       mockCommercetoolsAPIInstance,
       mockToolDefinitions[1].method,
       mockToolDefinitions[1].description,
       expect.any(Object),
-      toolOutputFormat
+      toolOutputFormat,
+      undefined
     );
     expect(CommercetoolsTool).not.toHaveBeenCalledWith(
       expect.anything(),

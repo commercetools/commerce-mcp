@@ -1,8 +1,11 @@
 import {StreamableHTTPServerTransportOptions} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import {Client} from '@commercetools/ts-client';
 import {AuthConfig, CommercetoolsCommerceAgent} from '../modelcontextprotocol';
 import {AvailableNamespaces, Tool} from './tools';
 import {IncomingMessage, ServerResponse} from 'node:http';
+import {
+  FieldFilteringManager,
+  FieldFilteringManagerConfig,
+} from '../modelcontextprotocol/field-filtering';
 
 // Actions restrict the subset of API calls that can be made. They should
 // be used in conjunction with Restricted API Keys. Setting a permission to false
@@ -35,6 +38,7 @@ export type Context = {
   mode?: 'stateless' | 'stateful';
   logging?: boolean;
   toolOutputFormat?: 'json' | 'tabular';
+  fieldFiltering?: FieldFilteringManagerConfig | FieldFilteringManager;
 };
 
 export type CommercetoolsFuncContext = Context & {

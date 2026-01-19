@@ -50,7 +50,8 @@ class CommercetoolsCommerceAgent implements BaseToolkit {
         toolDef.method,
         toolDef.description,
         toolDef.parameters,
-        processedConfiguration.context?.toolOutputFormat
+        processedConfiguration.context?.toolOutputFormat,
+        configuration.context?.fieldFiltering
       )
     );
   }
