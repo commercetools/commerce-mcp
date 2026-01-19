@@ -335,9 +335,6 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
 function tryParseFieldFiltering(
   fieldFilteringString: string
 ): FieldFilteringManagerConfig | never {
-  const example: FieldFilteringManagerConfig = {
-    paths: [],
-  };
   let fieldFilteringConfig: FieldFilteringManagerConfig;
   try {
     fieldFilteringConfig = JSON.parse(fieldFilteringString);
