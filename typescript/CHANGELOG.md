@@ -1,5 +1,11 @@
 # @commercetools/commerce-agent
 
+## 1.1.0
+
+### Minor Changes
+
+- [#8](https://github.com/commercetools/commerce-mcp/pull/8) [`b9ac11e`](https://github.com/commercetools/commerce-mcp/commit/b9ac11e37e3c378b8aff8f003d43f65dae543a18) Thanks [@Trackerchum](https://github.com/Trackerchum)! - Added customizable field filtering and redaction at a resource level.
+
 ## 1.0.6
 
 ### Patch Changes
