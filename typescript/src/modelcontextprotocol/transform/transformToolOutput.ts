@@ -51,7 +51,7 @@ export const transformToolOutput = (args: {
     transformedDataAggregate = `${transformTitle(title)}\n`;
   }
 
-  // negative tabCount to offset first level data
+  // negative tabCount to offset first level data transformation
   const transformedData = transformData({data, tabCount: -1});
 
   return (transformedDataAggregate +=
@@ -109,7 +109,7 @@ const transformData = (args: {data: any; tabCount: number}): string | null => {
 /**
  * The internal method used to correctly loop through array values before transforming values with {@link transformObjectOrArrayContent}
  *
- * @returns {string} The LLM optimised tool string output.
+ * @returns {string} The LLM optimised stringified tool output.
  */
 const handleArrayTransformation = (args: {
   array: Array<unknown>;
@@ -145,6 +145,7 @@ const handleArrayTransformation = (args: {
       : simpleTransformedArray;
   }
 
+  // else handle array of non-simple types like objects/arrays or mix
   let transformedData = '';
   let unignoredArrayPropertyIndex = 0;
   array.forEach((value) => {
@@ -247,7 +248,7 @@ const isArrayWithoutObjectsOrArrays = (array: Array<unknown>): boolean => {
 };
 
 /**
- * Checks if the data type passed is one to be ignored in transformation.
+ * Checks if the data type passed is one to be ignored in transformation, type of 'undefined' or 'function'.
  *
  * @param {unknown} data - An unknown data type to be tested.
  *
