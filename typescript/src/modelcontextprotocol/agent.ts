@@ -124,7 +124,7 @@ class CommercetoolsCommerceAgent extends McpServer {
 
     return [
       ...customTools,
-      ...contextToTools(configuration.context).filter((tool) =>
+      ...contextToTools(configuration.context, configuration).filter((tool) =>
         isToolAllowed(tool, configuration)
       ),
     ];
