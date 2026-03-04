@@ -11,14 +11,14 @@ const generateTabs = (tabCount: number) => {
   return tabs;
 };
 
-type Format = 'tabular' | 'json';
+type Format = 'tabular' | 'json' | 'json+tabular';
 
 /**
  * A method to strigify tool output into a LLM friendly and optimised format.
  *
  * @param {unknown} args.data - The response of a tool's output, in the format of an object.
  * @param {string} [args.title] - An optional string, the title or description to give the data for LLM context.
- * @param {Format} [args.format] - An optional string of either "tabular" or "JSON" defining the format output, default "tabular". Choose "tabular" for chat contexts, "json" for coding
+ * @param {Format} [args.format] - An optional string of either "tabular", "json", or "json+tabular" defining the format output, default "tabular". Choose "tabular" for chat contexts, "json" for coding, "json+tabular" for both formats together
  *
  * @returns {string} The LLM optimised tool string output.
  */
@@ -29,7 +29,39 @@ export const transformToolOutput = (args: {
 }): string => {
   const {data, title, format} = args;
 
-  if (isPropertyTypeToBeIgnored(data)) {
+  const isIgnored = isPropertyTypeToBeIgnored(data);
+
+  // if requested format is json+tabular, return both formats
+  if (format === 'json+tabular') {
+    const jsonOutput = title
+      ? JSON.stringify(
+          {
+            [transformTitle(title)]: data,
+          },
+          null,
+          2
+        )
+      : JSON.stringify(data, null, 2);
+
+    // Generate tabular format
+    let tabularOutput = '';
+    if (title) {
+      tabularOutput = `${transformTitle(title)}\n`;
+    }
+
+    if (isIgnored) {
+      tabularOutput += emptyObjectTransformValue;
+    } else {
+      // negative tabCount to offset first level data transformation
+      const transformedData = transformData({data, tabCount: -1});
+      tabularOutput += transformedData ?? emptyObjectTransformValue;
+    }
+
+    // Return both formats with clear separation
+    return `=== JSON Format ===\n${jsonOutput}\n\n=== Tabular Format ===\n${tabularOutput}`;
+  }
+
+  if (isIgnored) {
     return title
       ? `${transformTitle(title)}\n${emptyObjectTransformValue}`
       : emptyObjectTransformValue;

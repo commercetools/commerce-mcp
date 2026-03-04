@@ -37,7 +37,7 @@ export type Context = {
   sessionId?: string;
   mode?: 'stateless' | 'stateful';
   logging?: boolean;
-  toolOutputFormat?: 'json' | 'tabular';
+  toolOutputFormat?: 'json' | 'tabular' | 'json+tabular';
   fieldFiltering?: FieldFilteringManagerConfig | FieldFilteringManager;
 };
 

@@ -629,4 +629,94 @@ ${tab}My Nested Object With Only Ignored Types: no properties`;
       expect(transformedData).toBe(expectedTransformedData);
     });
   });
+
+  describe('format: json+tabular', () => {
+    const format = 'json+tabular';
+    test('returns both JSON and tabular formats together', () => {
+      const testObj: Record<string, any> = {
+        testString: 'test value',
+        testNumber: 123,
+        testObject: {
+          nestedValue: 456,
+        },
+      };
+
+      const transformedData = transformToolOutput({data: testObj, format});
+      
+      // Should contain JSON format section
+      expect(transformedData).toContain('=== JSON Format ===');
+      expect(transformedData).toContain(JSON.stringify(testObj, null, 2));
+      
+      // Should contain tabular format section
+      expect(transformedData).toContain('=== Tabular Format ===');
+      expect(transformedData).toContain('Test String: test value');
+      expect(transformedData).toContain('Test Number: 123');
+      expect(transformedData).toContain('Test Object:');
+      expect(transformedData).toContain(`${tab}Nested Value: 456`);
+    });
+
+    test('when title is passed, includes title in both formats', () => {
+      const testObj: Record<string, any> = {
+        testString: 'test value',
+        testNumber: 123,
+      };
+
+      const title = 'My test result';
+
+      const transformedData = transformToolOutput({
+        data: testObj,
+        title,
+        format,
+      });
+      
+      // Should contain JSON format with title
+      expect(transformedData).toContain('=== JSON Format ===');
+      expect(transformedData).toContain(
+        JSON.stringify(
+          {
+            [title.toUpperCase()]: testObj,
+          },
+          null,
+          2
+        )
+      );
+      
+      // Should contain tabular format with title
+      expect(transformedData).toContain('=== Tabular Format ===');
+      expect(transformedData).toContain(title.toUpperCase());
+      expect(transformedData).toContain('Test String: test value');
+      expect(transformedData).toContain('Test Number: 123');
+    });
+
+    test('handles empty objects correctly in both formats', () => {
+      const testObj: Record<string, any> = {};
+
+      const transformedData = transformToolOutput({data: testObj, format});
+      
+      expect(transformedData).toContain('=== JSON Format ===');
+      expect(transformedData).toContain(JSON.stringify(testObj, null, 2));
+      
+      expect(transformedData).toContain('=== Tabular Format ===');
+      expect(transformedData).toContain(emptyObjectTransformValue);
+    });
+
+    test('handles arrays correctly in both formats', () => {
+      const testObj = {
+        simpleArray: [1, 2, 3],
+        objectArray: [
+          {name: 'Item 1', value: 10},
+          {name: 'Item 2', value: 20},
+        ],
+      };
+
+      const transformedData = transformToolOutput({data: testObj, format});
+      
+      expect(transformedData).toContain('=== JSON Format ===');
+      expect(transformedData).toContain(JSON.stringify(testObj, null, 2));
+      
+      expect(transformedData).toContain('=== Tabular Format ===');
+      expect(transformedData).toContain('Simple Array: 1, 2, 3');
+      expect(transformedData).toContain('Object Array:');
+    });
+  });
 });
