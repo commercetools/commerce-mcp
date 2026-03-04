@@ -642,11 +642,11 @@ ${tab}My Nested Object With Only Ignored Types: no properties`;
       };
 
       const transformedData = transformToolOutput({data: testObj, format});
-      
+
       // Should contain JSON format section
       expect(transformedData).toContain('=== JSON Format ===');
       expect(transformedData).toContain(JSON.stringify(testObj, null, 2));
-      
+
       // Should contain tabular format section
       expect(transformedData).toContain('=== Tabular Format ===');
       expect(transformedData).toContain('Test String: test value');
@@ -668,7 +668,7 @@ ${tab}My Nested Object With Only Ignored Types: no properties`;
         title,
         format,
       });
-      
+
       // Should contain JSON format with title
       expect(transformedData).toContain('=== JSON Format ===');
       expect(transformedData).toContain(
@@ -680,7 +680,7 @@ ${tab}My Nested Object With Only Ignored Types: no properties`;
           2
         )
       );
-      
+
       // Should contain tabular format with title
       expect(transformedData).toContain('=== Tabular Format ===');
       expect(transformedData).toContain(title.toUpperCase());
@@ -692,10 +692,10 @@ ${tab}My Nested Object With Only Ignored Types: no properties`;
       const testObj: Record<string, any> = {};
 
       const transformedData = transformToolOutput({data: testObj, format});
-      
+
       expect(transformedData).toContain('=== JSON Format ===');
       expect(transformedData).toContain(JSON.stringify(testObj, null, 2));
-      
+
       expect(transformedData).toContain('=== Tabular Format ===');
       expect(transformedData).toContain(emptyObjectTransformValue);
     });
@@ -710,10 +710,10 @@ ${tab}My Nested Object With Only Ignored Types: no properties`;
       };
 
       const transformedData = transformToolOutput({data: testObj, format});
-      
+
       expect(transformedData).toContain('=== JSON Format ===');
       expect(transformedData).toContain(JSON.stringify(testObj, null, 2));
-      
+
       expect(transformedData).toContain('=== Tabular Format ===');
       expect(transformedData).toContain('Simple Array: 1, 2, 3');
       expect(transformedData).toContain('Object Array:');
