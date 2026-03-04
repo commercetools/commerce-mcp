@@ -216,7 +216,11 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
       } else if (key == 'dynamicToolLoadingThreshold') {
         options.dynamicToolLoadingThreshold = Number(value);
       } else if (key == 'toolOutputFormat') {
-        if (value === 'json' || value === 'tabular' || value === 'json+tabular') {
+        if (
+          value === 'json' ||
+          value === 'tabular' ||
+          value === 'json+tabular'
+        ) {
           options.toolOutputFormat = value;
         }
       } else if (key == 'fieldFiltering') {
