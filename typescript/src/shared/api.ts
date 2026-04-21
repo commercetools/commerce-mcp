@@ -107,7 +107,7 @@ class CommercetoolsAPI {
   }
 
   private handleUnrecognizedAuthConfig(authConfig: AuthConfig): never {
-    throw new Error(`Unrecognized auth type: ${JSON.stringify(authConfig)}`);
+    throw new Error(`Unrecognized auth type: ${authConfig.type}`);
   }
 
   private async getToken(): Promise<string> {
