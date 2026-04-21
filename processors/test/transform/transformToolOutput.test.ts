@@ -1,4 +1,4 @@
-import {transformToolOutput} from '../../../modelcontextprotocol/transform';
+import {transformToolOutput} from '../../src/transform';
 import {complexObject} from './transform.mock-data';
 
 const emptyObjectTransformValue = 'no properties';
