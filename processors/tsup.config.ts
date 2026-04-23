@@ -5,10 +5,10 @@ export default defineConfig((options) => {
   return {
     entry: ['src/index.ts'],
     outDir: 'dist',
-    sourcemap: true,
     dts: true,
     watch: isDev,
     format: ['cjs', 'esm'],
     ignoreWatch: 'src/test',
+    sourcemap: false,
   };
 });
