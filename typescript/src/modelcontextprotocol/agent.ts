@@ -13,12 +13,12 @@ import {contextToToolsResourceBasedToolSystem} from '../shared/resource-based-to
 import {Tool} from '../types/tools';
 import {contextToBulkTools} from '../shared/bulk/tools';
 import {DYNAMIC_TOOL_LOADING_THRESHOLD} from '../shared/constants';
-import {transformToolOutput} from './transform';
+import {transformToolOutput} from '@commercetools/processors';
 import {
   FieldFilteringHandler,
   FieldFilteringManager,
   isFieldFilteringManager,
-} from './field-filtering';
+} from '@commercetools/processors';
 
 class CommercetoolsCommerceAgent extends McpServer {
   private authConfig: AuthConfig;

@@ -3,13 +3,13 @@ import {DynamicStructuredTool} from '@langchain/core/tools';
 import {CallbackManagerForToolRun} from '@langchain/core/callbacks/manager';
 import {RunnableConfig} from '@langchain/core/runnables';
 import CommercetoolsAPI from '../shared/api';
-import {transformToolOutput} from '../modelcontextprotocol/transform';
+import {transformToolOutput} from '@commercetools/processors';
 import {
   FieldFilteringHandler,
   FieldFilteringManager,
   FieldFilteringManagerConfig,
   isFieldFilteringManager,
-} from '../modelcontextprotocol/field-filtering';
+} from '@commercetools/processors';
 
 export default function CommercetoolsTool(
   commercetoolsAPI: CommercetoolsAPI,
