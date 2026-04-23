@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@commercetools/commerce-agent": "workspace:*",
-    "@modelcontextprotocol/sdk": "^1.24.0",
+    "@modelcontextprotocol/sdk": "^1.26.0",
     "colors": "^1.4.0",
     "dotenv": "^17.2.1",
     "mcp-remote": "^0.1.18"
