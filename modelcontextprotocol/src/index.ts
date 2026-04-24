@@ -24,7 +24,7 @@ type Options = {
   businessUnitKey?: string;
   dynamicToolLoadingThreshold?: number;
   logging?: boolean;
-  toolOutputFormat?: 'json' | 'tabular';
+  toolOutputFormat?: 'json' | 'tabular' | 'json+tabular';
   fieldFiltering?: FieldFilteringManagerConfig;
 };
 
@@ -216,7 +216,11 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
       } else if (key == 'dynamicToolLoadingThreshold') {
         options.dynamicToolLoadingThreshold = Number(value);
       } else if (key == 'toolOutputFormat') {
-        if (value === 'json' || value === 'tabular') {
+        if (
+          value === 'json' ||
+          value === 'tabular' ||
+          value === 'json+tabular'
+        ) {
           options.toolOutputFormat = value;
         }
       } else if (key == 'fieldFiltering') {
@@ -291,9 +295,10 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
       : undefined);
 
   if (
-    (process.env.TOOL_OUTPUT_FORMAT &&
-      process.env.TOOL_OUTPUT_FORMAT === 'tabular') ||
-    process.env.TOOL_OUTPUT_FORMAT === 'json'
+    process.env.TOOL_OUTPUT_FORMAT &&
+    (process.env.TOOL_OUTPUT_FORMAT === 'tabular' ||
+      process.env.TOOL_OUTPUT_FORMAT === 'json' ||
+      process.env.TOOL_OUTPUT_FORMAT === 'json+tabular')
   ) {
     options.toolOutputFormat = process.env.TOOL_OUTPUT_FORMAT;
   }
