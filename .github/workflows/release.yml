@@ -56,11 +56,13 @@ jobs:
 
       - name: Create Release Pull Request or Publish to npm
         id: changesets
-        uses: changesets/action@v1
+        uses: changesets/action@v1.7.0
         with:
           title: Pending Releases (aka Version Packages)
           publish: pnpm changeset publish
           version: pnpm changeset:version
           commit: "ci(changesets): version packages"
+          createGithubReleases: true
+          commitMode: "github-api"
         env:
           GITHUB_TOKEN: ${{ steps.generate_github_token.outputs.token }}
