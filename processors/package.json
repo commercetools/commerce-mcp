@@ -7,7 +7,6 @@
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "bin": "dist/index.js",
   "files": [
     "dist",
     "LICENSE",
@@ -49,7 +48,7 @@
   "author": "commercetools GmbH <info@commercetools.com> (https://commercetools.com)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/commercetools/commerce-mcp",
+    "url": "git+https://github.com/commercetools/commerce-mcp.git",
     "directory": "processors"
   },
   "license": "MIT",
