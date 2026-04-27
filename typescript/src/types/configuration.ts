@@ -5,7 +5,7 @@ import {IncomingMessage, ServerResponse} from 'node:http';
 import {
   FieldFilteringManager,
   FieldFilteringManagerConfig,
-} from '../modelcontextprotocol/field-filtering';
+} from '@commercetools/processors';
 
 // Actions restrict the subset of API calls that can be made. They should
 // be used in conjunction with Restricted API Keys. Setting a permission to false
