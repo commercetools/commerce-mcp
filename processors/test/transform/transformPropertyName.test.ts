@@ -1,4 +1,4 @@
-import {transformPropertyName} from '../../../modelcontextprotocol/transform/transformPropertyName';
+import {transformPropertyName} from '../../src/transform';
 
 describe('transformPropertyName', () => {
   test('transforms camel case property names as expected', () => {

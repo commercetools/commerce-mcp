@@ -9,4 +9,4 @@ export {
   type FieldFilteringManagerConfig,
   type FieldFilteringRule,
   FieldFilteringHandler,
-} from './field-filtering';
+} from '@commercetools/processors';
