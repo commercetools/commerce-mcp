@@ -1,5 +1,11 @@
 # @commercetools/commerce-agent
 
+## 1.1.1
+
+### Patch Changes
+
+- [#32](https://github.com/commercetools/commerce-mcp/pull/32) [`c29fcef`](https://github.com/commercetools/commerce-mcp/commit/c29fcef5ab61d11d18c5103ade8dd382f22f1d44) Thanks [@geethanga-ct](https://github.com/geethanga-ct)! - fix(security): prevent credential leak in auth error message
+
 ## 1.1.0
 
 ### Minor Changes
