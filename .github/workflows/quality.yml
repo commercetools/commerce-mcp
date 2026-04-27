@@ -27,6 +27,9 @@ jobs:
       - name: Lint - Model Context Protocol
         run: pnpm --filter @commercetools/commerce-mcp run lint
 
+      - name: Lint - Processors
+        run: pnpm --filter @commercetools/processors run lint
+
   formatting:
     name: Formatting
     runs-on: ubuntu-latest
@@ -44,6 +47,9 @@ jobs:
       - name: Prettier - Model Context Protocol
         run: pnpm --filter @commercetools/commerce-mcp run prettier-check
 
+      - name: Prettier - Processors
+        run: pnpm --filter @commercetools/processors run prettier-check
+
   testing:
     name: Testing
     runs-on: ubuntu-latest
@@ -55,32 +61,17 @@ jobs:
       - name: Setup testing
         uses: ./.github/actions/setup
 
+      - name: Build all packages
+        run: |
+          pnpm --filter @commercetools/processors run build
+          pnpm --filter @commercetools/commerce-agent run build
+          pnpm --filter @commercetools/commerce-mcp run build
+
       - name: Test - TypeScript
         run: pnpm --filter @commercetools/commerce-agent run test
 
       - name: Test - Model Context Protocol
-        run: |
-          # Builds types which are neededin tests
-          pnpm --filter @commercetools/commerce-agent run build
-          pnpm --filter @commercetools/commerce-mcp run test
+        run: pnpm --filter @commercetools/commerce-mcp run test
 
-  building:
-    name: Building
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup testing
-        uses: ./.github/actions/setup
-
-      - name: Test - TypeScript
-        run: |
-          pnpm --filter @commercetools/commerce-agent run build
-          pnpm --filter @commercetools/commerce-agent run clean
-
-      - name: Test - Model Context Protocol
-        run: |
-          pnpm --filter @commercetools/commerce-mcp run build
-          pnpm --filter @commercetools/commerce-mcp run clean
+      - name: Test - Processors
+        run: pnpm --filter @commercetools/processors run test

@@ -2,7 +2,7 @@ import {
   generateQueryString,
   isValidUrl,
   normaliseUrl,
-} from '../../../modelcontextprotocol/field-filtering/urlHelpers';
+} from '../../src/field-filtering';
 
 describe('urlHelpers', () => {
   describe('normaliseUrl', () => {

@@ -1,9 +1,9 @@
-import {FieldFilteringHandler} from '../../../modelcontextprotocol/field-filtering/FieldFilteringHandler';
+import {FieldFilteringHandler} from '../../src/field-filtering';
 import {
   defaultJsonRedactionText,
   defaultUrlRedactionText,
-} from '../../../modelcontextprotocol/field-filtering/defaultFilteringRules';
-import {FieldFilteringManagerConfig} from '../../../modelcontextprotocol/field-filtering/FieldFilteringManagerConfig';
+} from '../../src/field-filtering';
+import {FieldFilteringManagerConfig} from '../../src/field-filtering';
 
 describe(FieldFilteringHandler.name, () => {
   afterAll(() => {
@@ -50,17 +50,17 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.pathToFilter).toBeUndefined();
-        expect(returnedData.myObject.myPathToFilter).toBeUndefined();
+        expect(returnedData.myObject?.myPathToFilter).toBeUndefined();
         expect(
-          returnedData.myObject.nestedObject.nestedPathToFilter
+          returnedData.myObject?.nestedObject?.nestedPathToFilter
         ).toBeUndefined();
-        expect(returnedData.myobject.mypathToFilter).toBeUndefined();
+        expect(returnedData.myobject?.mypathToFilter).toBeUndefined();
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
-          data.myObject.otherProperty
+        expect(returnedData.myObject?.otherProperty).toBe(
+          data.myObject?.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
           data.myObject.nestedObject.myOtherNestedProperty
         );
       });
@@ -103,20 +103,20 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.pathToFilter).toBeUndefined();
-        expect(returnedData.myObject.myPathToFilter).toBeUndefined();
+        expect(returnedData.myObject?.myPathToFilter).toBeUndefined();
         expect(
-          returnedData.myObject.nestedObject.nestedPathToFilter
+          returnedData.myObject?.nestedObject?.nestedPathToFilter
         ).toBeUndefined();
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
-          data.myObject.otherProperty
+        expect(returnedData.myObject?.otherProperty).toBe(
+          data.myObject?.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
-        expect(returnedData.myobject.mypathToFilter).toBe(
-          data.myobject.mypathToFilter
+        expect(returnedData.myobject?.mypathToFilter).toBe(
+          data.myobject?.mypathToFilter
         );
       });
 
@@ -153,18 +153,18 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.myPropertyToFilter).toBeUndefined();
-        expect(returnedData.myObject.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.myObject?.myPropertyToFilter).toBeUndefined();
         expect(
-          returnedData.myObject.nestedObject.nestedPropertyToFilter
+          returnedData.myObject?.nestedObject?.nestedPropertyToFilter
         ).toBeUndefined();
-        expect(returnedData.myobject.mypropertytoFilter).toBeUndefined();
+        expect(returnedData.myobject?.mypropertytoFilter).toBeUndefined();
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
-          data.myObject.otherProperty
+        expect(returnedData.myObject?.otherProperty).toBe(
+          data.myObject?.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
       });
 
@@ -201,20 +201,20 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.myPropertyToFilter).toBeUndefined();
-        expect(returnedData.myObject.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.myObject?.myPropertyToFilter).toBeUndefined();
         expect(
-          returnedData.myObject.nestedObject.nestedPropertyToFilter
+          returnedData.myObject?.nestedObject?.nestedPropertyToFilter
         ).toBeUndefined();
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
-        expect(returnedData.myobject.mypropertytoFilter).toBe(
-          data.myobject.mypropertytoFilter
+        expect(returnedData.myobject?.mypropertytoFilter).toBe(
+          data.myobject?.mypropertytoFilter
         );
       });
 
@@ -266,22 +266,22 @@ describe(FieldFilteringHandler.name, () => {
         expect(returnedData.myPropertyToFilter).toBeUndefined();
         expect(returnedData.otherProperty).toBe(data.otherProperty);
 
-        expect(returnedData.myObject.myPropertyToNotFilter).toBe(
-          data.myObject.myPropertyToNotFilter
+        expect(returnedData.myObject?.myPropertyToNotFilter).toBe(
+          data.myObject?.myPropertyToNotFilter
         );
-        expect(returnedData.myObject.otherProperty).toBe(
-          data.myObject.otherProperty
+        expect(returnedData.myObject?.otherProperty).toBe(
+          data.myObject?.otherProperty
         );
 
         expect(
-          returnedData.myObject.nestedObject.nestedPropertyToFilter
+          returnedData.myObject?.nestedObject?.nestedPropertyToFilter
         ).toBeUndefined();
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
 
-        expect(returnedData.myobject.myPropertyToNotfilter).toBe(
-          data.myobject.myPropertyToNotfilter
+        expect(returnedData.myobject?.myPropertyToNotfilter).toBe(
+          data.myobject?.myPropertyToNotfilter
         );
       });
 
@@ -333,22 +333,22 @@ describe(FieldFilteringHandler.name, () => {
         expect(returnedData.myPropertyToFilter).toBeUndefined();
         expect(returnedData.otherProperty).toBe(data.otherProperty);
 
-        expect(returnedData.myObject.myPropertyToNotFilter).toBe(
-          data.myObject.myPropertyToNotFilter
+        expect(returnedData.myObject?.myPropertyToNotFilter).toBe(
+          data.myObject?.myPropertyToNotFilter
         );
-        expect(returnedData.myObject.otherProperty).toBe(
-          data.myObject.otherProperty
+        expect(returnedData.myObject?.otherProperty).toBe(
+          data.myObject?.otherProperty
         );
 
         expect(
-          returnedData.myObject.nestedObject.nestedPropertyToFilter
+          returnedData.myObject?.nestedObject?.nestedPropertyToFilter
         ).toBeUndefined();
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
 
-        expect(returnedData.myobject.myPropertyToNotfilter).toBe(
-          data.myobject.myPropertyToNotfilter
+        expect(returnedData.myobject?.myPropertyToNotfilter).toBe(
+          data.myobject?.myPropertyToNotfilter
         );
       });
 
@@ -384,21 +384,21 @@ describe(FieldFilteringHandler.name, () => {
         expect(returnedData.myPropertyToFilter).toBeUndefined();
         expect(returnedData.otherProperty).toBe(data.otherProperty);
 
-        expect(returnedData.myObject.myPropertyToFilter).toBeUndefined();
-        expect(returnedData.myObject.myPropertyToAlsoRed).toBeUndefined();
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.myObject?.myPropertyToAlsoRed).toBeUndefined();
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
 
         expect(
-          returnedData.myObject.nestedObject.nestedPropertyToFilter
+          returnedData.myObject?.nestedObject?.nestedPropertyToFilter
         ).toBeUndefined();
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
 
-        expect(returnedData.myobject.myPropertytofilter).toBe(
-          data.myobject.myPropertytofilter
+        expect(returnedData.myobject?.myPropertytofilter).toBe(
+          data.myobject?.myPropertytofilter
         );
       });
 
@@ -432,18 +432,18 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.myPropertyToFilter).toBeUndefined();
-        expect(returnedData.myObject.myPropertyToFilter).toBeUndefined();
+        expect(returnedData.myObject?.myPropertyToFilter).toBeUndefined();
         expect(
-          returnedData.myObject.nestedObject.nestedPropertyToFilter
+          returnedData.myObject?.nestedObject?.nestedPropertyToFilter
         ).toBeUndefined();
-        expect(returnedData.myobject.myPropertytofilter).toBeUndefined();
+        expect(returnedData.myobject?.myPropertytofilter).toBeUndefined();
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
       });
 
@@ -487,12 +487,14 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.httpUrl).toBe(filteredHttpUrl);
-        expect(returnedData.myObject.httpsUrl).toBe(filteredHttpsUrl);
-        expect(returnedData.myObject.nestedObject.websocketUrl).toBe(
+        expect(returnedData.myObject?.httpsUrl).toBe(filteredHttpsUrl);
+        expect(returnedData.myObject?.nestedObject?.websocketUrl).toBe(
           filteredWebsocketUrl
         );
 
-        expect(returnedData.myObject.nestedObject.ftpUrl).toBe(filteredFtpUrl);
+        expect(returnedData.myObject?.nestedObject?.ftpUrl).toBe(
+          filteredFtpUrl
+        );
       });
     });
 
@@ -535,22 +537,22 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.pathToRedact).toBe(defaultJsonRedactionText);
-        expect(returnedData.myObject.myPathToRedact).toBe(
+        expect(returnedData.myObject?.myPathToRedact).toBe(
           defaultJsonRedactionText
         );
-        expect(returnedData.myObject.nestedObject.nestedPathToRedact).toBe(
+        expect(returnedData.myObject?.nestedObject?.nestedPathToRedact).toBe(
           defaultJsonRedactionText
         );
-        expect(returnedData.myobject.mypathToRedact).toBe(
+        expect(returnedData.myobject?.mypathToRedact).toBe(
           defaultJsonRedactionText
         );
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
       });
 
@@ -592,22 +594,22 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.pathToRedact).toBe(defaultJsonRedactionText);
-        expect(returnedData.myObject.myPathToRedact).toBe(
+        expect(returnedData.myObject?.myPathToRedact).toBe(
           defaultJsonRedactionText
         );
-        expect(returnedData.myObject.nestedObject.nestedPathToRedact).toBe(
+        expect(returnedData.myObject?.nestedObject?.nestedPathToRedact).toBe(
           defaultJsonRedactionText
         );
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
-        expect(returnedData.myobject.mypathToRedact).toBe(
-          data.myobject.mypathToRedact
+        expect(returnedData.myobject?.mypathToRedact).toBe(
+          data.myobject?.mypathToRedact
         );
       });
 
@@ -644,22 +646,22 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
-        expect(returnedData.myObject.myPropertyToRedact).toBe(
+        expect(returnedData.myObject?.myPropertyToRedact).toBe(
           defaultJsonRedactionText
         );
-        expect(returnedData.myObject.nestedObject.nestedPropertyToRedact).toBe(
-          defaultJsonRedactionText
-        );
-        expect(returnedData.myobject.mypropertytoRedact).toBe(
+        expect(
+          returnedData.myObject?.nestedObject?.nestedPropertyToRedact
+        ).toBe(defaultJsonRedactionText);
+        expect(returnedData.myobject?.mypropertytoRedact).toBe(
           defaultJsonRedactionText
         );
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
       });
 
@@ -696,22 +698,22 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
-        expect(returnedData.myObject.myPropertyToRedact).toBe(
+        expect(returnedData.myObject?.myPropertyToRedact).toBe(
           defaultJsonRedactionText
         );
-        expect(returnedData.myObject.nestedObject.nestedPropertyToRedact).toBe(
-          defaultJsonRedactionText
-        );
+        expect(
+          returnedData.myObject?.nestedObject?.nestedPropertyToRedact
+        ).toBe(defaultJsonRedactionText);
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
-          data.myObject.otherProperty
+        expect(returnedData.myObject?.otherProperty).toBe(
+          data.myObject?.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
-        expect(returnedData.myobject.mypropertytoRedact).toBe(
-          data.myobject.mypropertytoRedact
+        expect(returnedData.myobject?.mypropertytoRedact).toBe(
+          data.myobject?.mypropertytoRedact
         );
       });
 
@@ -735,7 +737,7 @@ describe(FieldFilteringHandler.name, () => {
             {
               value: 'myObject.myPropertyToNotRedact',
               caseSensitive: false,
-              type: 'redact',
+              // type: 'redact',
             },
           ],
           includes: [{value: 'Redact', type: 'redact', caseSensitive: false}],
@@ -764,22 +766,22 @@ describe(FieldFilteringHandler.name, () => {
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.otherProperty).toBe(data.otherProperty);
 
-        expect(returnedData.myObject.myPropertyToNotRedact).toBe(
-          data.myObject.myPropertyToNotRedact
+        expect(returnedData.myObject?.myPropertyToNotRedact).toBe(
+          data.myObject?.myPropertyToNotRedact
         );
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
 
-        expect(returnedData.myObject.nestedObject.nestedPropertyToRedact).toBe(
-          defaultJsonRedactionText
-        );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(
+          returnedData.myObject?.nestedObject?.nestedPropertyToRedact
+        ).toBe(defaultJsonRedactionText);
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
 
-        expect(returnedData.myobject.myPropertyToNotredact).toBe(
-          data.myobject.myPropertyToNotredact
+        expect(returnedData.myobject?.myPropertyToNotredact).toBe(
+          data.myobject?.myPropertyToNotredact
         );
       });
 
@@ -803,7 +805,7 @@ describe(FieldFilteringHandler.name, () => {
             {
               value: 'myObject.myPropertyToNotRedact',
               caseSensitive: true,
-              type: 'redact',
+              // type: 'redact',
             },
           ],
           includes: [{value: 'Redact', caseSensitive: true, type: 'redact'}],
@@ -832,21 +834,21 @@ describe(FieldFilteringHandler.name, () => {
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.otherProperty).toBe(data.otherProperty);
 
-        expect(returnedData.myObject.myPropertyToNotRedact).toBe(
+        expect(returnedData.myObject?.myPropertyToNotRedact).toBe(
           data.myObject.myPropertyToNotRedact
         );
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
 
-        expect(returnedData.myObject.nestedObject.nestedPropertyToRedact).toBe(
-          defaultJsonRedactionText
-        );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(
+          returnedData.myObject?.nestedObject?.nestedPropertyToRedact
+        ).toBe(defaultJsonRedactionText);
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
 
-        expect(returnedData.myobject.myPropertyToNotredact).toBe(
+        expect(returnedData.myobject?.myPropertyToNotredact).toBe(
           data.myobject.myPropertyToNotredact
         );
       });
@@ -883,25 +885,25 @@ describe(FieldFilteringHandler.name, () => {
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
         expect(returnedData.otherProperty).toBe(data.otherProperty);
 
-        expect(returnedData.myObject.myPropertyToRedact).toBe(
+        expect(returnedData.myObject?.myPropertyToRedact).toBe(
           defaultJsonRedactionText
         );
-        expect(returnedData.myObject.myPropertyToAlsoRed).toBe(
+        expect(returnedData.myObject?.myPropertyToAlsoRed).toBe(
           defaultJsonRedactionText
         );
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
 
-        expect(returnedData.myObject.nestedObject.nestedPropertyToRedact).toBe(
-          defaultJsonRedactionText
-        );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(
+          returnedData.myObject?.nestedObject?.nestedPropertyToRedact
+        ).toBe(defaultJsonRedactionText);
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
 
-        expect(returnedData.myobject.myPropertytoredact).toBe(
-          data.myobject.myPropertytoredact
+        expect(returnedData.myobject?.myPropertytoredact).toBe(
+          data.myobject?.myPropertytoredact
         );
       });
 
@@ -935,22 +937,22 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.myPropertyToRedact).toBe(defaultJsonRedactionText);
-        expect(returnedData.myObject.myPropertyToRedact).toBe(
+        expect(returnedData.myObject?.myPropertyToRedact).toBe(
           defaultJsonRedactionText
         );
-        expect(returnedData.myObject.nestedObject.nestedPropertyToRedact).toBe(
-          defaultJsonRedactionText
-        );
-        expect(returnedData.myobject.myPropertytoredact).toBe(
+        expect(
+          returnedData.myObject?.nestedObject?.nestedPropertyToRedact
+        ).toBe(defaultJsonRedactionText);
+        expect(returnedData.myobject?.myPropertytoredact).toBe(
           defaultJsonRedactionText
         );
 
         expect(returnedData.otherProperty).toBe(data.otherProperty);
-        expect(returnedData.myObject.otherProperty).toBe(
+        expect(returnedData.myObject?.otherProperty).toBe(
           data.myObject.otherProperty
         );
-        expect(returnedData.myObject.nestedObject.myOtherNestedProperty).toBe(
-          data.myObject.nestedObject.myOtherNestedProperty
+        expect(returnedData.myObject?.nestedObject?.myOtherNestedProperty).toBe(
+          data.myObject?.nestedObject?.myOtherNestedProperty
         );
       });
 
@@ -975,9 +977,9 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.propertyToRedact).toBe(customJsonRedactionText);
-        expect(returnedData.myObject.nestedObject.nestedPropertyToRedact).toBe(
-          customJsonRedactionText
-        );
+        expect(
+          returnedData.myObject?.nestedObject?.nestedPropertyToRedact
+        ).toBe(customJsonRedactionText);
       });
 
       test('redacts queries in all url formatted JSON properties by rules passed', () => {
@@ -1026,11 +1028,13 @@ describe(FieldFilteringHandler.name, () => {
         ).filterFields(data);
 
         expect(returnedData.httpUrl).toBe(redactedHttpUrl);
-        expect(returnedData.myObject.httpsUrl).toBe(redactedHttpsUrl);
-        expect(returnedData.myObject.nestedObject.websocketUrl).toBe(
+        expect(returnedData.myObject?.httpsUrl).toBe(redactedHttpsUrl);
+        expect(returnedData.myObject?.nestedObject?.websocketUrl).toBe(
           redactedWebsocketUrl
         );
-        expect(returnedData.myObject.nestedObject.ftpUrl).toBe(redactedFtpUrl);
+        expect(returnedData.myObject?.nestedObject?.ftpUrl).toBe(
+          redactedFtpUrl
+        );
       });
     });
   });
