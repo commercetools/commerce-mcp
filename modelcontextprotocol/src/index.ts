@@ -11,7 +11,7 @@ import {
   FieldFilteringManagerConfig,
   FieldFilteringRule,
   FieldFilteringHandler,
-} from '@commercetools/commerce-agent/modelcontextprotocol';
+} from '@commercetools/processors';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {red, yellow} from 'colors';
 

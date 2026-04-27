@@ -45,6 +45,9 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Build - Processors
+        run: pnpm --filter @commercetools/processors run build
+
       - name: Build - TypeScript
         run: pnpm --filter @commercetools/commerce-agent run build
 
