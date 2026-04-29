@@ -48,13 +48,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToCartDiscountTools = (context?: Context) => {
-  if (context?.isAdmin || context?.storeKey) {
-    return [
-      tools.read_cart_discount,
-      tools.create_cart_discount,
-      tools.update_cart_discount,
-    ];
-  }
-  return [];
+export const contextToCartDiscountTools = (_context?: Context) => {
+  return [
+    tools.read_cart_discount,
+    tools.create_cart_discount,
+    tools.update_cart_discount,
+  ];
 };

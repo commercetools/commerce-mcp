@@ -32,24 +32,24 @@ describe('Custom Objects Tools', () => {
       });
     });
 
-    it('should return empty array when isAdmin is false', () => {
+    it('should return all custom object tools when isAdmin is false', () => {
       const context = {isAdmin: false};
       const tools = contextToCustomObjectTools(context);
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
 
-    it('should return empty array when context is undefined', () => {
+    it('should return all custom object tools when context is undefined', () => {
       const tools = contextToCustomObjectTools();
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
 
-    it('should return empty array when context does not have isAdmin', () => {
+    it('should return all custom object tools when context does not have isAdmin', () => {
       const context = {};
       const tools = contextToCustomObjectTools(context);
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
   });
 });

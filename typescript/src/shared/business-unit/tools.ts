@@ -64,20 +64,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToBusinessUnitTools = (context?: Context) => {
-  if (context?.storeKey) {
-    return [
-      tools.read_business_unit,
-      tools.create_business_unit,
-      tools.update_business_unit,
-    ];
-  }
-  if (context?.isAdmin) {
-    return [
-      tools.read_business_unit,
-      tools.create_business_unit,
-      tools.update_business_unit,
-    ];
-  }
-  return [];
+export const contextToBusinessUnitTools = (_context?: Context) => {
+  return [
+    tools.read_business_unit,
+    tools.create_business_unit,
+    tools.update_business_unit,
+  ];
 };

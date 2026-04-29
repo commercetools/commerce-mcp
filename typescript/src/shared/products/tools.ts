@@ -48,9 +48,6 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToProductsTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [tools.list_products, tools.create_product, tools.update_product];
-  }
-  return [tools.list_products];
+export const contextToProductsTools = (_context?: Context) => {
+  return [tools.list_products, tools.create_product, tools.update_product];
 };

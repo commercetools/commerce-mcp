@@ -47,9 +47,6 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToPaymentTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [tools.read_payments, tools.create_payments, tools.update_payments];
-  }
-  return [];
+export const contextToPaymentTools = (_context?: Context) => {
+  return [tools.read_payments, tools.create_payments, tools.update_payments];
 };

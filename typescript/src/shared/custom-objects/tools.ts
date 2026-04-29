@@ -47,13 +47,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToCustomObjectTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [
-      tools.read_custom_object,
-      tools.create_custom_object,
-      tools.update_custom_object,
-    ];
-  }
-  return [];
+export const contextToCustomObjectTools = (_context?: Context) => {
+  return [
+    tools.read_custom_object,
+    tools.create_custom_object,
+    tools.update_custom_object,
+  ];
 };

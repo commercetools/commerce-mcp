@@ -47,27 +47,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToShoppingListTools = (context?: Context) => {
-  if (context?.customerId) {
-    return [
-      tools.read_shopping_list,
-      tools.create_shopping_list,
-      tools.update_shopping_list,
-    ];
-  }
-  if (context?.storeKey) {
-    return [
-      tools.read_shopping_list,
-      tools.create_shopping_list,
-      tools.update_shopping_list,
-    ];
-  }
-  if (context?.isAdmin) {
-    return [
-      tools.read_shopping_list,
-      tools.create_shopping_list,
-      tools.update_shopping_list,
-    ];
-  }
-  return [];
+export const contextToShoppingListTools = (_context?: Context) => {
+  return [
+    tools.read_shopping_list,
+    tools.create_shopping_list,
+    tools.update_shopping_list,
+  ];
 };

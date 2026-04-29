@@ -41,24 +41,24 @@ describe('Shipping Methods Tools', () => {
       expect(tools[0]).toHaveProperty('method', 'read_shipping_methods');
     });
 
-    it('should return empty array when isAdmin is false and no customerId', () => {
+    it('should return all shipping method tools when isAdmin is false and no customerId', () => {
       const context = {isAdmin: false};
       const tools = contextToShippingMethodTools(context);
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
 
-    it('should return empty array when context is undefined', () => {
+    it('should return all shipping method tools when context is undefined', () => {
       const tools = contextToShippingMethodTools();
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
 
-    it('should return empty array when context does not have isAdmin or customerId', () => {
+    it('should return all shipping method tools when context has no isAdmin or customerId', () => {
       const context = {};
       const tools = contextToShippingMethodTools(context);
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
   });
 });
