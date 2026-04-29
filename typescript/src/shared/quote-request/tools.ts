@@ -65,10 +65,7 @@ const tools: Record<string, Tool> = {
 };
 
 export const contextToQuoteRequestTools = (context?: Context) => {
-  if (
-    context?.storeKey ||
-    (context?.customerId && context?.businessUnitKey)
-  ) {
+  if (context?.storeKey || (context?.customerId && context?.businessUnitKey)) {
     return [
       tools.read_quote_request,
       tools.create_quote_request,

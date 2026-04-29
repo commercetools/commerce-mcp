@@ -15,8 +15,8 @@ import {
   FieldFilteringRule,
   FieldFilteringHandler,
 } from '@commercetools/processors';
-import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { red, yellow } from 'colors';
+import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {red, yellow} from 'colors';
 
 type Options = {
   tools?: string[];
@@ -72,7 +72,7 @@ export {
   resolveToolsForConfiguration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 
-export function parseArgs(args: string[]): { options: Options; env: EnvVars } {
+export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
   const options: Options = {};
   const env: EnvVars = {};
 
@@ -361,7 +361,7 @@ export async function main() {
   require('dotenv').config({
     quiet: true,
   });
-  const { options, env } = parseArgs(process.argv.slice(2));
+  const {options, env} = parseArgs(process.argv.slice(2));
 
   // Create the CommercetoolsCommerceAgent instance
   const selectedTools = options.tools!;
@@ -382,7 +382,10 @@ export async function main() {
     },
   };
 
-  const resolution = resolveToolsForConfiguration(selectedTools, Boolean(options.isAdmin));
+  const resolution = resolveToolsForConfiguration(
+    selectedTools,
+    Boolean(options.isAdmin)
+  );
   applyResolvedToolsToConfiguration(configuration, resolution);
 
   const authConfig = createAuthConfig(env);

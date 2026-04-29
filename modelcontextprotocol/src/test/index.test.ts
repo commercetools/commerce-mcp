@@ -390,10 +390,7 @@ describe('parseArgs function', () => {
 
     it('ignores all and all.read when any explicit tool is listed', () => {
       expect(
-        resolveToolsForConfiguration(
-          ['all', 'all.read', 'quotes.read'],
-          true
-        )
+        resolveToolsForConfiguration(['all', 'all.read', 'quotes.read'], true)
       ).toEqual({
         mode: 'explicit',
         explicitTools: ['quotes.read'],
@@ -408,9 +405,7 @@ describe('parseArgs function', () => {
     });
 
     it('treats all,all.read without isAdmin as all_read (all.read still applies)', () => {
-      expect(
-        resolveToolsForConfiguration(['all', 'all.read'], false)
-      ).toEqual({
+      expect(resolveToolsForConfiguration(['all', 'all.read'], false)).toEqual({
         mode: 'all_read',
         explicitTools: [],
       });
@@ -418,10 +413,7 @@ describe('parseArgs function', () => {
 
     it('applies explicit tools even when isAdmin is false', () => {
       expect(
-        resolveToolsForConfiguration(
-          ['products.create', 'quotes.read'],
-          false
-        )
+        resolveToolsForConfiguration(['products.create', 'quotes.read'], false)
       ).toEqual({
         mode: 'explicit',
         explicitTools: ['products.create', 'quotes.read'],
@@ -438,9 +430,7 @@ describe('parseArgs function', () => {
       });
       expect(configuration.actions?.products?.read).toBe(true);
       expect(
-        configuration.actions?.[
-          'quote' as AvailableNamespaces
-        ]?.read
+        configuration.actions?.['quote' as AvailableNamespaces]?.read
       ).toBe(true);
       expect(configuration.actions?.cart).toBeUndefined();
     });

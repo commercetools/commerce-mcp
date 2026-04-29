@@ -48,9 +48,5 @@ const tools: Record<string, Tool> = {
 };
 
 export const contextToInventoryTools = (_context?: Context) => {
-  return [
-    tools.read_inventory,
-    tools.create_inventory,
-    tools.update_inventory,
-  ];
+  return [tools.read_inventory, tools.create_inventory, tools.update_inventory];
 };
