@@ -13,17 +13,17 @@ describe('Extension Tools', () => {
       expect(tools[2]).toHaveProperty('method', 'update_extension');
     });
 
-    it('should return empty array when no context is provided', () => {
+    it('should return all extension tools when no context is provided', () => {
       const tools = contextToExtensionTools();
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
 
-    it('should return empty array when context does not include isAdmin', () => {
+    it('should return all extension tools when context does not include isAdmin', () => {
       const context: Context = {};
       const tools = contextToExtensionTools(context);
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
 
     it('should have correct tool properties', () => {

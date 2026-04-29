@@ -193,11 +193,7 @@ class CommercetoolsCommerceAgent extends McpServer {
           result = fieldFilteringHandler.filterFields(result);
         }
         return this.createToolResponse(
-          transformToolOutput({
-            data: result,
-            title: `${tool.method} result`,
-            format: this.configuration.context?.toolOutputFormat,
-          })
+          this.formatToolResultText(result, `${tool.method} result`)
         );
       }
     );
@@ -264,17 +260,31 @@ class CommercetoolsCommerceAgent extends McpServer {
           }
 
           return this.createToolResponse(
-            transformToolOutput({
-              data: result,
-              title: `${args.toolMethod} result`,
-              format: this.configuration.context?.toolOutputFormat,
-            })
+            this.formatToolResultText(result, `${args.toolMethod} result`)
           );
         } catch (error) {
           return this.handleToolExecutionError(error, args.toolMethod);
         }
       }
     );
+  }
+
+  /**
+   * Default: plain JSON of the payload (no uppercase title wrapper).
+   * With {@link Context.toolOutputFormat} `"tabular"`, uses the legacy titled layout.
+   */
+  private formatToolResultText(data: unknown, tabularTitle: string): string {
+    if (this.configuration.context?.toolOutputFormat === 'tabular') {
+      return transformToolOutput({
+        data,
+        title: tabularTitle,
+      });
+    }
+
+    return transformToolOutput({
+      data,
+      format: 'json',
+    });
   }
 
   private createToolResponse(result: string): {

@@ -1,12 +1,19 @@
-import {ACCEPTED_TOOLS, parseArgs} from '../index';
+import {
+  ACCEPTED_TOOLS,
+  applyResolvedToolsToConfiguration,
+  parseArgs,
+  resolveToolsForConfiguration,
+} from '../index';
 import {
   CommercetoolsCommerceAgent,
   Configuration,
   AvailableNamespaces,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 
-// Mock the CommercetoolsCommerceAgent and transport
-jest.mock('@commercetools/commerce-agent/modelcontextprotocol');
+// Keep real exports (ACCEPTED_TOOLS, tool resolution, etc.); only stub transports below.
+jest.mock('@commercetools/commerce-agent/modelcontextprotocol', () => ({
+  ...jest.requireActual('@commercetools/commerce-agent/modelcontextprotocol'),
+}));
 jest.mock('@modelcontextprotocol/sdk/server/stdio.js');
 
 describe('parseArgs function', () => {
@@ -354,26 +361,119 @@ describe('parseArgs function', () => {
     });
   });
 
+  describe('resolveToolsForConfiguration', () => {
+    it('treats lone all without isAdmin as empty explicit selection', () => {
+      expect(resolveToolsForConfiguration(['all'], false)).toEqual({
+        mode: 'explicit',
+        explicitTools: [],
+      });
+    });
+
+    it('expands all when isAdmin is true', () => {
+      expect(resolveToolsForConfiguration(['all'], true)).toEqual({
+        mode: 'all_expand',
+        explicitTools: [],
+      });
+    });
+
+    it('ignores all when explicit tools are also listed', () => {
+      expect(
+        resolveToolsForConfiguration(
+          ['all', 'products.read', 'cart.read'],
+          false
+        )
+      ).toEqual({
+        mode: 'explicit',
+        explicitTools: ['products.read', 'cart.read'],
+      });
+    });
+
+    it('ignores all and all.read when any explicit tool is listed', () => {
+      expect(
+        resolveToolsForConfiguration(
+          ['all', 'all.read', 'quotes.read'],
+          true
+        )
+      ).toEqual({
+        mode: 'explicit',
+        explicitTools: ['quotes.read'],
+      });
+    });
+
+    it('keeps all.read without requiring isAdmin', () => {
+      expect(resolveToolsForConfiguration(['all.read'], false)).toEqual({
+        mode: 'all_read',
+        explicitTools: [],
+      });
+    });
+
+    it('treats all,all.read without isAdmin as all_read (all.read still applies)', () => {
+      expect(
+        resolveToolsForConfiguration(['all', 'all.read'], false)
+      ).toEqual({
+        mode: 'all_read',
+        explicitTools: [],
+      });
+    });
+
+    it('applies explicit tools even when isAdmin is false', () => {
+      expect(
+        resolveToolsForConfiguration(
+          ['products.create', 'quotes.read'],
+          false
+        )
+      ).toEqual({
+        mode: 'explicit',
+        explicitTools: ['products.create', 'quotes.read'],
+      });
+    });
+  });
+
+  describe('applyResolvedToolsToConfiguration', () => {
+    it('sets actions from explicit tools only', () => {
+      const configuration: Configuration = {actions: {}, context: {}};
+      applyResolvedToolsToConfiguration(configuration, {
+        mode: 'explicit',
+        explicitTools: ['products.read', 'quote.read'],
+      });
+      expect(configuration.actions?.products?.read).toBe(true);
+      expect(
+        configuration.actions?.[
+          'quote' as AvailableNamespaces
+        ]?.read
+      ).toBe(true);
+      expect(configuration.actions?.cart).toBeUndefined();
+    });
+
+    it('clears to empty actions when resolution is lone all without admin', () => {
+      const configuration: Configuration = {
+        actions: {products: {read: true}},
+        context: {},
+      };
+      applyResolvedToolsToConfiguration(configuration, {
+        mode: 'explicit',
+        explicitTools: [],
+      });
+      expect(configuration.actions).toEqual({});
+    });
+  });
+
   describe('configuration building integration tests', () => {
     beforeEach(() => {
       jest.clearAllMocks();
     });
 
     it('should build configuration with only read operations for all.read', () => {
-      // Mock the CommercetoolsCommerceAgent constructor
-      const mockCommercetoolsCommerceAgent = jest.mocked(
-        CommercetoolsCommerceAgent
-      );
       let capturedConfiguration: Configuration;
 
-      mockCommercetoolsCommerceAgent.create.mockImplementation(
-        (options: any) => {
+      const createSpy = jest
+        .spyOn(CommercetoolsCommerceAgent, 'create')
+        .mockImplementation((options: any) => {
           capturedConfiguration = options.configuration;
           return {
             connect: jest.fn(),
           } as any;
-        }
-      );
+        });
 
       // Set up process.argv to simulate command line args
       const originalArgv = process.argv;
@@ -423,6 +523,114 @@ describe('parseArgs function', () => {
 
         // Restore original argv
         process.argv = originalArgv;
+        createSpy.mockRestore();
+      });
+    });
+
+    it('should set empty actions when tools is all without isAdmin', () => {
+      let capturedConfiguration: Configuration;
+
+      const createSpy = jest
+        .spyOn(CommercetoolsCommerceAgent, 'create')
+        .mockImplementation((options: any) => {
+          capturedConfiguration = options.configuration;
+          return {
+            connect: jest.fn(),
+          } as any;
+        });
+
+      const originalArgv = process.argv;
+      delete process.env.IS_ADMIN;
+      process.argv = [
+        'node',
+        'index.js',
+        '--tools=all',
+        '--clientId=test_client_id',
+        '--clientSecret=test_client_secret',
+        '--authUrl=https://auth.commercetools.com',
+        '--projectKey=test_project',
+        '--apiUrl=https://api.commercetools.com',
+      ];
+
+      const {main} = require('../index');
+      return main().then(() => {
+        expect(capturedConfiguration.actions).toEqual({});
+        process.argv = originalArgv;
+        createSpy.mockRestore();
+      });
+    });
+
+    it('should enable create/update when tools is all with isAdmin', () => {
+      let capturedConfiguration: Configuration;
+
+      const createSpy = jest
+        .spyOn(CommercetoolsCommerceAgent, 'create')
+        .mockImplementation((options: any) => {
+          capturedConfiguration = options.configuration;
+          return {
+            connect: jest.fn(),
+          } as any;
+        });
+
+      const originalArgv = process.argv;
+      process.argv = [
+        'node',
+        'index.js',
+        '--tools=all',
+        '--clientId=test_client_id',
+        '--clientSecret=test_client_secret',
+        '--authUrl=https://auth.commercetools.com',
+        '--projectKey=test_project',
+        '--apiUrl=https://api.commercetools.com',
+        '--isAdmin=true',
+      ];
+
+      const {main} = require('../index');
+      return main().then(() => {
+        expect(
+          Object.keys(capturedConfiguration.actions ?? {}).length
+        ).toBeGreaterThan(10);
+        expect(capturedConfiguration.actions!.products?.create).toBe(true);
+        expect(capturedConfiguration.actions!.products?.read).toBe(true);
+        process.argv = originalArgv;
+        createSpy.mockRestore();
+      });
+    });
+
+    it('should ignore all when explicit tools are listed (without isAdmin)', () => {
+      let capturedConfiguration: Configuration;
+
+      const createSpy = jest
+        .spyOn(CommercetoolsCommerceAgent, 'create')
+        .mockImplementation((options: any) => {
+          capturedConfiguration = options.configuration;
+          return {
+            connect: jest.fn(),
+          } as any;
+        });
+
+      const originalArgv = process.argv;
+      delete process.env.IS_ADMIN;
+      process.argv = [
+        'node',
+        'index.js',
+        '--tools=all,products.read,cart.read,quote.read',
+        '--clientId=test_client_id',
+        '--clientSecret=test_client_secret',
+        '--authUrl=https://auth.commercetools.com',
+        '--projectKey=test_project',
+        '--apiUrl=https://api.commercetools.com',
+      ];
+
+      const {main} = require('../index');
+      return main().then(() => {
+        expect(capturedConfiguration.actions).toEqual({
+          products: {read: true},
+          cart: {read: true},
+          quote: {read: true},
+        });
+        process.argv = originalArgv;
+        createSpy.mockRestore();
       });
     });
   });

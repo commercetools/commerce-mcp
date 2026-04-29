@@ -47,13 +47,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToInventoryTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [
-      tools.read_inventory,
-      tools.create_inventory,
-      tools.update_inventory,
-    ];
-  }
-  return [];
+export const contextToInventoryTools = (_context?: Context) => {
+  return [
+    tools.read_inventory,
+    tools.create_inventory,
+    tools.update_inventory,
+  ];
 };

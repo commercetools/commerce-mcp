@@ -43,9 +43,6 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToZoneTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [tools.read_zone, tools.create_zone, tools.update_zone];
-  }
-  return [];
+export const contextToZoneTools = (_context?: Context) => {
+  return [tools.read_zone, tools.create_zone, tools.update_zone];
 };

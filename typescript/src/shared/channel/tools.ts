@@ -48,9 +48,6 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToChannelTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [tools.read_channel, tools.create_channel, tools.update_channel];
-  }
-  return [];
+export const contextToChannelTools = (_context?: Context) => {
+  return [tools.read_channel, tools.create_channel, tools.update_channel];
 };

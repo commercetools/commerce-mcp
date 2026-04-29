@@ -6,8 +6,9 @@ import {
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 
-// Mock these imports
-jest.mock('@commercetools/commerce-agent/modelcontextprotocol');
+jest.mock('@commercetools/commerce-agent/modelcontextprotocol', () => ({
+  ...jest.requireActual('@commercetools/commerce-agent/modelcontextprotocol'),
+}));
 jest.mock('@modelcontextprotocol/sdk/server/stdio.js');
 
 describe('Product Type Tools', () => {

@@ -50,13 +50,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToProductTailoringTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [
-      tools.read_product_tailoring,
-      tools.create_product_tailoring,
-      tools.update_product_tailoring,
-    ];
-  }
-  return [];
+export const contextToProductTailoringTools = (_context?: Context) => {
+  return [
+    tools.read_product_tailoring,
+    tools.create_product_tailoring,
+    tools.update_product_tailoring,
+  ];
 };

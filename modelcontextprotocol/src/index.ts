@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 
 import {
-  Configuration,
-  AvailableNamespaces,
+  ACCEPTED_TOOLS,
+  applyResolvedToolsToConfiguration,
+  type AvailableNamespaces,
+  type Configuration,
   CommercetoolsCommerceAgent,
   CommercetoolsCommerceAgentStreamable,
   AuthConfig,
+  resolveToolsForConfiguration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 import {
   FieldFilteringManagerConfig,
   FieldFilteringRule,
   FieldFilteringHandler,
 } from '@commercetools/processors';
-import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
-import {red, yellow} from 'colors';
+import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { red, yellow } from 'colors';
 
 type Options = {
   tools?: string[];
@@ -59,127 +62,17 @@ const PUBLIC_ARGS = [
 
 const ACCEPTED_ARGS = [...PUBLIC_ARGS, ...HIDDEN_ARGS];
 
-export const ACCEPTED_TOOLS = [
-  'business-unit.read',
-  'business-unit.create',
-  'business-unit.update',
-  'products.read',
-  'products.create',
-  'products.update',
-  'project.read',
-  'product-search.read',
-  'category.read',
-  'category.create',
-  'category.update',
-  'channel.read',
-  'channel.create',
-  'channel.update',
-  'product-selection.read',
-  'product-selection.create',
-  'product-selection.update',
-  'order.read',
-  'order.create',
-  'order.update',
-  'cart.read',
-  'cart.create',
-  'cart.update',
-  'customer.create',
-  'customer.read',
-  'customer.update',
-  'customer-group.read',
-  'customer-group.create',
-  'customer-group.update',
-  'quote.read',
-  'quote.create',
-  'quote.update',
-  'quote-request.read',
-  'quote-request.create',
-  'quote-request.update',
-  'staged-quote.read',
-  'staged-quote.create',
-  'staged-quote.update',
-  'standalone-price.read',
-  'standalone-price.create',
-  'standalone-price.update',
-  'product-discount.read',
-  'product-discount.create',
-  'product-discount.update',
-  'cart-discount.read',
-  'cart-discount.create',
-  'cart-discount.update',
-  'discount-code.read',
-  'discount-code.create',
-  'discount-code.update',
-  'product-type.read',
-  'product-type.create',
-  'product-type.update',
-  'bulk.create',
-  'bulk.update',
-  'inventory.read',
-  'inventory.create',
-  'inventory.update',
-  'store.read',
-  'store.create',
-  'store.update',
-  'review.read',
-  'review.create',
-  'review.update',
+export type {
+  ToolResolutionMode,
+  ToolsConfigurationResolution,
+} from '@commercetools/commerce-agent/modelcontextprotocol';
+export {
+  ACCEPTED_TOOLS,
+  applyResolvedToolsToConfiguration,
+  resolveToolsForConfiguration,
+} from '@commercetools/commerce-agent/modelcontextprotocol';
 
-  'tax-category.read',
-  'tax-category.create',
-  'tax-category.update',
-
-  'shipping-methods.read',
-  'shipping-methods.create',
-  'shipping-methods.update',
-
-  'payments.read',
-  'payments.create',
-  'payments.update',
-
-  'zone.read',
-  'zone.create',
-  'zone.update',
-
-  'product-tailoring.read',
-  'product-tailoring.create',
-  'product-tailoring.update',
-
-  'payment-methods.read',
-  'payment-methods.create',
-  'payment-methods.update',
-
-  'recurring-orders.read',
-  'recurring-orders.create',
-  'recurring-orders.update',
-
-  'shopping-lists.read',
-  'shopping-lists.create',
-  'shopping-lists.update',
-
-  'extensions.read',
-  'extensions.create',
-  'extensions.update',
-
-  'subscriptions.read',
-  'subscriptions.create',
-  'subscriptions.update',
-
-  'custom-objects.read',
-  'custom-objects.create',
-  'custom-objects.update',
-
-  'types.read',
-  'types.create',
-  'types.update',
-
-  'payment-intents.update',
-
-  'transactions.read',
-  'transactions.create',
-];
-
-export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
+export function parseArgs(args: string[]): { options: Options; env: EnvVars } {
   const options: Options = {};
   const env: EnvVars = {};
 
@@ -188,7 +81,7 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
       const [key, value] = arg.slice(2).split('=');
 
       if (key == 'tools') {
-        options.tools = value.split(',');
+        options.tools = value.replace(/\s+/g, '').split(',');
       } else if (key == 'authType') {
         env.authType = value as EnvVars['authType'];
       } else if (key == 'accessToken') {
@@ -468,7 +361,7 @@ export async function main() {
   require('dotenv').config({
     quiet: true,
   });
-  const {options, env} = parseArgs(process.argv.slice(2));
+  const { options, env } = parseArgs(process.argv.slice(2));
 
   // Create the CommercetoolsCommerceAgent instance
   const selectedTools = options.tools!;
@@ -489,43 +382,8 @@ export async function main() {
     },
   };
 
-  if (selectedTools[0] === 'all') {
-    ACCEPTED_TOOLS.forEach((tool) => {
-      if (!configuration.actions) {
-        configuration.actions = {};
-      }
-      const [namespace, action] = tool.split('.');
-
-      configuration.actions[namespace as AvailableNamespaces] = {
-        ...configuration.actions[namespace as AvailableNamespaces],
-        [action]: true,
-      };
-    });
-  } else if (selectedTools[0] === 'all.read') {
-    ACCEPTED_TOOLS.forEach((tool) => {
-      if (!configuration.actions) {
-        configuration.actions = {};
-      }
-      const [namespace, action] = tool.split('.');
-      if (action === 'read') {
-        configuration.actions[namespace as AvailableNamespaces] = {
-          ...configuration.actions[namespace as AvailableNamespaces],
-          [action]: true,
-        };
-      }
-    });
-  } else {
-    selectedTools.forEach((tool: any) => {
-      if (!configuration.actions) {
-        configuration.actions = {};
-      }
-      const [namespace, action] = tool.split('.');
-      configuration.actions[namespace as AvailableNamespaces] = {
-        ...(configuration.actions[namespace as AvailableNamespaces] || {}),
-        [action]: true,
-      };
-    });
-  }
+  const resolution = resolveToolsForConfiguration(selectedTools, Boolean(options.isAdmin));
+  applyResolvedToolsToConfiguration(configuration, resolution);
 
   const authConfig = createAuthConfig(env);
 

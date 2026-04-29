@@ -47,20 +47,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToStagedQuoteTools = (context?: Context) => {
-  if (context?.storeKey) {
-    return [
-      tools.read_staged_quote,
-      tools.create_staged_quote,
-      tools.update_staged_quote,
-    ];
-  }
-  if (context?.isAdmin) {
-    return [
-      tools.read_staged_quote,
-      tools.create_staged_quote,
-      tools.update_staged_quote,
-    ];
-  }
-  return [];
+export const contextToStagedQuoteTools = (_context?: Context) => {
+  return [
+    tools.read_staged_quote,
+    tools.create_staged_quote,
+    tools.update_staged_quote,
+  ];
 };

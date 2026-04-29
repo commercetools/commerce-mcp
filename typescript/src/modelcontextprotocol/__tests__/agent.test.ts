@@ -4,6 +4,7 @@ import CommercetoolsAPI from '../../shared/api';
 import {isToolAllowed} from '../../shared/configuration';
 import {Configuration, Context} from '../../types/configuration';
 import {scopesToActions} from '../../utils/scopes';
+import {transformToolOutput} from '@commercetools/processors';
 
 // Mock dependencies
 jest.mock('@modelcontextprotocol/sdk/server/mcp.js');
@@ -237,10 +238,46 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
       content: [
         {
           type: 'text',
-          text: `{"MCP TOOL1 RESULT":${JSON.stringify(apiResult)}}`,
+          text: JSON.stringify(apiResult),
         },
       ],
     });
+  });
+
+  it('uses titled tabular output when toolOutputFormat is tabular', async () => {
+    CommercetoolsCommerceAgent.create({
+      authConfig: {
+        clientId: 'id',
+        clientSecret: 'secret',
+        authUrl: 'auth',
+        projectKey: 'key',
+        apiUrl: 'api',
+        type: 'client_credentials',
+      },
+      configuration: {
+        ...mockConfiguration,
+        context: {
+          ...mockConfiguration.context,
+          toolOutputFormat: 'tabular',
+        },
+      },
+    });
+
+    await new Promise(setImmediate);
+    const toolCallArgs = mockToolMethod.mock.calls[0];
+    const handler = toolCallArgs[3];
+    const toolMethod = toolCallArgs[0];
+    const apiResult = {data: 'api success'};
+    mockCommercetoolsAPIInstance.run.mockResolvedValue(apiResult as any);
+
+    const result = await handler({}, {});
+
+    expect(result.content[0].text).toBe(
+      transformToolOutput({
+        data: apiResult,
+        title: `${toolMethod} result`,
+      })
+    );
   });
 
   it('should correctly handle no tools being allowed', async () => {
@@ -855,8 +892,8 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
 
         await new Promise(setImmediate);
 
-        // Should register resource-based tool system (3 tools) + bulk tools (2 tools) = 5 total
-        expect(mockToolMethod).toHaveBeenCalledTimes(3);
+        // Resource-based system: list_available_tools, inject_tools, execute_tool (3) + bulk_create, bulk_update (2) = 5
+        expect(mockToolMethod).toHaveBeenCalledTimes(5);
         expect(mockToolMethod).toHaveBeenCalledWith(
           'list_available_tools',
           expect.any(String),

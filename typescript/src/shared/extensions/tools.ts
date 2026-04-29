@@ -47,13 +47,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToExtensionTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [
-      tools.read_extension,
-      tools.create_extension,
-      tools.update_extension,
-    ];
-  }
-  return [];
+export const contextToExtensionTools = (_context?: Context) => {
+  return [
+    tools.read_extension,
+    tools.create_extension,
+    tools.update_extension,
+  ];
 };

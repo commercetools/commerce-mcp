@@ -48,13 +48,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToStandalonePriceTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [
-      tools.read_standalone_price,
-      tools.create_standalone_price,
-      tools.update_standalone_price,
-    ];
-  }
-  return [];
+export const contextToStandalonePriceTools = (_context?: Context) => {
+  return [
+    tools.read_standalone_price,
+    tools.create_standalone_price,
+    tools.update_standalone_price,
+  ];
 };
