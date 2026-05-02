@@ -36,10 +36,7 @@ class CommercetoolsAPI:
         import httpx  # lazy import — not bundled with integrations that skip HTTP
 
         self._client = httpx.AsyncClient(
-            headers={
-                "User-Agent": "commerce-mcp-python/0.1.0",
-                "Content-Type": "application/json",
-            }
+            headers={"User-Agent": "commerce-mcp-python/0.1.0"},
         )
 
         if isinstance(self._auth, ClientCredentialsAuth):

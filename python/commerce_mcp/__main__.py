@@ -22,6 +22,9 @@ Environment variables (mirror TypeScript server.json):
     BUSINESS_UNIT_KEY
     DYNAMIC_TOOL_LOADING_THRESHOLD  (default: 30)
     LOGGING                (default: false)
+    STATELESS_HTTP         (default: false) — set true for MCP inspector / clients that
+                           don't persist Mcp-Session-Id across requests
+    CORS_ORIGINS           (default: none) — comma-separated allowed origins for HTTP transport
 """
 from __future__ import annotations
 
@@ -169,6 +172,18 @@ def main(argv: list[str] | None = None) -> None:
             'or "introspect" to derive permissions from OAuth token scopes'
         ),
     )
+    _stateless_default = (
+        _env_bool("STATELESS_HTTP") if _env("STATELESS_HTTP") else True
+    )
+    parser.add_argument(
+        "--stateless",
+        action=argparse.BooleanOptionalAction,
+        default=_stateless_default,
+        help=(
+            "Run HTTP transport in stateless mode (no session tracking, default: true). "
+            "Pass --no-stateless for stateful sessions with Mcp-Session-Id."
+        ),
+    )
 
     args = parser.parse_args(argv)
     auth = _build_auth()
@@ -185,10 +200,25 @@ def main(argv: list[str] | None = None) -> None:
     if args.transport == "stdio":
         server.run(transport="stdio")
     else:
+        from starlette.middleware import Middleware
+        from starlette.middleware.cors import CORSMiddleware
+
+        raw_origins = _env("CORS_ORIGINS")
+        cors_origins = raw_origins.split(",") if raw_origins else []
+
         server.run(
             transport="streamable-http",
             host=args.host,
             port=args.port,
+            stateless_http=args.stateless,
+            middleware=[
+                Middleware(
+                    CORSMiddleware,
+                    allow_origins=cors_origins,
+                    allow_methods=["*"],
+                    allow_headers=["*"],
+                )
+            ],
         )
 
 
