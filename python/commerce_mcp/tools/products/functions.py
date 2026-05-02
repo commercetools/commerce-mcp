@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 from ..products.schemas import ListProductsParams, CreateProductParams, UpdateProductParams
 from ...shared.errors import SDKError, ContextError
 from ...shared.transform import transform_tool_output
@@ -16,17 +16,20 @@ async def list_products(
     context: "CTContext",
 ) -> str:
     try:
-        query: dict = {"limit": params.limit}
         if params.id:
-            query["where"] = f'id="{params.id}"'
+            query: dict[str, Any] = {}
+            if params.expand:
+                query["expand"] = params.expand
+            result = await api.get(f"/products/{params.id}", params=query or None)
+            return transform_tool_output(result)
+
+        query = {"limit": params.limit or 10}
         if params.offset is not None:
             query["offset"] = params.offset
         if params.sort:
             query["sort"] = params.sort
         if params.where:
-            existing = query.get("where", "")
-            combined = " and ".join(filter(None, [existing] + params.where))
-            query["where"] = combined
+            query["where"] = params.where
         if params.expand:
             query["expand"] = params.expand
 
@@ -41,7 +44,6 @@ async def create_product(
     api: "CommercetoolsAPI",
     context: "CTContext",
 ) -> str:
-    # Mirrors contextToProductFunctionMapping: create requires isAdmin.
     if not context.is_admin:
         raise ContextError("create_product", "isAdmin")
     try:
@@ -57,13 +59,12 @@ async def update_product(
     api: "CommercetoolsAPI",
     context: "CTContext",
 ) -> str:
-    # Mirrors contextToProductFunctionMapping: update requires isAdmin.
     if not context.is_admin:
         raise ContextError("update_product", "isAdmin")
     try:
         body = {
             "version": params.version,
-            "actions": [a.model_dump(exclude_none=True) for a in params.actions],
+            "actions": [a.model_dump(by_alias=True, exclude_none=True) for a in params.actions],
         }
         result = await api.post(f"/products/{params.id}", body=body)
         return transform_tool_output(result)

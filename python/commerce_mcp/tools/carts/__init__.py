@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 from ..registry import ToolDefinition, register_tool
-from .schemas import ReadCartParams, CreateCartParams, UpdateCartParams
-from .functions import read_cart, create_cart, update_cart
+from .schemas import ReadCartParams, CreateCartParams, ReplicateCartParams, UpdateCartParams
+from .functions import read_cart, create_cart, replicate_cart, update_cart
 
 _CART_TOOLS = [
     ToolDefinition(
@@ -19,6 +19,14 @@ _CART_TOOLS = [
         description="Create a new cart. Scoped to associate, customer, store, or admin context.",
         parameters=CreateCartParams,
         handler=create_cart,
+        actions={"cart": {"create": True}},
+    ),
+    ToolDefinition(
+        method="replicate_cart",
+        name="Replicate Cart",
+        description="Replicate an existing cart. Scoped to associate, customer, store, or admin context.",
+        parameters=ReplicateCartParams,
+        handler=replicate_cart,
         actions={"cart": {"create": True}},
     ),
     ToolDefinition(

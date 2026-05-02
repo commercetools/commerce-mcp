@@ -37,11 +37,17 @@ Rules:
 
 ## Step 1B — (TypeScript port only) Read the TypeScript source first
 
-If porting an existing TypeScript namespace, read all three files **before writing any Python**:
+If porting an existing TypeScript namespace, read all five files **before writing any Python**:
 
 - `typescript/src/shared/<namespace>/tools.ts` — tool names, descriptions, `actions` requirements
 - `typescript/src/shared/<namespace>/parameters.ts` — Zod schemas → translate to Pydantic
 - `typescript/src/shared/<namespace>/functions.ts` — read `contextToXFunctionMapping` carefully; this is the security contract
+- `typescript/src/shared/<namespace>/base.functions.ts` — API paths used by scope implementations
+- `typescript/src/shared/<namespace>/admin.functions.ts`, `customer.functions.ts`, `store.functions.ts`, `as-associate.functions.ts` — per-scope logic
+
+> **Invoke skill: `python-schema-alignment`** for the schema translation. It covers the full Zod→Pydantic mapping table, camelCase alias rules, sub-model extraction, and a completeness checklist.
+
+> **Invoke skill: `python-namespace-completeness`** early to enumerate all tools TypeScript exposes — so you know the full set before writing any code.
 
 The `contextToXFunctionMapping` function is the single most important thing to get right. It determines which API endpoint is called for each combination of context fields (`isAdmin`, `customerId`, `storeKey`, `businessUnitKey`). **Copy it faithfully** — see Step 3 for the dispatch pattern.
 
@@ -116,6 +122,8 @@ Rules:
 Async handlers with concrete type annotations and context-conditional dispatch.
 
 > **Invoke skill: `python-namespace-types`** — every handler must follow the annotated signature pattern.
+
+> **Invoke skill: `python-function-logic-alignment`** — for TypeScript ports, replicate the exact id/key/where dispatch order, ownership verification, and context injection from all four scope files. This skill documents the common divergences found during the cart alignment and how to avoid them.
 
 > **Invoke skill: `review-context-dispatch`** after writing — verify the dispatch faithfully mirrors the TypeScript `contextToXFunctionMapping`.
 
@@ -207,9 +215,11 @@ async def create_x(params: CreateXParams, api: "CommercetoolsAPI", ctx: "CTConte
 
 ---
 
-## Step 5 — Write __init__.py
+## Step 5 — Write __init__.py and audit completeness
 
 Only `ToolDefinition` declarations and `register_tool()` calls. No logic, no models, no handler code.
+
+> **Invoke skill: `python-namespace-completeness`** after writing `__init__.py` to confirm every TypeScript tool is registered with all four scope implementations and the correct `actions` dict.
 
 ```python
 # python/commerce_mcp/tools/<namespace>/__init__.py
@@ -330,9 +340,13 @@ A namespace is **not complete** until:
 
 | Step | Skill |
 |------|-------|
+| Step 1B — schema translation | `python-schema-alignment` |
+| Step 1B — tool enumeration | `python-namespace-completeness` |
 | Step 2 — file structure | `python-namespace-split` |
 | Step 4 — type annotations | `python-namespace-types` |
+| Step 4 — function logic alignment | `python-function-logic-alignment` |
 | Step 4 — context dispatch security | `review-context-dispatch` |
+| Step 5 — completeness audit | `python-namespace-completeness` |
 | Step 7 — writing and running tests | `python-namespace-tests` |
 | Step 8 — dispatch security audit | `review-context-dispatch` |
 | Step 1B — TypeScript translation | `python-fastmcp` |
