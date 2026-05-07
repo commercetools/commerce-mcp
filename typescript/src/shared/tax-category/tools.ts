@@ -47,13 +47,10 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToTaxCategoryTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [
-      tools.read_tax_category,
-      tools.create_tax_category,
-      tools.update_tax_category,
-    ];
-  }
-  return [tools.read_tax_category];
+export const contextToTaxCategoryTools = (_context?: Context) => {
+  return [
+    tools.read_tax_category,
+    tools.create_tax_category,
+    tools.update_tax_category,
+  ];
 };

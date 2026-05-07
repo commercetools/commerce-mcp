@@ -43,9 +43,6 @@ const tools: Record<string, Tool> = {
   },
 };
 
-export const contextToTypeTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [tools.read_type, tools.create_type, tools.update_type];
-  }
-  return [];
+export const contextToTypeTools = (_context?: Context) => {
+  return [tools.read_type, tools.create_type, tools.update_type];
 };

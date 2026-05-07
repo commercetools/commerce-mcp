@@ -7,7 +7,9 @@ import {
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
 import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
 
-jest.mock('@commercetools/commerce-agent/modelcontextprotocol');
+jest.mock('@commercetools/commerce-agent/modelcontextprotocol', () => ({
+  ...jest.requireActual('@commercetools/commerce-agent/modelcontextprotocol'),
+}));
 jest.mock('@modelcontextprotocol/sdk/server/stdio.js');
 jest.mock('@modelcontextprotocol/sdk/server/mcp.js');
 

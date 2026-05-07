@@ -10,3 +10,10 @@ export {
   type FieldFilteringRule,
   FieldFilteringHandler,
 } from '@commercetools/processors';
+export {ACCEPTED_TOOLS} from '../utils/accepted-tools';
+export {
+  type ToolResolutionMode,
+  type ToolsConfigurationResolution,
+  applyResolvedToolsToConfiguration,
+  resolveToolsForConfiguration,
+} from '../utils/resolve-tools-configuration';

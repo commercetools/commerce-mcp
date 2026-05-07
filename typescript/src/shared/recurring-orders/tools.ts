@@ -48,15 +48,12 @@ const tools: Record<string, Tool> = {
 };
 
 export const contextToRecurringOrderTools = (context?: Context) => {
-  if (context?.isAdmin) {
-    return [
-      tools.read_recurring_orders,
-      tools.create_recurring_orders,
-      tools.update_recurring_orders,
-    ];
-  }
   if (context?.customerId) {
     return [tools.read_recurring_orders];
   }
-  return [];
+  return [
+    tools.read_recurring_orders,
+    tools.create_recurring_orders,
+    tools.update_recurring_orders,
+  ];
 };

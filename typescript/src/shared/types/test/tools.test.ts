@@ -32,24 +32,24 @@ describe('Types Tools', () => {
       });
     });
 
-    it('should return empty array when isAdmin is false', () => {
+    it('should return all type tools when isAdmin is false (visibility is configuration-driven)', () => {
       const context = {isAdmin: false};
       const tools = contextToTypeTools(context);
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
 
-    it('should return empty array when context is undefined', () => {
+    it('should return all type tools when context is undefined', () => {
       const tools = contextToTypeTools();
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
 
-    it('should return empty array when context does not have isAdmin', () => {
+    it('should return all type tools when context does not have isAdmin', () => {
       const context = {};
       const tools = contextToTypeTools(context);
 
-      expect(tools).toEqual([]);
+      expect(tools).toHaveLength(3);
     });
   });
 });
