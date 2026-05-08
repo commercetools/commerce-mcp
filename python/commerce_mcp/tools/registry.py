@@ -143,4 +143,11 @@ def _ensure_all_namespaces_imported() -> None:
         shopping_lists,
         quote_request,
         quote,
+        approval_flow,
+        approval_rule,
+        associate_role,
+        order_edit,
+        product_selection_product,
+        recurrence_policy,
+        states,
     )

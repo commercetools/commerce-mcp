@@ -51,6 +51,13 @@ class Actions(BaseModel):
     quote: ResourceActions | None = None
     quote_request: ResourceActions | None = Field(None, alias="quote-request")
     staged_quote: ResourceActions | None = Field(None, alias="staged-quote")
+    approval_flow: ResourceActions | None = Field(None, alias="approval-flow")
+    approval_rule: ResourceActions | None = Field(None, alias="approval-rule")
+    associate_role: ResourceActions | None = Field(None, alias="associate-role")
+    order_edit: ResourceActions | None = Field(None, alias="order-edit")
+    product_selection_product: ResourceActions | None = Field(None, alias="product-selection-product")
+    recurrence_policy: ResourceActions | None = Field(None, alias="recurrence-policy")
+    states: ResourceActions | None = None
 
     model_config = {"populate_by_name": True}
 
