@@ -1,5 +1,12 @@
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {CommercetoolsFuncContext, Context} from '../types/configuration';
+import {contextToApprovalFlowFunctionMapping} from './approval-flow/functions';
+import {contextToApprovalRuleFunctionMapping} from './approval-rule/functions';
+import {contextToAssociateRoleFunctionMapping} from './associate-role/functions';
+import {contextToOrderEditFunctionMapping} from './order-edit/functions';
+import {contextToProductSelectionProductFunctionMapping} from './product-selection-product/functions';
+import {contextToRecurrencePolicyFunctionMapping} from './recurrence-policy/functions';
+import {contextToStateFunctionMapping} from './states/functions';
 import {contextToBulkFunctionMapping} from './bulk/functions';
 import {contextToBusinessUnitFunctionMapping} from './business-unit/functions';
 import {contextToCartDiscountFunctionMapping} from './cart-discount/functions';
@@ -51,6 +58,13 @@ export const contextToFunctionMapping = (
   ) => Promise<any>
 > => {
   return {
+    ...contextToApprovalFlowFunctionMapping(context),
+    ...contextToApprovalRuleFunctionMapping(context),
+    ...contextToAssociateRoleFunctionMapping(context),
+    ...contextToOrderEditFunctionMapping(context),
+    ...contextToProductSelectionProductFunctionMapping(context),
+    ...contextToRecurrencePolicyFunctionMapping(context),
+    ...contextToStateFunctionMapping(context),
     ...contextToBusinessUnitFunctionMapping(context),
     ...contextToOrderFunctionMapping(context),
     ...contextToCartFunctionMapping(context),
