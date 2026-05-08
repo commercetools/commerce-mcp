@@ -1,3 +1,10 @@
+import {contextToApprovalFlowTools} from './approval-flow/tools';
+import {contextToApprovalRuleTools} from './approval-rule/tools';
+import {contextToAssociateRoleTools} from './associate-role/tools';
+import {contextToOrderEditTools} from './order-edit/tools';
+import {contextToProductSelectionProductTools} from './product-selection-product/tools';
+import {contextToRecurrencePolicyTools} from './recurrence-policy/tools';
+import {contextToStateTools} from './states/tools';
 import {contextToBusinessUnitTools} from './business-unit/tools';
 import {contextToProductsTools} from './products/tools';
 import {contextToProjectTools} from './project/tools';
@@ -76,6 +83,13 @@ export const contextToResourceTools = (context?: Context) => {
     types: contextToTypeTools(context),
     'payment-intents': contextToPaymentIntentTools(context),
     transactions: contextToTransactionTools(context),
+    'approval-flow': contextToApprovalFlowTools(context),
+    'approval-rule': contextToApprovalRuleTools(context),
+    'associate-role': contextToAssociateRoleTools(context),
+    'order-edit': contextToOrderEditTools(context),
+    'product-selection-product': contextToProductSelectionProductTools(context),
+    'recurrence-policy': contextToRecurrencePolicyTools(context),
+    states: contextToStateTools(context),
   };
 };
 export const contextToTools = (context?: Context) => {
