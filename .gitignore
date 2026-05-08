@@ -168,3 +168,5 @@ node_modules/
 
 # mcp
 .mcpregistry_*
+
+.claude

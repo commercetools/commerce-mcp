@@ -46,6 +46,7 @@ class Actions(BaseModel):
     custom_objects: ResourceActions | None = Field(None, alias="custom-objects")
     payment_intents: ResourceActions | None = Field(None, alias="payment-intents")
     transactions: ResourceActions | None = None
+    types: ResourceActions | None = None
     channel: ResourceActions | None = None
     quote: ResourceActions | None = None
     quote_request: ResourceActions | None = Field(None, alias="quote-request")
