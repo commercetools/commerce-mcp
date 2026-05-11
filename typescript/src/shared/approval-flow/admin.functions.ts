@@ -17,7 +17,9 @@ export const readApprovalFlow = async (
   params: z.infer<typeof readApprovalFlowParameters>
 ) => {
   if (!params.associateId) {
-    throw new Error('associateId is required for admin approval flow operations');
+    throw new Error(
+      'associateId is required for admin approval flow operations'
+    );
   }
   if (!params.businessUnitKey) {
     throw new Error(
@@ -59,7 +61,9 @@ export const updateApprovalFlow = async (
   params: z.infer<typeof updateApprovalFlowParameters>
 ) => {
   if (!params.associateId) {
-    throw new Error('associateId is required for admin approval flow operations');
+    throw new Error(
+      'associateId is required for admin approval flow operations'
+    );
   }
   if (!params.businessUnitKey) {
     throw new Error(

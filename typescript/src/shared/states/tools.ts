@@ -13,21 +13,36 @@ const tools: Record<string, Tool> = {
     method: 'read_state',
     name: 'Read State',
     description: readStatePrompt,
-    parameters: readStateParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: readStateParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {states: {read: true}},
   },
   create_state: {
     method: 'create_state',
     name: 'Create State',
     description: createStatePrompt,
-    parameters: createStateParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: createStateParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {states: {create: true}},
   },
   update_state: {
     method: 'update_state',
     name: 'Update State',
     description: updateStatePrompt,
-    parameters: updateStateParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: updateStateParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {states: {update: true}},
   },
 };

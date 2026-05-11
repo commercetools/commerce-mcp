@@ -1,4 +1,8 @@
-import {ApiRoot, ApprovalRuleDraft, ApprovalRuleUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  ApprovalRuleDraft,
+  ApprovalRuleUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 
 const getApprovalRulesBuilder = (

@@ -1,5 +1,9 @@
 import {z} from 'zod';
-import {ApiRoot, OrderEditDraft, OrderEditUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  OrderEditDraft,
+  OrderEditUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 import {
   readOrderEditById,
@@ -24,10 +28,20 @@ export const readOrderEdit = async (
 ) => {
   try {
     if (params.id) {
-      return await readOrderEditById(apiRoot, context.projectKey, params.id, params.expand);
+      return await readOrderEditById(
+        apiRoot,
+        context.projectKey,
+        params.id,
+        params.expand
+      );
     }
     if (params.key) {
-      return await readOrderEditByKey(apiRoot, context.projectKey, params.key, params.expand);
+      return await readOrderEditByKey(
+        apiRoot,
+        context.projectKey,
+        params.key,
+        params.expand
+      );
     }
     return await queryOrderEdits(
       apiRoot,
@@ -49,7 +63,11 @@ export const createOrderEdit = async (
   params: z.infer<typeof createOrderEditParameters>
 ) => {
   try {
-    return await createBase(apiRoot, context.projectKey, params as OrderEditDraft);
+    return await createBase(
+      apiRoot,
+      context.projectKey,
+      params as OrderEditDraft
+    );
   } catch (error: any) {
     throw new SDKError('Failed to create order edit', error);
   }
@@ -81,7 +99,9 @@ export const updateOrderEdit = async (
         params.dryRun
       );
     }
-    throw new Error('Either id or key must be provided to update an order edit');
+    throw new Error(
+      'Either id or key must be provided to update an order edit'
+    );
   } catch (error: any) {
     throw new SDKError('Failed to update order edit', error);
   }

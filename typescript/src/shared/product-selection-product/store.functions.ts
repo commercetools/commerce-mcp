@@ -41,6 +41,9 @@ export const readProductSelectionProduct = async (
       params.expand
     );
   } catch (error: any) {
-    throw new SDKError('Failed to read product selection products as store', error);
+    throw new SDKError(
+      'Failed to read product selection products as store',
+      error
+    );
   }
 };

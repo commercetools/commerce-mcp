@@ -13,7 +13,9 @@ export const readApprovalRuleParameters = z.object({
     .min(1)
     .max(500)
     .optional()
-    .describe('Maximum number of results to return (default: 10, range: 1-500)'),
+    .describe(
+      'Maximum number of results to return (default: 10, range: 1-500)'
+    ),
   offset: z
     .number()
     .int()
@@ -24,10 +26,7 @@ export const readApprovalRuleParameters = z.object({
     .array(z.string())
     .optional()
     .describe('Sort expressions, e.g. ["createdAt desc"]'),
-  expand: z
-    .array(z.string())
-    .optional()
-    .describe('References to expand'),
+  expand: z.array(z.string()).optional().describe('References to expand'),
   associateId: z
     .string()
     .optional()
@@ -40,7 +39,9 @@ export const readApprovalRuleParameters = z.object({
 
 export const createApprovalRuleParameters = z.object({
   name: z.string().describe('Name of the Approval Rule'),
-  predicate: z.string().describe('Predicate that must match for the rule to trigger'),
+  predicate: z
+    .string()
+    .describe('Predicate that must match for the rule to trigger'),
   approvers: z
     .record(z.string(), z.any())
     .describe('Approver hierarchy — tiers of approver groups'),
@@ -50,8 +51,14 @@ export const createApprovalRuleParameters = z.object({
   status: z
     .enum(['Active', 'Inactive'])
     .describe('Whether the Approval Rule is Active or Inactive'),
-  key: z.string().optional().describe('User-defined unique identifier for the Approval Rule'),
-  description: z.string().optional().describe('Description of the Approval Rule'),
+  key: z
+    .string()
+    .optional()
+    .describe('User-defined unique identifier for the Approval Rule'),
+  description: z
+    .string()
+    .optional()
+    .describe('Description of the Approval Rule'),
   associateId: z
     .string()
     .optional()
@@ -69,7 +76,9 @@ export const updateApprovalRuleParameters = z.object({
     .number()
     .int()
     .min(0)
-    .describe('Current version of the Approval Rule for optimistic concurrency'),
+    .describe(
+      'Current version of the Approval Rule for optimistic concurrency'
+    ),
   actions: z
     .array(
       z

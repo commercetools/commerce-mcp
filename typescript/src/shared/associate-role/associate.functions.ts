@@ -16,10 +16,20 @@ export const readAssociateRole = async (
 ) => {
   try {
     if (params.id) {
-      return await readAssociateRoleById(apiRoot, context.projectKey, params.id, params.expand);
+      return await readAssociateRoleById(
+        apiRoot,
+        context.projectKey,
+        params.id,
+        params.expand
+      );
     }
     if (params.key) {
-      return await readAssociateRoleByKey(apiRoot, context.projectKey, params.key, params.expand);
+      return await readAssociateRoleByKey(
+        apiRoot,
+        context.projectKey,
+        params.key,
+        params.expand
+      );
     }
     return await queryAssociateRoles(
       apiRoot,

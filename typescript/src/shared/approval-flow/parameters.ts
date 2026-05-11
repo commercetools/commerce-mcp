@@ -14,7 +14,9 @@ export const readApprovalFlowParameters = z.object({
     .min(1)
     .max(500)
     .optional()
-    .describe('Maximum number of results to return (default: 10, range: 1-500)'),
+    .describe(
+      'Maximum number of results to return (default: 10, range: 1-500)'
+    ),
   offset: z
     .number()
     .int()
@@ -45,7 +47,9 @@ export const updateApprovalFlowParameters = z.object({
     .number()
     .int()
     .min(0)
-    .describe('Current version of the Approval Flow for optimistic concurrency'),
+    .describe(
+      'Current version of the Approval Flow for optimistic concurrency'
+    ),
   actions: z
     .array(
       z

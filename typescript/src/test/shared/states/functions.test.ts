@@ -1,4 +1,8 @@
-import {readState, createState, updateState} from '../../../shared/states/functions';
+import {
+  readState,
+  createState,
+  updateState,
+} from '../../../shared/states/functions';
 import {contextToStateFunctionMapping} from '../../../shared/states/functions';
 import * as adminFunctions from '../../../shared/states/admin.functions';
 import {ApiRoot} from '@commercetools/platform-sdk';
@@ -48,12 +52,21 @@ describe('State Functions', () => {
     const adminContext = {projectKey: 'test-project', isAdmin: true};
 
     it('fetches by ID when id is provided', async () => {
-      const mockState = {id: 'state-1', version: 1, key: 'processing', type: 'OrderState'};
+      const mockState = {
+        id: 'state-1',
+        version: 1,
+        key: 'processing',
+        type: 'OrderState',
+      };
       mockExecute.mockResolvedValueOnce({body: mockState});
 
-      const result = await readState(mockApiRoot, adminContext, {id: 'state-1'});
+      const result = await readState(mockApiRoot, adminContext, {
+        id: 'state-1',
+      });
 
-      expect(mockWithProjectKey).toHaveBeenCalledWith({projectKey: 'test-project'});
+      expect(mockWithProjectKey).toHaveBeenCalledWith({
+        projectKey: 'test-project',
+      });
       expect(mockStates).toHaveBeenCalled();
       expect(mockWithId).toHaveBeenCalledWith({ID: 'state-1'});
       expect(result).toEqual(mockState);
@@ -63,7 +76,9 @@ describe('State Functions', () => {
       const mockState = {id: 'state-1', version: 1, key: 'processing'};
       mockExecute.mockResolvedValueOnce({body: mockState});
 
-      const result = await readState(mockApiRoot, adminContext, {key: 'processing'});
+      const result = await readState(mockApiRoot, adminContext, {
+        key: 'processing',
+      });
 
       expect(mockWithKey).toHaveBeenCalledWith({key: 'processing'});
       expect(result).toEqual(mockState);
@@ -89,7 +104,12 @@ describe('State Functions', () => {
     const adminContext = {projectKey: 'test-project', isAdmin: true};
 
     it('posts the draft to the endpoint', async () => {
-      const mockCreated = {id: 'state-2', version: 1, key: 'shipped', type: 'OrderState'};
+      const mockCreated = {
+        id: 'state-2',
+        version: 1,
+        key: 'shipped',
+        type: 'OrderState',
+      };
       mockExecute.mockResolvedValueOnce({body: mockCreated});
 
       const result = await createState(mockApiRoot, adminContext, {
@@ -101,7 +121,12 @@ describe('State Functions', () => {
 
       expect(mockStates).toHaveBeenCalled();
       expect(mockPost).toHaveBeenCalledWith({
-        body: {key: 'shipped', type: 'OrderState', initial: false, name: {en: 'Shipped'}},
+        body: {
+          key: 'shipped',
+          type: 'OrderState',
+          initial: false,
+          name: {en: 'Shipped'},
+        },
       });
       expect(result).toEqual(mockCreated);
     });
@@ -125,7 +150,10 @@ describe('State Functions', () => {
 
       expect(mockWithId).toHaveBeenCalledWith({ID: 'state-1'});
       expect(mockPost).toHaveBeenCalledWith({
-        body: {version: 2, actions: [{action: 'setName', name: {en: 'Processing'}}]},
+        body: {
+          version: 2,
+          actions: [{action: 'setName', name: {en: 'Processing'}}],
+        },
       });
       expect(result).toEqual(mockUpdated);
     });

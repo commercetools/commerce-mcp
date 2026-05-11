@@ -1,5 +1,9 @@
 import {z} from 'zod';
-import {ApiRoot, StateDraft, StateUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  StateDraft,
+  StateUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 import {
   readStateById,
@@ -22,10 +26,20 @@ export const readState = async (
 ) => {
   try {
     if (params.id) {
-      return await readStateById(apiRoot, context.projectKey, params.id, params.expand);
+      return await readStateById(
+        apiRoot,
+        context.projectKey,
+        params.id,
+        params.expand
+      );
     }
     if (params.key) {
-      return await readStateByKey(apiRoot, context.projectKey, params.key, params.expand);
+      return await readStateByKey(
+        apiRoot,
+        context.projectKey,
+        params.key,
+        params.expand
+      );
     }
     return await queryStates(
       apiRoot,

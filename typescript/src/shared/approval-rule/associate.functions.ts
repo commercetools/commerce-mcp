@@ -1,5 +1,9 @@
 import {z} from 'zod';
-import {ApiRoot, ApprovalRuleDraft, ApprovalRuleUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  ApprovalRuleDraft,
+  ApprovalRuleUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 import {CommercetoolsFuncContext} from '../../types/configuration';
 import {
@@ -22,7 +26,9 @@ export const readApprovalRule = async (
   params: z.infer<typeof readApprovalRuleParameters>
 ) => {
   if (!context.customerId) {
-    throw new Error('Associate ID (customerId) is required for associate operations');
+    throw new Error(
+      'Associate ID (customerId) is required for associate operations'
+    );
   }
   if (!context.businessUnitKey) {
     throw new Error('Business Unit key is required for associate operations');
@@ -71,7 +77,9 @@ export const createApprovalRule = async (
   params: z.infer<typeof createApprovalRuleParameters>
 ) => {
   if (!context.customerId) {
-    throw new Error('Associate ID (customerId) is required for associate operations');
+    throw new Error(
+      'Associate ID (customerId) is required for associate operations'
+    );
   }
   if (!context.businessUnitKey) {
     throw new Error('Business Unit key is required for associate operations');
@@ -97,7 +105,9 @@ export const updateApprovalRule = async (
   params: z.infer<typeof updateApprovalRuleParameters>
 ) => {
   if (!context.customerId) {
-    throw new Error('Associate ID (customerId) is required for associate operations');
+    throw new Error(
+      'Associate ID (customerId) is required for associate operations'
+    );
   }
   if (!context.businessUnitKey) {
     throw new Error('Business Unit key is required for associate operations');
@@ -126,7 +136,9 @@ export const updateApprovalRule = async (
         params.actions as ApprovalRuleUpdateAction[]
       );
     }
-    throw new Error('Either id or key must be provided to update an approval rule');
+    throw new Error(
+      'Either id or key must be provided to update an approval rule'
+    );
   } catch (error: any) {
     throw new SDKError('Failed to update approval rule as associate', error);
   }

@@ -1,4 +1,8 @@
-import {ApiRoot, StateDraft, StateUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  StateDraft,
+  StateUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 
 export const readStateById = async (

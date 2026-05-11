@@ -13,7 +13,9 @@ export const readOrderEditParameters = z.object({
     .min(1)
     .max(500)
     .optional()
-    .describe('Maximum number of results to return (default: 10, range: 1-500)'),
+    .describe(
+      'Maximum number of results to return (default: 10, range: 1-500)'
+    ),
   offset: z
     .number()
     .int()
@@ -45,12 +47,17 @@ export const createOrderEditParameters = z.object({
     )
     .optional()
     .describe('Order update actions to stage for later application'),
-  key: z.string().optional().describe('User-defined unique identifier for the Order Edit'),
+  key: z
+    .string()
+    .optional()
+    .describe('User-defined unique identifier for the Order Edit'),
   comment: z.string().optional().describe('Message describing the Order Edit'),
   dryRun: z
     .boolean()
     .optional()
-    .describe('If true, validates the staged actions without persisting the edit'),
+    .describe(
+      'If true, validates the staged actions without persisting the edit'
+    ),
   custom: z
     .object({
       type: z.object({id: z.string(), typeId: z.literal('type')}),

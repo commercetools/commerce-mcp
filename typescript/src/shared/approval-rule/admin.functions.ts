@@ -1,5 +1,9 @@
 import {z} from 'zod';
-import {ApiRoot, ApprovalRuleDraft, ApprovalRuleUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  ApprovalRuleDraft,
+  ApprovalRuleUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 import {
   readApprovalRuleById,
@@ -21,10 +25,14 @@ export const readApprovalRule = async (
   params: z.infer<typeof readApprovalRuleParameters>
 ) => {
   if (!params.associateId) {
-    throw new Error('associateId is required for admin approval rule operations');
+    throw new Error(
+      'associateId is required for admin approval rule operations'
+    );
   }
   if (!params.businessUnitKey) {
-    throw new Error('businessUnitKey is required for admin approval rule operations');
+    throw new Error(
+      'businessUnitKey is required for admin approval rule operations'
+    );
   }
 
   try {
@@ -70,10 +78,14 @@ export const createApprovalRule = async (
   params: z.infer<typeof createApprovalRuleParameters>
 ) => {
   if (!params.associateId) {
-    throw new Error('associateId is required for admin approval rule operations');
+    throw new Error(
+      'associateId is required for admin approval rule operations'
+    );
   }
   if (!params.businessUnitKey) {
-    throw new Error('businessUnitKey is required for admin approval rule operations');
+    throw new Error(
+      'businessUnitKey is required for admin approval rule operations'
+    );
   }
 
   try {
@@ -96,10 +108,14 @@ export const updateApprovalRule = async (
   params: z.infer<typeof updateApprovalRuleParameters>
 ) => {
   if (!params.associateId) {
-    throw new Error('associateId is required for admin approval rule operations');
+    throw new Error(
+      'associateId is required for admin approval rule operations'
+    );
   }
   if (!params.businessUnitKey) {
-    throw new Error('businessUnitKey is required for admin approval rule operations');
+    throw new Error(
+      'businessUnitKey is required for admin approval rule operations'
+    );
   }
 
   try {
@@ -125,7 +141,9 @@ export const updateApprovalRule = async (
         params.actions as ApprovalRuleUpdateAction[]
       );
     }
-    throw new Error('Either id or key must be provided to update an approval rule');
+    throw new Error(
+      'Either id or key must be provided to update an approval rule'
+    );
   } catch (error: any) {
     throw new SDKError('Failed to update approval rule', error);
   }

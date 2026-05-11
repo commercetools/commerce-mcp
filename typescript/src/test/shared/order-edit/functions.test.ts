@@ -14,7 +14,9 @@ const mockGet = jest.fn().mockReturnValue({execute: mockExecute});
 const mockPost = jest.fn().mockReturnValue({execute: mockExecute});
 const mockApplyPost = jest.fn().mockReturnValue({execute: mockExecute});
 const mockApply = jest.fn().mockReturnValue({post: mockApplyPost});
-const mockWithId = jest.fn().mockReturnValue({get: mockGet, post: mockPost, apply: mockApply});
+const mockWithId = jest
+  .fn()
+  .mockReturnValue({get: mockGet, post: mockPost, apply: mockApply});
 const mockWithKey = jest.fn().mockReturnValue({get: mockGet, post: mockPost});
 const mockEdits = jest.fn().mockReturnValue({
   withId: mockWithId,
@@ -49,7 +51,10 @@ describe('Order Edit Functions', () => {
 
     it('returns empty object for non-admin context', () => {
       expect(
-        contextToOrderEditFunctionMapping({customerId: 'c1', businessUnitKey: 'bu-1'})
+        contextToOrderEditFunctionMapping({
+          customerId: 'c1',
+          businessUnitKey: 'bu-1',
+        })
       ).toEqual({});
     });
   });
@@ -61,9 +66,13 @@ describe('Order Edit Functions', () => {
       const mockEdit = {id: 'edit-1', version: 1};
       mockExecute.mockResolvedValueOnce({body: mockEdit});
 
-      const result = await readOrderEdit(mockApiRoot, adminContext, {id: 'edit-1'});
+      const result = await readOrderEdit(mockApiRoot, adminContext, {
+        id: 'edit-1',
+      });
 
-      expect(mockWithProjectKey).toHaveBeenCalledWith({projectKey: 'test-project'});
+      expect(mockWithProjectKey).toHaveBeenCalledWith({
+        projectKey: 'test-project',
+      });
       expect(mockOrders).toHaveBeenCalled();
       expect(mockEdits).toHaveBeenCalled();
       expect(mockWithId).toHaveBeenCalledWith({ID: 'edit-1'});
@@ -74,7 +83,9 @@ describe('Order Edit Functions', () => {
       const mockEdit = {id: 'edit-1', version: 1, key: 'my-edit'};
       mockExecute.mockResolvedValueOnce({body: mockEdit});
 
-      const result = await readOrderEdit(mockApiRoot, adminContext, {key: 'my-edit'});
+      const result = await readOrderEdit(mockApiRoot, adminContext, {
+        key: 'my-edit',
+      });
 
       expect(mockWithKey).toHaveBeenCalledWith({key: 'my-edit'});
       expect(result).toEqual(mockEdit);

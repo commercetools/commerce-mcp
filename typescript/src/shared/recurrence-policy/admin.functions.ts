@@ -1,5 +1,9 @@
 import {z} from 'zod';
-import {ApiRoot, RecurrencePolicyDraft, RecurrencePolicyUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  RecurrencePolicyDraft,
+  RecurrencePolicyUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 import {
   readRecurrencePolicyById,
@@ -22,10 +26,20 @@ export const readRecurrencePolicy = async (
 ) => {
   try {
     if (params.id) {
-      return await readRecurrencePolicyById(apiRoot, context.projectKey, params.id, params.expand);
+      return await readRecurrencePolicyById(
+        apiRoot,
+        context.projectKey,
+        params.id,
+        params.expand
+      );
     }
     if (params.key) {
-      return await readRecurrencePolicyByKey(apiRoot, context.projectKey, params.key, params.expand);
+      return await readRecurrencePolicyByKey(
+        apiRoot,
+        context.projectKey,
+        params.key,
+        params.expand
+      );
     }
     return await queryRecurrencePolicies(
       apiRoot,
@@ -47,7 +61,11 @@ export const createRecurrencePolicy = async (
   params: z.infer<typeof createRecurrencePolicyParameters>
 ) => {
   try {
-    return await createBase(apiRoot, context.projectKey, params as RecurrencePolicyDraft);
+    return await createBase(
+      apiRoot,
+      context.projectKey,
+      params as RecurrencePolicyDraft
+    );
   } catch (error: any) {
     throw new SDKError('Failed to create recurrence policy', error);
   }
@@ -77,7 +95,9 @@ export const updateRecurrencePolicy = async (
         params.actions as RecurrencePolicyUpdateAction[]
       );
     }
-    throw new Error('Either id or key must be provided to update a recurrence policy');
+    throw new Error(
+      'Either id or key must be provided to update a recurrence policy'
+    );
   } catch (error: any) {
     throw new SDKError('Failed to update recurrence policy', error);
   }
