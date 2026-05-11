@@ -30,21 +30,33 @@ export const contextToApprovalRuleFunctionMapping = (
   return {};
 };
 
-export const readApprovalRule = (apiRoot: ApiRoot, context: any, params: any) => {
+export const readApprovalRule = (
+  apiRoot: ApiRoot,
+  context: any,
+  params: any
+) => {
   if (context?.customerId && context?.businessUnitKey) {
     return associate.readApprovalRule(apiRoot, context, params);
   }
   return admin.readApprovalRule(apiRoot, context, params);
 };
 
-export const createApprovalRule = (apiRoot: ApiRoot, context: any, params: any) => {
+export const createApprovalRule = (
+  apiRoot: ApiRoot,
+  context: any,
+  params: any
+) => {
   if (context?.customerId && context?.businessUnitKey) {
     return associate.createApprovalRule(apiRoot, context, params);
   }
   return admin.createApprovalRule(apiRoot, context, params);
 };
 
-export const updateApprovalRule = (apiRoot: ApiRoot, context: any, params: any) => {
+export const updateApprovalRule = (
+  apiRoot: ApiRoot,
+  context: any,
+  params: any
+) => {
   if (context?.customerId && context?.businessUnitKey) {
     return associate.updateApprovalRule(apiRoot, context, params);
   }

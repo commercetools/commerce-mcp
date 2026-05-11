@@ -20,7 +20,9 @@ const mockAssociateRoles = jest.fn().mockReturnValue({
   get: mockGet,
   post: mockPost,
 });
-const mockWithProjectKey = jest.fn().mockReturnValue({associateRoles: mockAssociateRoles});
+const mockWithProjectKey = jest
+  .fn()
+  .mockReturnValue({associateRoles: mockAssociateRoles});
 
 const mockApiRoot = {withProjectKey: mockWithProjectKey} as unknown as ApiRoot;
 
@@ -38,7 +40,9 @@ describe('Associate Role Functions', () => {
       expect(mapping).toHaveProperty('read_associate_role');
       expect(mapping).not.toHaveProperty('create_associate_role');
       expect(mapping).not.toHaveProperty('update_associate_role');
-      expect(mapping.read_associate_role).toBe(associateFunctions.readAssociateRole);
+      expect(mapping.read_associate_role).toBe(
+        associateFunctions.readAssociateRole
+      );
     });
 
     it('returns all functions for admin context', () => {
@@ -46,9 +50,15 @@ describe('Associate Role Functions', () => {
       expect(mapping).toHaveProperty('read_associate_role');
       expect(mapping).toHaveProperty('create_associate_role');
       expect(mapping).toHaveProperty('update_associate_role');
-      expect(mapping.read_associate_role).toBe(adminFunctions.readAssociateRole);
-      expect(mapping.create_associate_role).toBe(adminFunctions.createAssociateRole);
-      expect(mapping.update_associate_role).toBe(adminFunctions.updateAssociateRole);
+      expect(mapping.read_associate_role).toBe(
+        adminFunctions.readAssociateRole
+      );
+      expect(mapping.create_associate_role).toBe(
+        adminFunctions.createAssociateRole
+      );
+      expect(mapping.update_associate_role).toBe(
+        adminFunctions.updateAssociateRole
+      );
     });
 
     it('returns empty object when context is undefined', () => {
@@ -56,7 +66,9 @@ describe('Associate Role Functions', () => {
     });
 
     it('returns empty object when context has only customerId', () => {
-      expect(contextToAssociateRoleFunctionMapping({customerId: 'c1'})).toEqual({});
+      expect(contextToAssociateRoleFunctionMapping({customerId: 'c1'})).toEqual(
+        {}
+      );
     });
   });
 
@@ -67,9 +79,13 @@ describe('Associate Role Functions', () => {
       const mockRole = {id: 'role-1', version: 1, key: 'buyer'};
       mockExecute.mockResolvedValueOnce({body: mockRole});
 
-      const result = await readAssociateRole(mockApiRoot, adminContext, {id: 'role-1'});
+      const result = await readAssociateRole(mockApiRoot, adminContext, {
+        id: 'role-1',
+      });
 
-      expect(mockWithProjectKey).toHaveBeenCalledWith({projectKey: 'test-project'});
+      expect(mockWithProjectKey).toHaveBeenCalledWith({
+        projectKey: 'test-project',
+      });
       expect(mockAssociateRoles).toHaveBeenCalled();
       expect(mockWithId).toHaveBeenCalledWith({ID: 'role-1'});
       expect(result).toEqual(mockRole);
@@ -79,7 +95,9 @@ describe('Associate Role Functions', () => {
       const mockRole = {id: 'role-1', version: 1, key: 'buyer'};
       mockExecute.mockResolvedValueOnce({body: mockRole});
 
-      const result = await readAssociateRole(mockApiRoot, adminContext, {key: 'buyer'});
+      const result = await readAssociateRole(mockApiRoot, adminContext, {
+        key: 'buyer',
+      });
 
       expect(mockWithKey).toHaveBeenCalledWith({key: 'buyer'});
       expect(result).toEqual(mockRole);
@@ -89,7 +107,9 @@ describe('Associate Role Functions', () => {
       const mockResponse = {results: [], count: 0, limit: 10, offset: 0};
       mockExecute.mockResolvedValueOnce({body: mockResponse});
 
-      const result = await readAssociateRole(mockApiRoot, adminContext, {limit: 5});
+      const result = await readAssociateRole(mockApiRoot, adminContext, {
+        limit: 5,
+      });
 
       expect(mockGet).toHaveBeenCalledWith({queryArgs: {limit: 5}});
       expect(result).toEqual(mockResponse);
@@ -107,7 +127,9 @@ describe('Associate Role Functions', () => {
       const mockRole = {id: 'role-1', version: 1, key: 'buyer'};
       mockExecute.mockResolvedValueOnce({body: mockRole});
 
-      const result = await readAssociateRole(mockApiRoot, associateContext, {id: 'role-1'});
+      const result = await readAssociateRole(mockApiRoot, associateContext, {
+        id: 'role-1',
+      });
 
       expect(mockAssociateRoles).toHaveBeenCalled();
       expect(mockWithId).toHaveBeenCalledWith({ID: 'role-1'});
@@ -153,7 +175,10 @@ describe('Associate Role Functions', () => {
 
       expect(mockWithId).toHaveBeenCalledWith({ID: 'role-1'});
       expect(mockPost).toHaveBeenCalledWith({
-        body: {version: 1, actions: [{action: 'setName', name: 'Senior Manager'}]},
+        body: {
+          version: 1,
+          actions: [{action: 'setName', name: 'Senior Manager'}],
+        },
       });
       expect(result).toEqual(mockUpdated);
     });

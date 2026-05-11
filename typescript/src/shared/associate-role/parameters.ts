@@ -13,7 +13,9 @@ export const readAssociateRoleParameters = z.object({
     .min(1)
     .max(500)
     .optional()
-    .describe('Maximum number of results to return (default: 10, range: 1-500)'),
+    .describe(
+      'Maximum number of results to return (default: 10, range: 1-500)'
+    ),
   offset: z
     .number()
     .int()
@@ -24,14 +26,13 @@ export const readAssociateRoleParameters = z.object({
     .array(z.string())
     .optional()
     .describe('Sort expressions, e.g. ["createdAt desc"]'),
-  expand: z
-    .array(z.string())
-    .optional()
-    .describe('References to expand'),
+  expand: z.array(z.string()).optional().describe('References to expand'),
 });
 
 export const createAssociateRoleParameters = z.object({
-  key: z.string().describe('User-defined unique identifier for the Associate Role'),
+  key: z
+    .string()
+    .describe('User-defined unique identifier for the Associate Role'),
   buyerAssignable: z
     .boolean()
     .describe('Whether the Associate Role can be assigned to buyers'),
@@ -51,11 +52,16 @@ export const createAssociateRoleParameters = z.object({
 
 export const updateAssociateRoleParameters = z.object({
   id: z.string().optional().describe('The ID of the Associate Role to update'),
-  key: z.string().optional().describe('The key of the Associate Role to update'),
+  key: z
+    .string()
+    .optional()
+    .describe('The key of the Associate Role to update'),
   version: z
     .number()
     .int()
-    .describe('Current version of the Associate Role for optimistic concurrency'),
+    .describe(
+      'Current version of the Associate Role for optimistic concurrency'
+    ),
   actions: z
     .array(
       z

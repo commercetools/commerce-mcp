@@ -19,28 +19,48 @@ const tools: Record<string, Tool> = {
     method: 'read_order_edit',
     name: 'Read Order Edit',
     description: readOrderEditPrompt,
-    parameters: readOrderEditParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: readOrderEditParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {'order-edit': {read: true}},
   },
   create_order_edit: {
     method: 'create_order_edit',
     name: 'Create Order Edit',
     description: createOrderEditPrompt,
-    parameters: createOrderEditParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: createOrderEditParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {'order-edit': {create: true}},
   },
   update_order_edit: {
     method: 'update_order_edit',
     name: 'Update Order Edit',
     description: updateOrderEditPrompt,
-    parameters: updateOrderEditParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: updateOrderEditParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {'order-edit': {update: true}},
   },
   apply_order_edit: {
     method: 'apply_order_edit',
     name: 'Apply Order Edit',
     description: applyOrderEditPrompt,
-    parameters: applyOrderEditParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: applyOrderEditParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {'order-edit': {update: true}},
   },
 };

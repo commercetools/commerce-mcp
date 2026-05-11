@@ -1,5 +1,9 @@
 import {z} from 'zod';
-import {ApiRoot, AssociateRoleDraft, AssociateRoleUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  AssociateRoleDraft,
+  AssociateRoleUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 import {
   readAssociateRoleById,
@@ -22,10 +26,20 @@ export const readAssociateRole = async (
 ) => {
   try {
     if (params.id) {
-      return await readAssociateRoleById(apiRoot, context.projectKey, params.id, params.expand);
+      return await readAssociateRoleById(
+        apiRoot,
+        context.projectKey,
+        params.id,
+        params.expand
+      );
     }
     if (params.key) {
-      return await readAssociateRoleByKey(apiRoot, context.projectKey, params.key, params.expand);
+      return await readAssociateRoleByKey(
+        apiRoot,
+        context.projectKey,
+        params.key,
+        params.expand
+      );
     }
     return await queryAssociateRoles(
       apiRoot,
@@ -47,7 +61,11 @@ export const createAssociateRole = async (
   params: z.infer<typeof createAssociateRoleParameters>
 ) => {
   try {
-    return await createBase(apiRoot, context.projectKey, params as AssociateRoleDraft);
+    return await createBase(
+      apiRoot,
+      context.projectKey,
+      params as AssociateRoleDraft
+    );
   } catch (error: any) {
     throw new SDKError('Failed to create associate role', error);
   }
@@ -77,7 +95,9 @@ export const updateAssociateRole = async (
         params.actions as AssociateRoleUpdateAction[]
       );
     }
-    throw new Error('Either id or key must be provided to update an associate role');
+    throw new Error(
+      'Either id or key must be provided to update an associate role'
+    );
   } catch (error: any) {
     throw new SDKError('Failed to update associate role', error);
   }

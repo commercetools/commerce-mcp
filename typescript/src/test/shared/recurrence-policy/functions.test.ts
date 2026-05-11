@@ -36,9 +36,15 @@ describe('Recurrence Policy Functions', () => {
       expect(mapping).toHaveProperty('read_recurrence_policy');
       expect(mapping).toHaveProperty('create_recurrence_policy');
       expect(mapping).toHaveProperty('update_recurrence_policy');
-      expect(mapping.read_recurrence_policy).toBe(adminFunctions.readRecurrencePolicy);
-      expect(mapping.create_recurrence_policy).toBe(adminFunctions.createRecurrencePolicy);
-      expect(mapping.update_recurrence_policy).toBe(adminFunctions.updateRecurrencePolicy);
+      expect(mapping.read_recurrence_policy).toBe(
+        adminFunctions.readRecurrencePolicy
+      );
+      expect(mapping.create_recurrence_policy).toBe(
+        adminFunctions.createRecurrencePolicy
+      );
+      expect(mapping.update_recurrence_policy).toBe(
+        adminFunctions.updateRecurrencePolicy
+      );
     });
 
     it('returns empty object when context is undefined', () => {
@@ -46,7 +52,9 @@ describe('Recurrence Policy Functions', () => {
     });
 
     it('returns empty object when context has no relevant fields', () => {
-      expect(contextToRecurrencePolicyFunctionMapping({storeKey: 'some-store'})).toEqual({});
+      expect(
+        contextToRecurrencePolicyFunctionMapping({storeKey: 'some-store'})
+      ).toEqual({});
     });
   });
 
@@ -57,9 +65,13 @@ describe('Recurrence Policy Functions', () => {
       const mockPolicy = {id: 'policy-1', version: 1, key: 'monthly'};
       mockExecute.mockResolvedValueOnce({body: mockPolicy});
 
-      const result = await readRecurrencePolicy(mockApiRoot, adminContext, {id: 'policy-1'});
+      const result = await readRecurrencePolicy(mockApiRoot, adminContext, {
+        id: 'policy-1',
+      });
 
-      expect(mockWithProjectKey).toHaveBeenCalledWith({projectKey: 'test-project'});
+      expect(mockWithProjectKey).toHaveBeenCalledWith({
+        projectKey: 'test-project',
+      });
       expect(mockRecurrencePolicies).toHaveBeenCalled();
       expect(mockWithId).toHaveBeenCalledWith({ID: 'policy-1'});
       expect(result).toEqual(mockPolicy);
@@ -69,7 +81,9 @@ describe('Recurrence Policy Functions', () => {
       const mockPolicy = {id: 'policy-1', version: 1, key: 'monthly'};
       mockExecute.mockResolvedValueOnce({body: mockPolicy});
 
-      const result = await readRecurrencePolicy(mockApiRoot, adminContext, {key: 'monthly'});
+      const result = await readRecurrencePolicy(mockApiRoot, adminContext, {
+        key: 'monthly',
+      });
 
       expect(mockWithKey).toHaveBeenCalledWith({key: 'monthly'});
       expect(result).toEqual(mockPolicy);
@@ -105,7 +119,10 @@ describe('Recurrence Policy Functions', () => {
 
       expect(mockRecurrencePolicies).toHaveBeenCalled();
       expect(mockPost).toHaveBeenCalledWith({
-        body: {key: 'weekly', schedule: {type: 'standard', interval: 7, unit: 'Day'}},
+        body: {
+          key: 'weekly',
+          schedule: {type: 'standard', interval: 7, unit: 'Day'},
+        },
       });
       expect(result).toEqual(mockCreated);
     });

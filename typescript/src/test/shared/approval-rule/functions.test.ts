@@ -21,16 +21,21 @@ const mockApprovalRules = jest.fn().mockReturnValue({
   get: mockGet,
   post: mockPost,
 });
-const mockInBusinessUnitKeyWithBusinessUnitKeyValue = jest.fn().mockReturnValue({
-  approvalRules: mockApprovalRules,
-});
+const mockInBusinessUnitKeyWithBusinessUnitKeyValue = jest
+  .fn()
+  .mockReturnValue({
+    approvalRules: mockApprovalRules,
+  });
 const mockWithAssociateIdValue = jest.fn().mockReturnValue({
-  inBusinessUnitKeyWithBusinessUnitKeyValue: mockInBusinessUnitKeyWithBusinessUnitKeyValue,
+  inBusinessUnitKeyWithBusinessUnitKeyValue:
+    mockInBusinessUnitKeyWithBusinessUnitKeyValue,
 });
 const mockAsAssociate = jest.fn().mockReturnValue({
   withAssociateIdValue: mockWithAssociateIdValue,
 });
-const mockWithProjectKey = jest.fn().mockReturnValue({asAssociate: mockAsAssociate});
+const mockWithProjectKey = jest
+  .fn()
+  .mockReturnValue({asAssociate: mockAsAssociate});
 
 const mockApiRoot = {withProjectKey: mockWithProjectKey} as unknown as ApiRoot;
 
@@ -48,9 +53,15 @@ describe('Approval Rule Functions', () => {
       expect(mapping).toHaveProperty('read_approval_rule');
       expect(mapping).toHaveProperty('create_approval_rule');
       expect(mapping).toHaveProperty('update_approval_rule');
-      expect(mapping.read_approval_rule).toBe(associateFunctions.readApprovalRule);
-      expect(mapping.create_approval_rule).toBe(associateFunctions.createApprovalRule);
-      expect(mapping.update_approval_rule).toBe(associateFunctions.updateApprovalRule);
+      expect(mapping.read_approval_rule).toBe(
+        associateFunctions.readApprovalRule
+      );
+      expect(mapping.create_approval_rule).toBe(
+        associateFunctions.createApprovalRule
+      );
+      expect(mapping.update_approval_rule).toBe(
+        associateFunctions.updateApprovalRule
+      );
     });
 
     it('returns admin functions when isAdmin is true', () => {
@@ -59,8 +70,12 @@ describe('Approval Rule Functions', () => {
       expect(mapping).toHaveProperty('create_approval_rule');
       expect(mapping).toHaveProperty('update_approval_rule');
       expect(mapping.read_approval_rule).toBe(adminFunctions.readApprovalRule);
-      expect(mapping.create_approval_rule).toBe(adminFunctions.createApprovalRule);
-      expect(mapping.update_approval_rule).toBe(adminFunctions.updateApprovalRule);
+      expect(mapping.create_approval_rule).toBe(
+        adminFunctions.createApprovalRule
+      );
+      expect(mapping.update_approval_rule).toBe(
+        adminFunctions.updateApprovalRule
+      );
     });
 
     it('returns empty object when context is undefined', () => {
@@ -68,7 +83,9 @@ describe('Approval Rule Functions', () => {
     });
 
     it('returns empty object when context has only customerId', () => {
-      expect(contextToApprovalRuleFunctionMapping({customerId: 'c1'})).toEqual({});
+      expect(contextToApprovalRuleFunctionMapping({customerId: 'c1'})).toEqual(
+        {}
+      );
     });
   });
 
@@ -83,12 +100,20 @@ describe('Approval Rule Functions', () => {
       const mockRule = {id: 'rule-1', version: 1};
       mockExecute.mockResolvedValueOnce({body: mockRule});
 
-      const result = await readApprovalRule(mockApiRoot, associateContext, {id: 'rule-1'});
+      const result = await readApprovalRule(mockApiRoot, associateContext, {
+        id: 'rule-1',
+      });
 
-      expect(mockWithProjectKey).toHaveBeenCalledWith({projectKey: 'test-project'});
+      expect(mockWithProjectKey).toHaveBeenCalledWith({
+        projectKey: 'test-project',
+      });
       expect(mockAsAssociate).toHaveBeenCalled();
-      expect(mockWithAssociateIdValue).toHaveBeenCalledWith({associateId: 'associate-1'});
-      expect(mockInBusinessUnitKeyWithBusinessUnitKeyValue).toHaveBeenCalledWith({
+      expect(mockWithAssociateIdValue).toHaveBeenCalledWith({
+        associateId: 'associate-1',
+      });
+      expect(
+        mockInBusinessUnitKeyWithBusinessUnitKeyValue
+      ).toHaveBeenCalledWith({
         businessUnitKey: 'bu-key-1',
       });
       expect(mockApprovalRules).toHaveBeenCalled();
@@ -100,7 +125,9 @@ describe('Approval Rule Functions', () => {
       const mockRule = {id: 'rule-1', version: 1, key: 'high-value'};
       mockExecute.mockResolvedValueOnce({body: mockRule});
 
-      const result = await readApprovalRule(mockApiRoot, associateContext, {key: 'high-value'});
+      const result = await readApprovalRule(mockApiRoot, associateContext, {
+        key: 'high-value',
+      });
 
       expect(mockWithKey).toHaveBeenCalledWith({key: 'high-value'});
       expect(result).toEqual(mockRule);
@@ -155,8 +182,12 @@ describe('Approval Rule Functions', () => {
         businessUnitKey: 'admin-bu-key',
       });
 
-      expect(mockWithAssociateIdValue).toHaveBeenCalledWith({associateId: 'admin-associate-1'});
-      expect(mockInBusinessUnitKeyWithBusinessUnitKeyValue).toHaveBeenCalledWith({
+      expect(mockWithAssociateIdValue).toHaveBeenCalledWith({
+        associateId: 'admin-associate-1',
+      });
+      expect(
+        mockInBusinessUnitKeyWithBusinessUnitKeyValue
+      ).toHaveBeenCalledWith({
         businessUnitKey: 'admin-bu-key',
       });
       expect(result).toEqual(mockRule);
@@ -165,13 +196,17 @@ describe('Approval Rule Functions', () => {
     it('throws when associateId is missing from params', async () => {
       await expect(
         readApprovalRule(mockApiRoot, adminContext, {businessUnitKey: 'bu-1'})
-      ).rejects.toThrow('associateId is required for admin approval rule operations');
+      ).rejects.toThrow(
+        'associateId is required for admin approval rule operations'
+      );
     });
 
     it('throws when businessUnitKey is missing from params', async () => {
       await expect(
         readApprovalRule(mockApiRoot, adminContext, {associateId: 'a-1'})
-      ).rejects.toThrow('businessUnitKey is required for admin approval rule operations');
+      ).rejects.toThrow(
+        'businessUnitKey is required for admin approval rule operations'
+      );
     });
   });
 
@@ -228,7 +263,10 @@ describe('Approval Rule Functions', () => {
 
       expect(mockWithId).toHaveBeenCalledWith({ID: 'rule-1'});
       expect(mockPost).toHaveBeenCalledWith({
-        body: {version: 2, actions: [{action: 'setName', name: 'Updated Rule'}]},
+        body: {
+          version: 2,
+          actions: [{action: 'setName', name: 'Updated Rule'}],
+        },
       });
       expect(result).toEqual(mockUpdated);
     });
@@ -252,9 +290,14 @@ describe('Approval Rule Functions', () => {
         businessUnitKey: 'admin-bu-key',
       });
 
-      expect(mockWithAssociateIdValue).toHaveBeenCalledWith({associateId: 'admin-associate-1'});
+      expect(mockWithAssociateIdValue).toHaveBeenCalledWith({
+        associateId: 'admin-associate-1',
+      });
       expect(mockPost).toHaveBeenCalledWith({
-        body: {version: 1, actions: [{action: 'setStatus', status: 'Inactive'}]},
+        body: {
+          version: 1,
+          actions: [{action: 'setStatus', status: 'Inactive'}],
+        },
       });
       expect(result).toEqual(mockUpdated);
     });

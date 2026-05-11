@@ -29,7 +29,10 @@ export const queryProductSelectionProductsById = async (
       .execute();
     return response.body;
   } catch (error: any) {
-    throw new SDKError('Failed to query product selection products by ID', error);
+    throw new SDKError(
+      'Failed to query product selection products by ID',
+      error
+    );
   }
 };
 
@@ -61,6 +64,9 @@ export const queryProductSelectionProductsByKey = async (
       .execute();
     return response.body;
   } catch (error: any) {
-    throw new SDKError('Failed to query product selection products by key', error);
+    throw new SDKError(
+      'Failed to query product selection products by key',
+      error
+    );
   }
 };

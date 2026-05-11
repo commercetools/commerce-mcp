@@ -27,7 +27,9 @@ describe('Product Selection Product Functions', () => {
 
   describe('contextToProductSelectionProductFunctionMapping', () => {
     it('returns store function when storeKey is present', () => {
-      const mapping = contextToProductSelectionProductFunctionMapping({storeKey: 'store-1'});
+      const mapping = contextToProductSelectionProductFunctionMapping({
+        storeKey: 'store-1',
+      });
       expect(mapping).toHaveProperty('read_product_selection_product');
       expect(mapping.read_product_selection_product).toBe(
         storeFunctions.readProductSelectionProduct
@@ -35,7 +37,9 @@ describe('Product Selection Product Functions', () => {
     });
 
     it('returns admin function when isAdmin is true', () => {
-      const mapping = contextToProductSelectionProductFunctionMapping({isAdmin: true});
+      const mapping = contextToProductSelectionProductFunctionMapping({
+        isAdmin: true,
+      });
       expect(mapping).toHaveProperty('read_product_selection_product');
       expect(mapping.read_product_selection_product).toBe(
         adminFunctions.readProductSelectionProduct
@@ -43,7 +47,9 @@ describe('Product Selection Product Functions', () => {
     });
 
     it('returns empty object when context is undefined', () => {
-      expect(contextToProductSelectionProductFunctionMapping(undefined)).toEqual({});
+      expect(
+        contextToProductSelectionProductFunctionMapping(undefined)
+      ).toEqual({});
     });
 
     it('returns empty object for associate context', () => {
@@ -63,12 +69,18 @@ describe('Product Selection Product Functions', () => {
       const mockResponse = {results: [], count: 0, limit: 10, offset: 0};
       mockExecute.mockResolvedValueOnce({body: mockResponse});
 
-      const result = await readProductSelectionProduct(mockApiRoot, adminContext, {
-        productSelectionId: 'sel-1',
-        limit: 10,
-      });
+      const result = await readProductSelectionProduct(
+        mockApiRoot,
+        adminContext,
+        {
+          productSelectionId: 'sel-1',
+          limit: 10,
+        }
+      );
 
-      expect(mockWithProjectKey).toHaveBeenCalledWith({projectKey: 'test-project'});
+      expect(mockWithProjectKey).toHaveBeenCalledWith({
+        projectKey: 'test-project',
+      });
       expect(mockProductSelections).toHaveBeenCalled();
       expect(mockWithId).toHaveBeenCalledWith({ID: 'sel-1'});
       expect(mockProducts).toHaveBeenCalled();
@@ -80,9 +92,13 @@ describe('Product Selection Product Functions', () => {
       const mockResponse = {results: [], count: 0, limit: 10, offset: 0};
       mockExecute.mockResolvedValueOnce({body: mockResponse});
 
-      const result = await readProductSelectionProduct(mockApiRoot, adminContext, {
-        productSelectionKey: 'selection-key',
-      });
+      const result = await readProductSelectionProduct(
+        mockApiRoot,
+        adminContext,
+        {
+          productSelectionKey: 'selection-key',
+        }
+      );
 
       expect(mockWithKey).toHaveBeenCalledWith({key: 'selection-key'});
       expect(result).toEqual(mockResponse);
@@ -91,7 +107,9 @@ describe('Product Selection Product Functions', () => {
     it('throws when neither productSelectionId nor productSelectionKey is given', async () => {
       await expect(
         readProductSelectionProduct(mockApiRoot, adminContext, {})
-      ).rejects.toThrow('Either productSelectionId or productSelectionKey must be provided');
+      ).rejects.toThrow(
+        'Either productSelectionId or productSelectionKey must be provided'
+      );
     });
   });
 
@@ -99,12 +117,19 @@ describe('Product Selection Product Functions', () => {
     const storeContext = {projectKey: 'test-project', storeKey: 'my-store'};
 
     it('queries products by selection ID via store context', async () => {
-      const mockResponse = {results: [{product: {id: 'prod-1', typeId: 'product'}}], count: 1};
+      const mockResponse = {
+        results: [{product: {id: 'prod-1', typeId: 'product'}}],
+        count: 1,
+      };
       mockExecute.mockResolvedValueOnce({body: mockResponse});
 
-      const result = await readProductSelectionProduct(mockApiRoot, storeContext, {
-        productSelectionId: 'sel-2',
-      });
+      const result = await readProductSelectionProduct(
+        mockApiRoot,
+        storeContext,
+        {
+          productSelectionId: 'sel-2',
+        }
+      );
 
       expect(mockWithId).toHaveBeenCalledWith({ID: 'sel-2'});
       expect(result).toEqual(mockResponse);

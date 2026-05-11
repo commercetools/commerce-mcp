@@ -13,7 +13,9 @@ export const readStateParameters = z.object({
     .min(1)
     .max(500)
     .optional()
-    .describe('Maximum number of results to return (default: 10, range: 1-500)'),
+    .describe(
+      'Maximum number of results to return (default: 10, range: 1-500)'
+    ),
   offset: z
     .number()
     .int()
@@ -44,11 +46,15 @@ export const createStateParameters = z.object({
       'StagedQuoteState',
       'QuoteState',
     ])
-    .describe('The type of the State, determining which resource it applies to'),
+    .describe(
+      'The type of the State, determining which resource it applies to'
+    ),
   initial: z
     .boolean()
     .optional()
-    .describe('Whether this is an initial State. There can be only one initial State per type.'),
+    .describe(
+      'Whether this is an initial State. There can be only one initial State per type.'
+    ),
   name: z
     .record(z.string(), z.string())
     .optional()
@@ -60,7 +66,9 @@ export const createStateParameters = z.object({
   roles: z
     .array(z.enum(['ReviewIncludedInStatistics', 'Return']))
     .optional()
-    .describe('Roles of the State. Only applicable for LineItemState and ReviewState.'),
+    .describe(
+      'Roles of the State. Only applicable for LineItemState and ReviewState.'
+    ),
   transitions: z
     .array(
       z.object({
@@ -75,7 +83,10 @@ export const createStateParameters = z.object({
 export const updateStateParameters = z.object({
   id: z.string().optional().describe('The ID of the State to update'),
   key: z.string().optional().describe('The key of the State to update'),
-  version: z.number().int().describe('Current version of the State for optimistic concurrency'),
+  version: z
+    .number()
+    .int()
+    .describe('Current version of the State for optimistic concurrency'),
   actions: z
     .array(
       z

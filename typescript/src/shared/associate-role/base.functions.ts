@@ -1,4 +1,8 @@
-import {ApiRoot, AssociateRoleDraft, AssociateRoleUpdateAction} from '@commercetools/platform-sdk';
+import {
+  ApiRoot,
+  AssociateRoleDraft,
+  AssociateRoleUpdateAction,
+} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 
 export const readAssociateRoleById = async (

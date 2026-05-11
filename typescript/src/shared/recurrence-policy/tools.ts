@@ -17,7 +17,12 @@ const tools: Record<string, Tool> = {
     method: 'read_recurrence_policy',
     name: 'Read Recurrence Policy',
     description: readRecurrencePolicyPrompt,
-    parameters: readRecurrencePolicyParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: readRecurrencePolicyParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {
       'recurrence-policy': {read: true},
     },
@@ -26,7 +31,12 @@ const tools: Record<string, Tool> = {
     method: 'create_recurrence_policy',
     name: 'Create Recurrence Policy',
     description: createRecurrencePolicyPrompt,
-    parameters: createRecurrencePolicyParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: createRecurrencePolicyParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {
       'recurrence-policy': {create: true},
     },
@@ -35,7 +45,12 @@ const tools: Record<string, Tool> = {
     method: 'update_recurrence_policy',
     name: 'Update Recurrence Policy',
     description: updateRecurrencePolicyPrompt,
-    parameters: updateRecurrencePolicyParameters as unknown as z.ZodObject<any, any, any, any>,
+    parameters: updateRecurrencePolicyParameters as unknown as z.ZodObject<
+      any,
+      any,
+      any,
+      any
+    >,
     actions: {
       'recurrence-policy': {update: true},
     },

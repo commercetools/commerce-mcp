@@ -1,4 +1,7 @@
-import {readApprovalFlow, updateApprovalFlow} from '../../../shared/approval-flow/functions';
+import {
+  readApprovalFlow,
+  updateApprovalFlow,
+} from '../../../shared/approval-flow/functions';
 import {contextToApprovalFlowFunctionMapping} from '../../../shared/approval-flow/functions';
 import * as adminFunctions from '../../../shared/approval-flow/admin.functions';
 import * as associateFunctions from '../../../shared/approval-flow/associate.functions';
@@ -16,9 +19,11 @@ const mockApprovalFlows = jest.fn().mockReturnValue({
   withId: mockWithId,
   get: mockGet,
 });
-const mockInBusinessUnitKeyWithBusinessUnitKeyValue = jest.fn().mockReturnValue({
-  approvalFlows: mockApprovalFlows,
-});
+const mockInBusinessUnitKeyWithBusinessUnitKeyValue = jest
+  .fn()
+  .mockReturnValue({
+    approvalFlows: mockApprovalFlows,
+  });
 const mockWithAssociateIdValue = jest.fn().mockReturnValue({
   inBusinessUnitKeyWithBusinessUnitKeyValue:
     mockInBusinessUnitKeyWithBusinessUnitKeyValue,
@@ -47,7 +52,9 @@ describe('Approval Flow Functions', () => {
       });
       expect(mapping).toHaveProperty('read_approval_flow');
       expect(mapping).toHaveProperty('update_approval_flow');
-      expect(mapping.read_approval_flow).toBe(associateFunctions.readApprovalFlow);
+      expect(mapping.read_approval_flow).toBe(
+        associateFunctions.readApprovalFlow
+      );
       expect(mapping.update_approval_flow).toBe(
         associateFunctions.updateApprovalFlow
       );
@@ -58,7 +65,9 @@ describe('Approval Flow Functions', () => {
       expect(mapping).toHaveProperty('read_approval_flow');
       expect(mapping).toHaveProperty('update_approval_flow');
       expect(mapping.read_approval_flow).toBe(adminFunctions.readApprovalFlow);
-      expect(mapping.update_approval_flow).toBe(adminFunctions.updateApprovalFlow);
+      expect(mapping.update_approval_flow).toBe(
+        adminFunctions.updateApprovalFlow
+      );
     });
 
     it('returns empty object when context is undefined', () => {
@@ -72,9 +81,9 @@ describe('Approval Flow Functions', () => {
     });
 
     it('returns empty object when context has no relevant fields', () => {
-      expect(contextToApprovalFlowFunctionMapping({storeKey: 'some-store'})).toEqual(
-        {}
-      );
+      expect(
+        contextToApprovalFlowFunctionMapping({storeKey: 'some-store'})
+      ).toEqual({});
     });
   });
 
@@ -100,7 +109,9 @@ describe('Approval Flow Functions', () => {
       expect(mockWithAssociateIdValue).toHaveBeenCalledWith({
         associateId: 'associate-1',
       });
-      expect(mockInBusinessUnitKeyWithBusinessUnitKeyValue).toHaveBeenCalledWith({
+      expect(
+        mockInBusinessUnitKeyWithBusinessUnitKeyValue
+      ).toHaveBeenCalledWith({
         businessUnitKey: 'bu-key-1',
       });
       expect(mockApprovalFlows).toHaveBeenCalled();
@@ -167,7 +178,9 @@ describe('Approval Flow Functions', () => {
       expect(mockWithAssociateIdValue).toHaveBeenCalledWith({
         associateId: 'admin-associate-1',
       });
-      expect(mockInBusinessUnitKeyWithBusinessUnitKeyValue).toHaveBeenCalledWith({
+      expect(
+        mockInBusinessUnitKeyWithBusinessUnitKeyValue
+      ).toHaveBeenCalledWith({
         businessUnitKey: 'admin-bu-key',
       });
       expect(result).toEqual(mockFlow);
@@ -178,7 +191,9 @@ describe('Approval Flow Functions', () => {
         readApprovalFlow(mockApiRoot, adminContext, {
           businessUnitKey: 'bu-1',
         })
-      ).rejects.toThrow('associateId is required for admin approval flow operations');
+      ).rejects.toThrow(
+        'associateId is required for admin approval flow operations'
+      );
     });
 
     it('throws when businessUnitKey is missing from params', async () => {

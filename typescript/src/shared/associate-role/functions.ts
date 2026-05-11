@@ -28,15 +28,25 @@ export const contextToAssociateRoleFunctionMapping = (
   return {};
 };
 
-export const readAssociateRole = (apiRoot: ApiRoot, context: any, params: any) => {
+export const readAssociateRole = (
+  apiRoot: ApiRoot,
+  context: any,
+  params: any
+) => {
   if (context?.customerId && context?.businessUnitKey) {
     return associate.readAssociateRole(apiRoot, context, params);
   }
   return admin.readAssociateRole(apiRoot, context, params);
 };
 
-export const createAssociateRole = (apiRoot: ApiRoot, context: any, params: any) =>
-  admin.createAssociateRole(apiRoot, context, params);
+export const createAssociateRole = (
+  apiRoot: ApiRoot,
+  context: any,
+  params: any
+) => admin.createAssociateRole(apiRoot, context, params);
 
-export const updateAssociateRole = (apiRoot: ApiRoot, context: any, params: any) =>
-  admin.updateAssociateRole(apiRoot, context, params);
+export const updateAssociateRole = (
+  apiRoot: ApiRoot,
+  context: any,
+  params: any
+) => admin.updateAssociateRole(apiRoot, context, params);

@@ -1,8 +1,14 @@
 import {z} from 'zod';
 
 export const readRecurrencePolicyParameters = z.object({
-  id: z.string().optional().describe('The ID of the Recurrence Policy to fetch'),
-  key: z.string().optional().describe('The key of the Recurrence Policy to fetch'),
+  id: z
+    .string()
+    .optional()
+    .describe('The ID of the Recurrence Policy to fetch'),
+  key: z
+    .string()
+    .optional()
+    .describe('The key of the Recurrence Policy to fetch'),
   where: z
     .array(z.string())
     .optional()
@@ -13,7 +19,9 @@ export const readRecurrencePolicyParameters = z.object({
     .min(1)
     .max(500)
     .optional()
-    .describe('Maximum number of results to return (default: 10, range: 1-500)'),
+    .describe(
+      'Maximum number of results to return (default: 10, range: 1-500)'
+    ),
   offset: z
     .number()
     .int()
@@ -24,14 +32,13 @@ export const readRecurrencePolicyParameters = z.object({
     .array(z.string())
     .optional()
     .describe('Sort expressions, e.g. ["createdAt desc"]'),
-  expand: z
-    .array(z.string())
-    .optional()
-    .describe('References to expand'),
+  expand: z.array(z.string()).optional().describe('References to expand'),
 });
 
 export const createRecurrencePolicyParameters = z.object({
-  key: z.string().describe('User-defined unique identifier for the Recurrence Policy'),
+  key: z
+    .string()
+    .describe('User-defined unique identifier for the Recurrence Policy'),
   schedule: z
     .record(z.string(), z.any())
     .describe(
@@ -48,12 +55,20 @@ export const createRecurrencePolicyParameters = z.object({
 });
 
 export const updateRecurrencePolicyParameters = z.object({
-  id: z.string().optional().describe('The ID of the Recurrence Policy to update'),
-  key: z.string().optional().describe('The key of the Recurrence Policy to update'),
+  id: z
+    .string()
+    .optional()
+    .describe('The ID of the Recurrence Policy to update'),
+  key: z
+    .string()
+    .optional()
+    .describe('The key of the Recurrence Policy to update'),
   version: z
     .number()
     .int()
-    .describe('Current version of the Recurrence Policy for optimistic concurrency'),
+    .describe(
+      'Current version of the Recurrence Policy for optimistic concurrency'
+    ),
   actions: z
     .array(
       z
