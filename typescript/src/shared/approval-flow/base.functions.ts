@@ -4,20 +4,20 @@ import {SDKError} from '../errors/sdkError';
 const getApprovalFlowsBuilder = (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string
 ) =>
   apiRoot
     .withProjectKey({projectKey})
     .asAssociate()
-    .withAssociateIdValue({associateId})
+    .withAssociateIdValue({associateId: customerId})
     .inBusinessUnitKeyWithBusinessUnitKeyValue({businessUnitKey})
     .approvalFlows();
 
 export const readApprovalFlowById = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   id: string,
   expand?: string[]
@@ -26,7 +26,7 @@ export const readApprovalFlowById = async (
     const response = await getApprovalFlowsBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .withId({ID: id})
@@ -45,7 +45,7 @@ export const readApprovalFlowById = async (
 export const queryApprovalFlows = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   where?: string[],
   limit?: number,
@@ -57,7 +57,7 @@ export const queryApprovalFlows = async (
     const response = await getApprovalFlowsBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .get({
@@ -79,7 +79,7 @@ export const queryApprovalFlows = async (
 export const updateApprovalFlowById = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   id: string,
   version: number,
@@ -89,7 +89,7 @@ export const updateApprovalFlowById = async (
     const response = await getApprovalFlowsBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .withId({ID: id})

@@ -178,7 +178,7 @@ describe('Approval Rule Functions', () => {
 
       const result = await readApprovalRule(mockApiRoot, adminContext, {
         id: 'rule-2',
-        associateId: 'admin-associate-1',
+        customerId: 'admin-associate-1',
         businessUnitKey: 'admin-bu-key',
       });
 
@@ -193,17 +193,17 @@ describe('Approval Rule Functions', () => {
       expect(result).toEqual(mockRule);
     });
 
-    it('throws when associateId is missing from params', async () => {
+    it('throws when customerId is missing from params', async () => {
       await expect(
         readApprovalRule(mockApiRoot, adminContext, {businessUnitKey: 'bu-1'})
       ).rejects.toThrow(
-        'associateId is required for admin approval rule operations'
+        'customerId is required for admin approval rule operations'
       );
     });
 
     it('throws when businessUnitKey is missing from params', async () => {
       await expect(
-        readApprovalRule(mockApiRoot, adminContext, {associateId: 'a-1'})
+        readApprovalRule(mockApiRoot, adminContext, {customerId: 'a-1'})
       ).rejects.toThrow(
         'businessUnitKey is required for admin approval rule operations'
       );
@@ -286,7 +286,7 @@ describe('Approval Rule Functions', () => {
         id: 'rule-2',
         version: 1,
         actions: [{action: 'setStatus', status: 'Inactive'}],
-        associateId: 'admin-associate-1',
+        customerId: 'admin-associate-1',
         businessUnitKey: 'admin-bu-key',
       });
 

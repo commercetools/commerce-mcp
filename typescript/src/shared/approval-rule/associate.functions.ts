@@ -86,7 +86,7 @@ export const createApprovalRule = async (
   }
 
   try {
-    const {associateId: _a, businessUnitKey: _b, ...draft} = params;
+    const {customerId: _c, businessUnitKey: _b, ...draft} = params;
     return await createBase(
       apiRoot,
       context.projectKey,
