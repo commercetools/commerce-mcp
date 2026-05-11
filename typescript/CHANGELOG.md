@@ -1,5 +1,62 @@
 # @commercetools/commerce-agent
 
+## 2.0.0
+
+### Major Changes
+
+- [#39](https://github.com/commercetools/commerce-mcp/pull/39) [`df51410`](https://github.com/commercetools/commerce-mcp/commit/df514108420915df16886679e02f0a69d7db7db7) Thanks [@ajimae](https://github.com/ajimae)! - major package updates and bug fixes
+
+  ### What Changed
+  - Tool output now is defaulted to `json`
+    _this means if `--toolOutputFormat` option is not specified then it defaults to `json`_
+  - Tool output text in `json` format has been dropped
+    _the root explanatory text for tool output json object has been removed_
+
+  ```ts
+  // before
+  {
+    "READ CART DISCOUNT RESULT": {
+      limit: 10,
+      offset: 0,
+      count: 10,
+      results: [
+        {
+          id: '123',
+          name: 'Cart Discount 1',
+          description: 'This is a cart discount',
+          code: '1234567890',
+        }
+      ],
+    },
+  }
+
+  // after
+  {
+    limit: 10,
+    offset: 0,
+    count: 10,
+    results: [
+      {
+        id: '123',
+        name: 'Cart Discount 1',
+        description: 'This is a cart discount',
+        code: '1234567890',
+      }
+    ],
+  }
+  ```
+
+  The `READ CART DISCOUNT RESULT` text has been dropped
+  - The `all` tool now requires setting `isAdmin` option to `true`
+
+  ```bash
+  npx -y @commercetools/commerce-mcp --tools="all" --isAdmin=true ...
+  ```
+
+### Patch Changes
+
+- [#32](https://github.com/commercetools/commerce-mcp/pull/32) [`c29fcef`](https://github.com/commercetools/commerce-mcp/commit/c29fcef5ab61d11d18c5103ade8dd382f22f1d44) Thanks [@geethanga-ct](https://github.com/geethanga-ct)! - fix(security): prevent credential leak in auth error message
+
 ## 1.1.0
 
 ### Minor Changes
