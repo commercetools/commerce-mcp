@@ -1,6 +1,6 @@
-# Commercetools MCP Server — Python
+# commercetools MCP Server — Python
 
-Python implementation of the Commercetools MCP server, built with [FastMCP](https://github.com/jlowin/fastmcp). Exposes Commercetools operations as MCP tools for use with Claude Desktop, Claude Code, and any MCP-compatible client.
+Python implementation of the commercetools MCP server, built with [FastMCP](https://github.com/jlowin/fastmcp). Exposes commercetools operations as MCP tools for use with Claude Desktop, Claude Code, and any MCP-compatible client.
 
 ## Prerequisites
 
@@ -44,9 +44,9 @@ ACCESS_TOKEN=my-access-token
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `AUTH_URL` | yes | — | Commercetools auth endpoint |
-| `API_URL` | yes | — | Commercetools API endpoint |
-| `PROJECT_KEY` | yes | — | Commercetools project key |
+| `AUTH_URL` | yes | — | commercetools auth endpoint |
+| `API_URL` | yes | — | commercetools API endpoint |
+| `PROJECT_KEY` | yes | — | commercetools project key |
 | `CLIENT_ID` | yes* | — | OAuth client ID (*unless `ACCESS_TOKEN` is set) |
 | `CLIENT_SECRET` | yes* | — | OAuth client secret (*unless `ACCESS_TOKEN` is set) |
 | `ACCESS_TOKEN` | yes* | — | Pre-existing access token (alternative to client credentials) |

@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from ..registry import ToolDefinition, register_tool
 from .functions import create_discount_code, read_discount_code, update_discount_code
+from .prompts import CREATE_DISCOUNT_CODE_PROMPT, READ_DISCOUNT_CODE_PROMPT, UPDATE_DISCOUNT_CODE_PROMPT
 from .schemas import CreateDiscountCodeParams, ReadDiscountCodeParams, UpdateDiscountCodeParams
 
 _DISCOUNT_CODE_TOOLS = [
     ToolDefinition(
         method="read_discount_code",
         name="Read Discount Code",
-        description="Read or list discount codes. Provide an id or key to fetch a specific code, or omit both to list codes with optional filtering.",
+        description=READ_DISCOUNT_CODE_PROMPT,
         parameters=ReadDiscountCodeParams,
         handler=read_discount_code,
         actions={"discount_code": {"read": True}},
@@ -16,7 +17,7 @@ _DISCOUNT_CODE_TOOLS = [
     ToolDefinition(
         method="create_discount_code",
         name="Create Discount Code",
-        description="Create a new discount code linked to one or more cart discounts.",
+        description=CREATE_DISCOUNT_CODE_PROMPT,
         parameters=CreateDiscountCodeParams,
         handler=create_discount_code,
         actions={"discount_code": {"create": True}},
@@ -24,7 +25,7 @@ _DISCOUNT_CODE_TOOLS = [
     ToolDefinition(
         method="update_discount_code",
         name="Update Discount Code",
-        description="Apply update actions to an existing discount code identified by id or key.",
+        description=UPDATE_DISCOUNT_CODE_PROMPT,
         parameters=UpdateDiscountCodeParams,
         handler=update_discount_code,
         actions={"discount_code": {"update": True}},

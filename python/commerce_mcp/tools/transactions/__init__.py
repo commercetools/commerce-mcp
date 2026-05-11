@@ -3,12 +3,13 @@ from __future__ import annotations
 from ..registry import ToolDefinition, register_tool
 from .functions import create_transaction, read_transaction
 from .schemas import CreateTransactionParams, ReadTransactionParams
+from .prompts import CREATE_TRANSACTION_PROMPT, READ_TRANSACTION_PROMPT
 
 _TRANSACTIONS_TOOLS = [
     ToolDefinition(
         method="read_transaction",
         name="Read Transaction",
-        description="Read or list checkout transactions. Provide an id or key to fetch a specific transaction, or omit both to list transactions.",
+        description=READ_TRANSACTION_PROMPT,
         parameters=ReadTransactionParams,
         handler=read_transaction,
         actions={"transactions": {"read": True}},
@@ -16,7 +17,7 @@ _TRANSACTIONS_TOOLS = [
     ToolDefinition(
         method="create_transaction",
         name="Create Transaction",
-        description="Create a new checkout transaction for a cart with a payment integration.",
+        description=CREATE_TRANSACTION_PROMPT,
         parameters=CreateTransactionParams,
         handler=create_transaction,
         actions={"transactions": {"create": True}},

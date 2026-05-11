@@ -98,13 +98,13 @@ def _register_dynamic_tools(mcp: FastMCP) -> None:
     for fn, params_model, name, description in [
         (list_available_tools, ListAvailableToolsParams,
          "list_available_tools",
-         "List all available Commercetools tools grouped by resource namespace."),
+         "List all available commercetools tools grouped by resource namespace."),
         (inject_tools, InjectToolsParams,
          "inject_tools",
          "Dynamically inject specific tools into this MCP session by method name."),
         (execute_tool, ExecuteToolParams,
          "execute_tool",
-         "Execute any available Commercetools tool by method name without pre-injecting it."),
+         "Execute any available commercetools tool by method name without pre-injecting it."),
     ]:
         _fn, _pm, _name, _desc = fn, params_model, name, description
 

@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from ..registry import ToolDefinition, register_tool
 from .functions import create_payments, read_payments, update_payments
+from .prompts import CREATE_PAYMENT_PROMPT, READ_PAYMENT_PROMPT, UPDATE_PAYMENT_PROMPT
 from .schemas import CreatePaymentsParams, ReadPaymentsParams, UpdatePaymentsParams
 
 _PAYMENTS_TOOLS = [
     ToolDefinition(
         method="read_payments",
         name="Read Payment",
-        description="Read or list payments. Provide an id or key to fetch a specific payment, or omit both to list payments with optional filtering.",
+        description=READ_PAYMENT_PROMPT,
         parameters=ReadPaymentsParams,
         handler=read_payments,
         actions={"payments": {"read": True}},
@@ -16,7 +17,7 @@ _PAYMENTS_TOOLS = [
     ToolDefinition(
         method="create_payments",
         name="Create Payment",
-        description="Create a new payment with a planned amount and optional payment method information.",
+        description=CREATE_PAYMENT_PROMPT,
         parameters=CreatePaymentsParams,
         handler=create_payments,
         actions={"payments": {"create": True}},
@@ -24,7 +25,7 @@ _PAYMENTS_TOOLS = [
     ToolDefinition(
         method="update_payments",
         name="Update Payment",
-        description="Apply update actions to an existing payment identified by id or key.",
+        description=UPDATE_PAYMENT_PROMPT,
         parameters=UpdatePaymentsParams,
         handler=update_payments,
         actions={"payments": {"update": True}},

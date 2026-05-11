@@ -6,7 +6,7 @@ from .config import AuthConfig, ClientCredentialsAuth, ExistingTokenAuth, CTCont
 
 
 class CommercetoolsAPI:
-    """Async Commercetools API client.
+    """Async commercetools API client.
 
     Wraps httpx to handle auth, token management, and tool dispatch.
     Mirrors the TypeScript CommercetoolsAPI class.
@@ -153,7 +153,7 @@ def _full_actions() -> Actions:
 
 
 def _scopes_to_actions(scopes: list[str], project_key: str) -> Actions:
-    """Maps Commercetools OAuth scopes to the Actions permission matrix.
+    """Maps commercetools OAuth scopes to the Actions permission matrix.
 
     Scope format: manage_products:<projectKey> → products.{read,create,update}
                   view_products:<projectKey>   → products.read

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ..registry import ToolDefinition, register_tool
+from .prompts import CREATE_CART_PROMPT, READ_CART_PROMPT, REPLICATE_CART_PROMPT, UPDATE_CART_PROMPT
 from .schemas import ReadCartParams, CreateCartParams, ReplicateCartParams, UpdateCartParams
 from .functions import read_cart, create_cart, replicate_cart, update_cart
 
@@ -8,7 +9,7 @@ _CART_TOOLS = [
     ToolDefinition(
         method="read_cart",
         name="Read Cart",
-        description="Read carts. Scoped to associate, customer, store, or admin context.",
+        description=READ_CART_PROMPT,
         parameters=ReadCartParams,
         handler=read_cart,
         actions={"cart": {"read": True}},
@@ -16,7 +17,7 @@ _CART_TOOLS = [
     ToolDefinition(
         method="create_cart",
         name="Create Cart",
-        description="Create a new cart. Scoped to associate, customer, store, or admin context.",
+        description=CREATE_CART_PROMPT,
         parameters=CreateCartParams,
         handler=create_cart,
         actions={"cart": {"create": True}},
@@ -24,7 +25,7 @@ _CART_TOOLS = [
     ToolDefinition(
         method="replicate_cart",
         name="Replicate Cart",
-        description="Replicate an existing cart. Scoped to associate, customer, store, or admin context.",
+        description=REPLICATE_CART_PROMPT,
         parameters=ReplicateCartParams,
         handler=replicate_cart,
         actions={"cart": {"create": True}},
@@ -32,7 +33,7 @@ _CART_TOOLS = [
     ToolDefinition(
         method="update_cart",
         name="Update Cart",
-        description="Apply update actions to an existing cart.",
+        description=UPDATE_CART_PROMPT,
         parameters=UpdateCartParams,
         handler=update_cart,
         actions={"cart": {"update": True}},

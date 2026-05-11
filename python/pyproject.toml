@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "commerce-mcp"
 version = "0.1.0"
-description = "Commercetools MCP server and agent toolkit adapters — Python edition"
+description = "commercetools MCP server and agent toolkit adapters — Python edition"
 requires-python = ">=3.11"
 dependencies = [
     "fastmcp>=2.0",

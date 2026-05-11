@@ -3,16 +3,13 @@ from __future__ import annotations
 from ..registry import ToolDefinition, register_tool
 from .functions import read_product_type, create_product_type, update_product_type
 from .schemas import ReadProductTypeParams, CreateProductTypeParams, UpdateProductTypeParams
+from .prompts import CREATE_PRODUCT_TYPE_PROMPT, READ_PRODUCT_TYPE_PROMPT, UPDATE_PRODUCT_TYPE_PROMPT
 
 _PRODUCT_TYPE_TOOLS = [
     ToolDefinition(
         method="read_product_type",
         name="Read Product Type",
-        description=(
-            "Read a single product type by its ID, or list product types with optional filtering, "
-            "sorting, and pagination. Provide an id to fetch a specific product type, or omit it "
-            "to list all product types. Available to all contexts."
-        ),
+        description=READ_PRODUCT_TYPE_PROMPT,
         parameters=ReadProductTypeParams,
         handler=read_product_type,
         actions={"product_type": {"read": True}},
@@ -20,11 +17,7 @@ _PRODUCT_TYPE_TOOLS = [
     ToolDefinition(
         method="create_product_type",
         name="Create Product Type",
-        description=(
-            "Create a new product type with a key, name, description, and optional attribute "
-            "definitions. Each attribute requires a name, label, and type definition. "
-            "Admin-only operation."
-        ),
+        description=CREATE_PRODUCT_TYPE_PROMPT,
         parameters=CreateProductTypeParams,
         handler=create_product_type,
         actions={"product_type": {"create": True}},
@@ -32,12 +25,7 @@ _PRODUCT_TYPE_TOOLS = [
     ToolDefinition(
         method="update_product_type",
         name="Update Product Type",
-        description=(
-            "Apply update actions to an existing product type identified by its ID. "
-            "Supported actions include: addAttributeDefinition, removeAttributeDefinition, "
-            "changeName, changeDescription, changeAttributeOrder, setKey, and more. "
-            "Admin-only operation."
-        ),
+        description=UPDATE_PRODUCT_TYPE_PROMPT,
         parameters=UpdateProductTypeParams,
         handler=update_product_type,
         actions={"product_type": {"update": True}},

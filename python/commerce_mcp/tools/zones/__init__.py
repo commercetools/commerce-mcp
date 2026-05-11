@@ -3,12 +3,13 @@ from __future__ import annotations
 from ..registry import ToolDefinition, register_tool
 from .functions import create_zone, read_zone, update_zone
 from .schemas import CreateZoneParams, ReadZoneParams, UpdateZoneParams
+from .prompts import CREATE_ZONE_PROMPT, READ_ZONE_PROMPT, UPDATE_ZONE_PROMPT
 
 _ZONES_TOOLS = [
     ToolDefinition(
         method="read_zone",
         name="Read Zone",
-        description="Read or list zones. Provide an id or key to fetch a specific zone, or omit both to list zones with optional filtering.",
+        description=READ_ZONE_PROMPT,
         parameters=ReadZoneParams,
         handler=read_zone,
         actions={"zones": {"read": True}},
@@ -16,7 +17,7 @@ _ZONES_TOOLS = [
     ToolDefinition(
         method="create_zone",
         name="Create Zone",
-        description="Create a new zone with a name, optional key, description, and locations.",
+        description=CREATE_ZONE_PROMPT,
         parameters=CreateZoneParams,
         handler=create_zone,
         actions={"zones": {"create": True}},
@@ -24,7 +25,7 @@ _ZONES_TOOLS = [
     ToolDefinition(
         method="update_zone",
         name="Update Zone",
-        description="Apply update actions to an existing zone identified by id or key.",
+        description=UPDATE_ZONE_PROMPT,
         parameters=UpdateZoneParams,
         handler=update_zone,
         actions={"zones": {"update": True}},

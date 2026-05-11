@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from ..registry import ToolDefinition, register_tool
+from .prompts import CREATE_CATEGORY_PROMPT, READ_CATEGORY_PROMPT, UPDATE_CATEGORY_PROMPT
 from .schemas import CreateCategoryParams, ReadCategoryParams, UpdateCategoryParams
 from .functions import create_category, read_category, update_category
 
@@ -8,10 +9,7 @@ _CATEGORY_TOOLS = [
     ToolDefinition(
         method="read_category",
         name="Read Category",
-        description=(
-            "Fetch a commercetools category by ID, key, or list with optional filtering and sorting. "
-            "Available in all contexts (no authentication context required for reading)."
-        ),
+        description=READ_CATEGORY_PROMPT,
         parameters=ReadCategoryParams,
         handler=read_category,
         actions={"category": {"read": True}},
@@ -19,10 +17,7 @@ _CATEGORY_TOOLS = [
     ToolDefinition(
         method="create_category",
         name="Create Category",
-        description=(
-            "Create a new commercetools category with a localized name, slug, and optional parent, "
-            "order hint, assets, and custom fields. Requires isAdmin context."
-        ),
+        description=CREATE_CATEGORY_PROMPT,
         parameters=CreateCategoryParams,
         handler=create_category,
         actions={"category": {"create": True}},
@@ -30,10 +25,7 @@ _CATEGORY_TOOLS = [
     ToolDefinition(
         method="update_category",
         name="Update Category",
-        description=(
-            "Apply update actions to an existing commercetools category identified by ID or key. "
-            "Requires isAdmin context."
-        ),
+        description=UPDATE_CATEGORY_PROMPT,
         parameters=UpdateCategoryParams,
         handler=update_category,
         actions={"category": {"update": True}},

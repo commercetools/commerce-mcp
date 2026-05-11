@@ -13,15 +13,13 @@ from __future__ import annotations
 from ..registry import ToolDefinition, register_tool
 from .schemas import ListProductsParams, CreateProductParams, UpdateProductParams
 from .functions import list_products, create_product, update_product
+from .prompts import CREATE_PRODUCT_PROMPT, LIST_PRODUCTS_PROMPT, UPDATE_PRODUCT_PROMPT
 
 _PRODUCTS_TOOLS = [
     ToolDefinition(
         method="list_products",
         name="List Products",
-        description=(
-            "List or search products in the Commercetools catalogue. "
-            "Supports filtering by ID, free-text where predicates, sorting, and expansion."
-        ),
+        description=LIST_PRODUCTS_PROMPT,
         parameters=ListProductsParams,
         handler=list_products,
         actions={"products": {"read": True}},
@@ -29,7 +27,7 @@ _PRODUCTS_TOOLS = [
     ToolDefinition(
         method="create_product",
         name="Create Product",
-        description="Create a new product in the Commercetools catalogue.",
+        description=CREATE_PRODUCT_PROMPT,
         parameters=CreateProductParams,
         handler=create_product,
         actions={"products": {"create": True}},
@@ -37,7 +35,7 @@ _PRODUCTS_TOOLS = [
     ToolDefinition(
         method="update_product",
         name="Update Product",
-        description="Apply update actions to an existing product.",
+        description=UPDATE_PRODUCT_PROMPT,
         parameters=UpdateProductParams,
         handler=update_product,
         actions={"products": {"update": True}},

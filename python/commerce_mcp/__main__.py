@@ -146,7 +146,7 @@ async def _introspect_actions(auth: AuthConfig) -> Actions:
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Commercetools MCP server (Python/fastMCP)")
+    parser = argparse.ArgumentParser(description="commercetools MCP server (Python/fastMCP)")
     parser.add_argument(
         "--transport",
         choices=["stdio", "http"],

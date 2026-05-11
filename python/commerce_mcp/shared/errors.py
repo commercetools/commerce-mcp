@@ -15,7 +15,7 @@ class ContextError(Exception):
 
 
 class SDKError(Exception):
-    """Wraps Commercetools API errors with operation context."""
+    """Wraps commercetools API errors with operation context."""
 
     def __init__(self, operation: str, error: Exception | None = None) -> None:
         detail = ""

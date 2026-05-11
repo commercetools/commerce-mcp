@@ -3,12 +3,13 @@ from __future__ import annotations
 from ..registry import ToolDefinition, register_tool
 from .functions import create_standalone_price, read_standalone_price, update_standalone_price
 from .schemas import CreateStandalonePriceParams, ReadStandalonePriceParams, UpdateStandalonePriceParams
+from .prompts import CREATE_STANDALONE_PRICE_PROMPT, READ_STANDALONE_PRICE_PROMPT, UPDATE_STANDALONE_PRICE_PROMPT
 
 _STANDALONE_PRICE_TOOLS = [
     ToolDefinition(
         method="read_standalone_price",
         name="Read Standalone Price",
-        description="Read or list standalone prices. Provide an id or key to fetch a specific price, or omit both to list prices with optional filtering.",
+        description=READ_STANDALONE_PRICE_PROMPT,
         parameters=ReadStandalonePriceParams,
         handler=read_standalone_price,
         actions={"standalone_price": {"read": True}},
@@ -16,7 +17,7 @@ _STANDALONE_PRICE_TOOLS = [
     ToolDefinition(
         method="create_standalone_price",
         name="Create Standalone Price",
-        description="Create a new standalone price for a product variant SKU.",
+        description=CREATE_STANDALONE_PRICE_PROMPT,
         parameters=CreateStandalonePriceParams,
         handler=create_standalone_price,
         actions={"standalone_price": {"create": True}},
@@ -24,7 +25,7 @@ _STANDALONE_PRICE_TOOLS = [
     ToolDefinition(
         method="update_standalone_price",
         name="Update Standalone Price",
-        description="Apply update actions to an existing standalone price identified by id or key.",
+        description=UPDATE_STANDALONE_PRICE_PROMPT,
         parameters=UpdateStandalonePriceParams,
         handler=update_standalone_price,
         actions={"standalone_price": {"update": True}},

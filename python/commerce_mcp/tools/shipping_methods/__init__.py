@@ -7,16 +7,13 @@ from .schemas import (
     CreateShippingMethodsParams,
     UpdateShippingMethodsParams,
 )
+from .prompts import CREATE_SHIPPING_METHOD_PROMPT, READ_SHIPPING_METHOD_PROMPT, UPDATE_SHIPPING_METHOD_PROMPT
 
 _SHIPPING_METHODS_TOOLS = [
     ToolDefinition(
         method="read_shipping_methods",
         name="Read Shipping Methods",
-        description=(
-            "Read or list shipping methods. Provide an id or key to fetch a specific shipping method, "
-            "or omit both to list shipping methods with optional filtering, sorting, and pagination. "
-            "Admin-only operation."
-        ),
+        description=READ_SHIPPING_METHOD_PROMPT,
         parameters=ReadShippingMethodsParams,
         handler=read_shipping_methods,
         actions={"shipping_methods": {"read": True}},
@@ -24,10 +21,7 @@ _SHIPPING_METHODS_TOOLS = [
     ToolDefinition(
         method="create_shipping_methods",
         name="Create Shipping Methods",
-        description=(
-            "Create a new shipping method with a name, zone rates, optional tax category, and other "
-            "settings. Zone rates define the shipping price per geographic zone. Admin-only operation."
-        ),
+        description=CREATE_SHIPPING_METHOD_PROMPT,
         parameters=CreateShippingMethodsParams,
         handler=create_shipping_methods,
         actions={"shipping_methods": {"create": True}},
@@ -35,11 +29,7 @@ _SHIPPING_METHODS_TOOLS = [
     ToolDefinition(
         method="update_shipping_methods",
         name="Update Shipping Methods",
-        description=(
-            "Apply update actions to an existing shipping method identified by id or key. "
-            "Supported actions include: changeName, setDescription, addZoneRate, removeZoneRate, "
-            "setDefault, setTaxCategory, setCustomType, setCustomField. Admin-only operation."
-        ),
+        description=UPDATE_SHIPPING_METHOD_PROMPT,
         parameters=UpdateShippingMethodsParams,
         handler=update_shipping_methods,
         actions={"shipping_methods": {"update": True}},

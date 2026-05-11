@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from ..registry import ToolDefinition, register_tool
 from .functions import create_inventory, read_inventory, update_inventory
+from .prompts import CREATE_INVENTORY_PROMPT, READ_INVENTORY_PROMPT, UPDATE_INVENTORY_PROMPT
 from .schemas import CreateInventoryParams, ReadInventoryParams, UpdateInventoryParams
 
 _INVENTORY_TOOLS = [
     ToolDefinition(
         method="read_inventory",
         name="Read Inventory",
-        description="Read or list inventory entries. Provide an id or key to fetch a specific entry, or omit both to list entries with optional filtering.",
+        description=READ_INVENTORY_PROMPT,
         parameters=ReadInventoryParams,
         handler=read_inventory,
         actions={"inventory": {"read": True}},
@@ -16,7 +17,7 @@ _INVENTORY_TOOLS = [
     ToolDefinition(
         method="create_inventory",
         name="Create Inventory",
-        description="Create a new inventory entry for a product variant SKU with an initial stock quantity.",
+        description=CREATE_INVENTORY_PROMPT,
         parameters=CreateInventoryParams,
         handler=create_inventory,
         actions={"inventory": {"create": True}},
@@ -24,7 +25,7 @@ _INVENTORY_TOOLS = [
     ToolDefinition(
         method="update_inventory",
         name="Update Inventory",
-        description="Apply update actions to an existing inventory entry identified by id or key.",
+        description=UPDATE_INVENTORY_PROMPT,
         parameters=UpdateInventoryParams,
         handler=update_inventory,
         actions={"inventory": {"update": True}},

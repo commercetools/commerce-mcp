@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from ..registry import ToolDefinition, register_tool
 from .functions import create_extension, read_extension, update_extension
+from .prompts import CREATE_EXTENSION_PROMPT, READ_EXTENSION_PROMPT, UPDATE_EXTENSION_PROMPT
 from .schemas import CreateExtensionParams, ReadExtensionParams, UpdateExtensionParams
 
 _EXTENSIONS_TOOLS = [
     ToolDefinition(
         method="read_extension",
         name="Read Extension",
-        description="Read or list API extensions. Provide an id or key to fetch a specific extension, or omit both to list extensions.",
+        description=READ_EXTENSION_PROMPT,
         parameters=ReadExtensionParams,
         handler=read_extension,
         actions={"extensions": {"read": True}},
@@ -16,7 +17,7 @@ _EXTENSIONS_TOOLS = [
     ToolDefinition(
         method="create_extension",
         name="Create Extension",
-        description="Create a new API extension with triggers and a destination (HTTP, AWS Lambda, or Google Cloud Function).",
+        description=CREATE_EXTENSION_PROMPT,
         parameters=CreateExtensionParams,
         handler=create_extension,
         actions={"extensions": {"create": True}},
@@ -24,7 +25,7 @@ _EXTENSIONS_TOOLS = [
     ToolDefinition(
         method="update_extension",
         name="Update Extension",
-        description="Apply update actions to an existing API extension identified by id or key.",
+        description=UPDATE_EXTENSION_PROMPT,
         parameters=UpdateExtensionParams,
         handler=update_extension,
         actions={"extensions": {"update": True}},
