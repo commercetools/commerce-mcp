@@ -95,6 +95,13 @@ describe('main function', () => {
           'custom-objects': {read: true, create: true, update: true},
           'payment-intents': {update: true},
           transactions: {read: true, create: true},
+          'approval-flow': {read: true, create: true, update: true},
+          'approval-rule': {read: true, create: true, update: true},
+          'associte-role': {read: true, create: true, update: true},
+          'order-edit': {read: true, create: true, update: true},
+          'product-selection-product': {read: true},
+          'recurrence-policy': {read: true, create: true, update: true},
+          states: {read: true, create: true, update: true},
         },
         context: {
           isAdmin: true,
