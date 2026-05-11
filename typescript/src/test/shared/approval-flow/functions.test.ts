@@ -145,7 +145,9 @@ describe('Approval Flow Functions', () => {
           {projectKey: 'test-project', businessUnitKey: 'bu-1'},
           {}
         )
-      ).rejects.toThrow('customerId is required for admin approval flow operations');
+      ).rejects.toThrow(
+        'customerId is required for admin approval flow operations'
+      );
     });
 
     it('throws when businessUnitKey is missing from context', async () => {
