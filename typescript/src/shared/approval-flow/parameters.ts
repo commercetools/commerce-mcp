@@ -31,10 +31,10 @@ export const readApprovalFlowParameters = z.object({
     .array(z.string())
     .optional()
     .describe('References to expand, e.g. ["order"]'),
-  associateId: z
+  customerId: z
     .string()
     .optional()
-    .describe('Associate ID — required when using admin context'),
+    .describe('Customer ID (associate ID) — required when using admin context'),
   businessUnitKey: z
     .string()
     .optional()
@@ -59,10 +59,10 @@ export const updateApprovalFlowParameters = z.object({
     .describe(
       'List of update actions. Supported actions: approve, reject, setCustomField, setCustomType'
     ),
-  associateId: z
+  customerId: z
     .string()
     .optional()
-    .describe('Associate ID — required when using admin context'),
+    .describe('Customer ID (associate ID) — required when using admin context'),
   businessUnitKey: z
     .string()
     .optional()

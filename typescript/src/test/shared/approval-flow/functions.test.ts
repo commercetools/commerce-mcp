@@ -145,12 +145,12 @@ describe('Approval Flow Functions', () => {
           {projectKey: 'test-project', businessUnitKey: 'bu-1'},
           {}
         )
-      ).rejects.toThrow('Associate ID (customerId) is required');
+      ).rejects.toThrow('customerId is required for admin approval flow operations');
     });
 
     it('throws when businessUnitKey is missing from context', async () => {
       await expect(
-        readApprovalFlow(
+        associateFunctions.readApprovalFlow(
           mockApiRoot,
           {projectKey: 'test-project', customerId: 'customer-1'},
           {}
@@ -171,7 +171,7 @@ describe('Approval Flow Functions', () => {
 
       const result = await readApprovalFlow(mockApiRoot, adminContext, {
         id: 'flow-2',
-        associateId: 'admin-associate-1',
+        customerId: 'admin-associate-1',
         businessUnitKey: 'admin-bu-key',
       });
 
@@ -186,20 +186,20 @@ describe('Approval Flow Functions', () => {
       expect(result).toEqual(mockFlow);
     });
 
-    it('throws when associateId is missing from params', async () => {
+    it('throws when customerId is missing from params', async () => {
       await expect(
         readApprovalFlow(mockApiRoot, adminContext, {
           businessUnitKey: 'bu-1',
         })
       ).rejects.toThrow(
-        'associateId is required for admin approval flow operations'
+        'customerId is required for admin approval flow operations'
       );
     });
 
     it('throws when businessUnitKey is missing from params', async () => {
       await expect(
         readApprovalFlow(mockApiRoot, adminContext, {
-          associateId: 'associate-1',
+          customerId: 'associate-1',
         })
       ).rejects.toThrow(
         'businessUnitKey is required for admin approval flow operations'
@@ -249,7 +249,7 @@ describe('Approval Flow Functions', () => {
         id: 'flow-2',
         version: 1,
         actions: [{action: 'reject', reason: 'Over budget'}],
-        associateId: 'admin-associate-1',
+        customerId: 'admin-associate-1',
         businessUnitKey: 'admin-bu-key',
       });
 

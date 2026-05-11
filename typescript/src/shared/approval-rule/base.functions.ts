@@ -8,20 +8,20 @@ import {SDKError} from '../errors/sdkError';
 const getApprovalRulesBuilder = (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string
 ) =>
   apiRoot
     .withProjectKey({projectKey})
     .asAssociate()
-    .withAssociateIdValue({associateId})
+    .withAssociateIdValue({associateId: customerId})
     .inBusinessUnitKeyWithBusinessUnitKeyValue({businessUnitKey})
     .approvalRules();
 
 export const readApprovalRuleById = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   id: string,
   expand?: string[]
@@ -30,7 +30,7 @@ export const readApprovalRuleById = async (
     const response = await getApprovalRulesBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .withId({ID: id})
@@ -45,7 +45,7 @@ export const readApprovalRuleById = async (
 export const readApprovalRuleByKey = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   key: string,
   expand?: string[]
@@ -54,7 +54,7 @@ export const readApprovalRuleByKey = async (
     const response = await getApprovalRulesBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .withKey({key})
@@ -69,7 +69,7 @@ export const readApprovalRuleByKey = async (
 export const queryApprovalRules = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   where?: string[],
   limit?: number,
@@ -81,7 +81,7 @@ export const queryApprovalRules = async (
     const response = await getApprovalRulesBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .get({
@@ -103,7 +103,7 @@ export const queryApprovalRules = async (
 export const createApprovalRule = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   draft: ApprovalRuleDraft
 ) => {
@@ -111,7 +111,7 @@ export const createApprovalRule = async (
     const response = await getApprovalRulesBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .post({body: draft})
@@ -125,7 +125,7 @@ export const createApprovalRule = async (
 export const updateApprovalRuleById = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   id: string,
   version: number,
@@ -135,14 +135,14 @@ export const updateApprovalRuleById = async (
     const current = await readApprovalRuleById(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey,
       id
     );
     const response = await getApprovalRulesBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .withId({ID: id})
@@ -157,7 +157,7 @@ export const updateApprovalRuleById = async (
 export const updateApprovalRuleByKey = async (
   apiRoot: ApiRoot,
   projectKey: string,
-  associateId: string,
+  customerId: string,
   businessUnitKey: string,
   key: string,
   version: number,
@@ -167,14 +167,14 @@ export const updateApprovalRuleByKey = async (
     const current = await readApprovalRuleByKey(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey,
       key
     );
     const response = await getApprovalRulesBuilder(
       apiRoot,
       projectKey,
-      associateId,
+      customerId,
       businessUnitKey
     )
       .withKey({key})

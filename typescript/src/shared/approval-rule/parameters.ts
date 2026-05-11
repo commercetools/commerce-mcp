@@ -27,10 +27,10 @@ export const readApprovalRuleParameters = z.object({
     .optional()
     .describe('Sort expressions, e.g. ["createdAt desc"]'),
   expand: z.array(z.string()).optional().describe('References to expand'),
-  associateId: z
+  customerId: z
     .string()
     .optional()
-    .describe('Associate ID — required when using admin context'),
+    .describe('Customer ID (associate ID) — required when using admin context'),
   businessUnitKey: z
     .string()
     .optional()
@@ -59,10 +59,10 @@ export const createApprovalRuleParameters = z.object({
     .string()
     .optional()
     .describe('Description of the Approval Rule'),
-  associateId: z
+  customerId: z
     .string()
     .optional()
-    .describe('Associate ID — required when using admin context'),
+    .describe('Customer ID (associate ID) — required when using admin context'),
   businessUnitKey: z
     .string()
     .optional()
@@ -88,10 +88,10 @@ export const updateApprovalRuleParameters = z.object({
     .describe(
       'List of update actions. Supported actions: setApprovers, setRequesters, setName, setDescription, setPredicate, setStatus, setKey, setCustomField, setCustomType'
     ),
-  associateId: z
+  customerId: z
     .string()
     .optional()
-    .describe('Associate ID — required when using admin context'),
+    .describe('Customer ID (associate ID) — required when using admin context'),
   businessUnitKey: z
     .string()
     .optional()

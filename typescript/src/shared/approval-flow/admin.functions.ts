@@ -16,9 +16,9 @@ export const readApprovalFlow = async (
   context: {projectKey: string},
   params: z.infer<typeof readApprovalFlowParameters>
 ) => {
-  if (!params.associateId) {
+  if (!params.customerId) {
     throw new Error(
-      'associateId is required for admin approval flow operations'
+      'customerId is required for admin approval flow operations'
     );
   }
   if (!params.businessUnitKey) {
@@ -32,7 +32,7 @@ export const readApprovalFlow = async (
       return await readApprovalFlowById(
         apiRoot,
         context.projectKey,
-        params.associateId,
+        params.customerId,
         params.businessUnitKey,
         params.id,
         params.expand
@@ -42,7 +42,7 @@ export const readApprovalFlow = async (
     return await queryApprovalFlows(
       apiRoot,
       context.projectKey,
-      params.associateId,
+      params.customerId,
       params.businessUnitKey,
       params.where,
       params.limit,
@@ -60,9 +60,9 @@ export const updateApprovalFlow = async (
   context: {projectKey: string},
   params: z.infer<typeof updateApprovalFlowParameters>
 ) => {
-  if (!params.associateId) {
+  if (!params.customerId) {
     throw new Error(
-      'associateId is required for admin approval flow operations'
+      'customerId is required for admin approval flow operations'
     );
   }
   if (!params.businessUnitKey) {
@@ -75,7 +75,7 @@ export const updateApprovalFlow = async (
     return await updateApprovalFlowById(
       apiRoot,
       context.projectKey,
-      params.associateId,
+      params.customerId,
       params.businessUnitKey,
       params.id,
       params.version,
