@@ -129,6 +129,24 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 
 | Tool                       | Description                                                                                                                        |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `approval-flow.read`       | [Read Approval Flow](https://docs.commercetools.com/api/projects/approval-flows#query-approvalflows)                               |
+| `approval-flow.update`     | [Update Approval Flow](https://docs.commercetools.com/api/projects/approval-flows#update-approvalflow-by-id)                       |
+| `approval-rule.read`       | [Read Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#query-approvalrules)                               |
+| `approval-rule.create`     | [Create Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#create-approvalrule)                             |
+| `approval-rule.update`     | [Update Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#update-approvalrule-by-id)                       |
+| `associate-role.read`      | [Read Associate Role](https://docs.commercetools.com/api/projects/associate-roles#query-associate-roles)                           |
+| `associate-role.create`    | [Create Associate Role](https://docs.commercetools.com/api/projects/associate-roles#create-associate-role)                         |
+| `associate-role.update`    | [Update Associate Role](https://docs.commercetools.com/api/projects/associate-roles#update-associate-role-by-id)                   |
+| `order-edit.read`          | [Read Order Edit](https://docs.commercetools.com/api/projects/order-edits#query-orderedits)                                        |
+| `order-edit.create`        | [Create Order Edit](https://docs.commercetools.com/api/projects/order-edits#create-orderedit)                                      |
+| `order-edit.update`        | [Update or Apply Order Edit](https://docs.commercetools.com/api/projects/order-edits#update-orderedit-by-id)                       |
+| `product-selection-product.read` | [Read Products in Product Selection](https://docs.commercetools.com/api/projects/product-selections#query-productselection-products) |
+| `recurrence-policy.read`   | [Read Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#query-recurrencepolicies)                 |
+| `recurrence-policy.create` | [Create Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#create-recurrencepolicy)                |
+| `recurrence-policy.update` | [Update Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#update-recurrencepolicy-by-id)          |
+| `states.read`              | [Read State](https://docs.commercetools.com/api/projects/states#query-states)                                                      |
+| `states.create`            | [Create State](https://docs.commercetools.com/api/projects/states#create-state)                                                    |
+| `states.update`            | [Update State](https://docs.commercetools.com/api/projects/states#update-state-by-id)                                              |
 | `products.read`            | [Read product information](https://docs.commercetools.com/api/projects/products#query-products)                                    |
 | `products.create`          | [Create product information](https://docs.commercetools.com/api/projects/products#create-product)                                  |
 | `products.update`          | [Update product information](https://docs.commercetools.com/api/projects/products#update-product)                                  |

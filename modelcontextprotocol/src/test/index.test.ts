@@ -657,7 +657,7 @@ describe('parseArgs function', () => {
         '--apiUrl=https://api.commercetools.com',
       ];
       expect(() => parseArgs(args)).toThrow(
-        'Invalid tool: invalid.tool. Accepted tools are: business-unit.read, business-unit.create, business-unit.update, products.read, products.create, products.update, project.read, product-search.read, category.read, category.create, category.update, channel.read, channel.create, channel.update, product-selection.read, product-selection.create, product-selection.update, order.read, order.create, order.update, cart.read, cart.create, cart.update, customer.create, customer.read, customer.update, customer-group.read, customer-group.create, customer-group.update, quote.read, quote.create, quote.update, quote-request.read, quote-request.create, quote-request.update, staged-quote.read, staged-quote.create, staged-quote.update, standalone-price.read, standalone-price.create, standalone-price.update, product-discount.read, product-discount.create, product-discount.update, cart-discount.read, cart-discount.create, cart-discount.update, discount-code.read, discount-code.create, discount-code.update, product-type.read, product-type.create, product-type.update, bulk.create, bulk.update, inventory.read, inventory.create, inventory.update, store.read, store.create, store.update'
+        `Invalid tool: invalid.tool. Accepted tools are: ${ACCEPTED_TOOLS.join(", ")}`
       );
     });
 
