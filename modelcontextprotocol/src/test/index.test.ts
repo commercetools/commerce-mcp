@@ -153,6 +153,44 @@ describe('parseArgs function', () => {
       delete process.env.API_URL;
     });
 
+    const baseArgs = [
+      '--tools=all',
+      '--clientId=test_client_id',
+      '--clientSecret=test_client_secret',
+      '--authUrl=https://auth.commercetools.com',
+      '--projectKey=test_project',
+      '--apiUrl=https://api.commercetools.com',
+    ];
+
+    it('should default enforceAuthHeader to true when not provided', () => {
+      const {env} = parseArgs(baseArgs);
+      expect(env.enforceAuthHeader).toBe(true);
+    });
+
+    it('should disable enforceAuthHeader with --enforceAuthHeader=false', () => {
+      const {env} = parseArgs([...baseArgs, '--enforceAuthHeader=false']);
+      expect(env.enforceAuthHeader).toBe(false);
+    });
+
+    it('should keep enforceAuthHeader true with --enforceAuthHeader=true', () => {
+      const {env} = parseArgs([...baseArgs, '--enforceAuthHeader=true']);
+      expect(env.enforceAuthHeader).toBe(true);
+    });
+
+    it('should disable enforceAuthHeader via ENFORCE_AUTH_HEADER=false env var', () => {
+      process.env.ENFORCE_AUTH_HEADER = 'false';
+      const {env} = parseArgs(baseArgs);
+      expect(env.enforceAuthHeader).toBe(false);
+      delete process.env.ENFORCE_AUTH_HEADER;
+    });
+
+    it('should prefer the CLI arg over the ENFORCE_AUTH_HEADER env var', () => {
+      process.env.ENFORCE_AUTH_HEADER = 'false';
+      const {env} = parseArgs([...baseArgs, '--enforceAuthHeader=true']);
+      expect(env.enforceAuthHeader).toBe(true);
+      delete process.env.ENFORCE_AUTH_HEADER;
+    });
+
     it('should parse customerId and isAdmin arguments correctly', () => {
       const args = [
         '--tools=all',

@@ -39,6 +39,7 @@ type EnvVars = {
   apiUrl?: string;
   remote?: boolean;
   stateless?: boolean;
+  enforceAuthHeader?: boolean;
   port?: number;
   logging?: boolean;
   accessToken?: string;
@@ -100,6 +101,9 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
         env.remote = value == 'true';
       } else if (key == 'stateless') {
         env.stateless = value == 'true';
+      } else if (key == 'enforceAuthHeader') {
+        // Secure by default: only an explicit "false" disables enforcement.
+        env.enforceAuthHeader = value != 'false';
       } else if (key == 'port') {
         env.port = Number(value);
       } else if (key == 'customerId') {
@@ -169,6 +173,10 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
   env.remote = env.remote || process.env.REMOTE == 'true';
   env.logging = env.logging || process.env.LOGGING == 'true';
   env.stateless = env.stateless || process.env.STATELESS == 'true';
+  // Secure by default: enforcement is on unless explicitly disabled via the
+  // CLI arg or the ENFORCE_AUTH_HEADER env var.
+  env.enforceAuthHeader =
+    env.enforceAuthHeader ?? process.env.ENFORCE_AUTH_HEADER != 'false';
   env.port = env.port || Number(process.env.PORT);
 
   options.businessUnitKey =
@@ -399,10 +407,19 @@ export async function main() {
   }
 
   if (env.remote) {
+    if (env.enforceAuthHeader === false) {
+      console.error(
+        yellow(
+          '⚠️  enforceAuthHeader is disabled: /mcp requests without an Authorization header will fall back to the startup credentials. Only use this behind your own authentication layer.'
+        )
+      );
+    }
+
     const streamServer = new CommercetoolsCommerceAgentStreamable({
       authConfig,
       configuration,
       stateless: env.stateless,
+      enforceAuthHeader: env.enforceAuthHeader,
       streamableHttpOptions: {
         sessionIdGenerator: undefined,
       },
