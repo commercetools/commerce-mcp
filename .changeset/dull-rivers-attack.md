@@ -1,9 +1,14 @@
 ---
-"@commercetools/commerce-agent": minor
-"@commercetools/commerce-mcp": minor
+"@commercetools/commerce-agent": major
+"@commercetools/commerce-mcp": major
 ---
 
 fix(security): require Authorization header for the streamable HTTP server (DEVX-806 / COM-15-004)
+
+**BREAKING:** In remote/streamable HTTP mode, `/mcp` now requires a valid
+`Authorization: Bearer <token>` on every request. Existing remote clients that
+relied on the no-header fallback will receive `401 Unauthorized` until they send
+a token.
 
 The remote/streamable HTTP MCP server no longer falls back to the credentials
 provided at startup when an incoming request omits the `Authorization` header.
