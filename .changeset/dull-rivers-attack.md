@@ -20,20 +20,12 @@ own configured token.
   `client_credentials` silently ignored the per-request header token.
 - The handler no longer mutates the shared `authConfig`; each request builds an
   isolated per-request auth config.
-- Added an `enforceAuthHeader` option (defaults to `true`) to opt out of the
-  check. It is available as the `CommercetoolsCommerceAgentStreamable`
-  constructor option, the `--enforceAuthHeader` CLI argument, and the
-  `ENFORCE_AUTH_HEADER` environment variable. When disabled in remote mode the
-  server logs a startup warning, since unauthenticated requests then fall back
-  to the startup credentials. Only use it behind your own authentication layer.
+- Added an `enforceAuthHeader` option to `CommercetoolsCommerceAgentStreamable`
+  (defaults to `true`). Embedders that perform their own authentication via an
+  injected `server` factory can set it to `false` to opt out.
 
 ### Migration
 
 Clients connecting to a remote server (e.g. via `mcp-remote`) must now send an
 `Authorization: Bearer <commercetools-access-token>` header on every request.
 The startup credentials are no longer used to serve network requests.
-
-Existing deployments that cannot add the header immediately can set
-`ENFORCE_AUTH_HEADER=false` (or `--enforceAuthHeader=false`) to temporarily
-restore the previous behavior while migrating. This is a transitional escape
-hatch and is not recommended for network-exposed servers.
