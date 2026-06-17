@@ -487,11 +487,31 @@ You can connect to the running remote server using Claude by specifying the belo
   "mcpServers": {
     "commercetools": {
       "command": "npx",
-      "args": ["mcp-remote", "http://localhost:8888/mcp", "..."]
+      "args": [
+        "mcp-remote",
+        "http://localhost:8888/mcp",
+        "--header",
+        "Authorization: Bearer ${CTP_ACCESS_TOKEN}"
+      ]
     }
   }
 }
 ```
+
+> **🔒 Authentication is required for the remote server.** Every HTTP request to
+> `/mcp` **must** include a valid `Authorization: Bearer <commercetools-access-token>`
+> header. The token is forwarded directly to the commercetools API, so it must be a
+> valid commercetools OAuth access token with the scopes you want the caller to have.
+> Requests with a missing or malformed header are rejected with `401 Unauthorized`.
+>
+> The credentials provided to the server at startup (`--clientId`/`--clientSecret` or
+> `--accessToken`) are **not** used to serve network requests — they only satisfy the
+> CLI's startup validation. This prevents an unauthenticated network caller from
+> inheriting the server's configured credentials.
+>
+> Advanced embedders who perform their own authentication can opt out of this check by
+> passing `enforceAuthHeader: false` to `CommercetoolsCommerceAgentStreamable` (see the
+> SDK usage below). This is **not** recommended for network-exposed deployments.
 
 You can also use the Streamable HTTP server with the Commerce Agent like an SDK and develop on it.
 
@@ -533,6 +553,10 @@ const serverStreamable = new CommercetoolsCommerceAgentStreamable({
   stateless: false, // make the MCP server stateless/stateful
   server: getAgentServer,
   app: expressApp, // optional express app instance
+  // By default every request must send an `Authorization: Bearer <token>`
+  // header (otherwise it is rejected with 401). If your `getAgentServer`
+  // factory already handles authentication, set this to false to opt out.
+  // enforceAuthHeader: false,
   streamableHttpOptions: {
     sessionIdGenerator: undefined,
   },
