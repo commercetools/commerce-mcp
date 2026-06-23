@@ -657,7 +657,7 @@ describe('parseArgs function', () => {
         '--apiUrl=https://api.commercetools.com',
       ];
       expect(() => parseArgs(args)).toThrow(
-        `Invalid tool: invalid.tool. Accepted tools are: ${ACCEPTED_TOOLS.join(", ")}`
+        `Invalid tool: invalid.tool. Accepted tools are: ${ACCEPTED_TOOLS.join(', ')}`
       );
     });
 
