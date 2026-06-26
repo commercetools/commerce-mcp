@@ -4,7 +4,7 @@ import {contextToApprovalFlowFunctionMapping} from './approval-flow/functions';
 import {contextToApprovalRuleFunctionMapping} from './approval-rule/functions';
 import {contextToAssociateRoleFunctionMapping} from './associate-role/functions';
 import {contextToOrderEditFunctionMapping} from './order-edit/functions';
-import {contextToProductSelectionProductFunctionMapping} from './product-selection-product/functions';
+import {contextToProductSelectionAssignmentFunctionMapping} from './product-selection-assignment/functions';
 import {contextToRecurrencePolicyFunctionMapping} from './recurrence-policy/functions';
 import {contextToStateFunctionMapping} from './states/functions';
 import {contextToBulkFunctionMapping} from './bulk/functions';
@@ -62,7 +62,7 @@ export const contextToFunctionMapping = (
     ...contextToApprovalRuleFunctionMapping(context),
     ...contextToAssociateRoleFunctionMapping(context),
     ...contextToOrderEditFunctionMapping(context),
-    ...contextToProductSelectionProductFunctionMapping(context),
+    ...contextToProductSelectionAssignmentFunctionMapping(context),
     ...contextToRecurrencePolicyFunctionMapping(context),
     ...contextToStateFunctionMapping(context),
     ...contextToBusinessUnitFunctionMapping(context),

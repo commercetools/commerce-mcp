@@ -125,7 +125,7 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 | `order-edit.read`          | [Read Order Edit](https://docs.commercetools.com/api/projects/order-edits#query-orderedits)                                        |
 | `order-edit.create`        | [Create Order Edit](https://docs.commercetools.com/api/projects/order-edits#create-orderedit)                                      |
 | `order-edit.update`        | [Update or Apply Order Edit](https://docs.commercetools.com/api/projects/order-edits#update-orderedit-by-id)                       |
-| `product-selection-product.read` | [Read Products in Product Selection](https://docs.commercetools.com/api/projects/product-selections#query-productselection-products) |
+| `product-selection-assignment.read` | [Read Products in Product Selection](https://docs.commercetools.com/api/projects/product-selections#query-productselection-products) |
 | `recurrence-policy.read`   | [Read Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#query-recurrencepolicies)                 |
 | `recurrence-policy.create` | [Create Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#create-recurrencepolicy)                |
 | `recurrence-policy.update` | [Update Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#update-recurrencepolicy-by-id)          |

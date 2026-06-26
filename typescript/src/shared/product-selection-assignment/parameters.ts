@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const readProductSelectionProductParameters = z.object({
+export const readProductSelectionAssignmentsParameters = z.object({
   productSelectionId: z
     .string()
     .optional()

@@ -11,7 +11,7 @@ export const ACCEPTED_TOOLS: readonly string[] = [
   'order-edit.read',
   'order-edit.create',
   'order-edit.update',
-  'product-selection-product.read',
+  'product-selection-assignment.read',
   'recurrence-policy.read',
   'recurrence-policy.create',
   'recurrence-policy.update',

@@ -1,7 +1,7 @@
-import {readProductSelectionProduct} from '../../../shared/product-selection-product/functions';
-import {contextToProductSelectionProductFunctionMapping} from '../../../shared/product-selection-product/functions';
-import * as adminFunctions from '../../../shared/product-selection-product/admin.functions';
-import * as storeFunctions from '../../../shared/product-selection-product/store.functions';
+import {readProductSelectionAssignments} from '../../../shared/product-selection-assignment/functions';
+import {contextToProductSelectionAssignmentFunctionMapping} from '../../../shared/product-selection-assignment/functions';
+import * as adminFunctions from '../../../shared/product-selection-assignment/admin.functions';
+import * as storeFunctions from '../../../shared/product-selection-assignment/store.functions';
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {SDKError} from '../../../shared/errors/sdkError';
 
@@ -20,41 +20,41 @@ const mockWithProjectKey = jest.fn().mockReturnValue({
 
 const mockApiRoot = {withProjectKey: mockWithProjectKey} as unknown as ApiRoot;
 
-describe('Product Selection Product Functions', () => {
+describe('Product Selection Assignment Functions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('contextToProductSelectionProductFunctionMapping', () => {
+  describe('contextToProductSelectionAssignmentFunctionMapping', () => {
     it('returns store function when storeKey is present', () => {
-      const mapping = contextToProductSelectionProductFunctionMapping({
+      const mapping = contextToProductSelectionAssignmentFunctionMapping({
         storeKey: 'store-1',
       });
-      expect(mapping).toHaveProperty('read_product_selection_product');
-      expect(mapping.read_product_selection_product).toBe(
-        storeFunctions.readProductSelectionProduct
+      expect(mapping).toHaveProperty('read_product_selection_assignments');
+      expect(mapping.read_product_selection_assignments).toBe(
+        storeFunctions.readProductSelectionAssignments
       );
     });
 
     it('returns admin function when isAdmin is true', () => {
-      const mapping = contextToProductSelectionProductFunctionMapping({
+      const mapping = contextToProductSelectionAssignmentFunctionMapping({
         isAdmin: true,
       });
-      expect(mapping).toHaveProperty('read_product_selection_product');
-      expect(mapping.read_product_selection_product).toBe(
-        adminFunctions.readProductSelectionProduct
+      expect(mapping).toHaveProperty('read_product_selection_assignments');
+      expect(mapping.read_product_selection_assignments).toBe(
+        adminFunctions.readProductSelectionAssignments
       );
     });
 
     it('returns empty object when context is undefined', () => {
       expect(
-        contextToProductSelectionProductFunctionMapping(undefined)
+        contextToProductSelectionAssignmentFunctionMapping(undefined)
       ).toEqual({});
     });
 
     it('returns empty object for associate context', () => {
       expect(
-        contextToProductSelectionProductFunctionMapping({
+        contextToProductSelectionAssignmentFunctionMapping({
           customerId: 'c1',
           businessUnitKey: 'bu-1',
         })
@@ -62,14 +62,14 @@ describe('Product Selection Product Functions', () => {
     });
   });
 
-  describe('readProductSelectionProduct (admin context)', () => {
+  describe('readProductSelectionAssignments (admin context)', () => {
     const adminContext = {projectKey: 'test-project', isAdmin: true};
 
     it('queries products by selection ID', async () => {
       const mockResponse = {results: [], count: 0, limit: 10, offset: 0};
       mockExecute.mockResolvedValueOnce({body: mockResponse});
 
-      const result = await readProductSelectionProduct(
+      const result = await readProductSelectionAssignments(
         mockApiRoot,
         adminContext,
         {
@@ -92,7 +92,7 @@ describe('Product Selection Product Functions', () => {
       const mockResponse = {results: [], count: 0, limit: 10, offset: 0};
       mockExecute.mockResolvedValueOnce({body: mockResponse});
 
-      const result = await readProductSelectionProduct(
+      const result = await readProductSelectionAssignments(
         mockApiRoot,
         adminContext,
         {
@@ -106,14 +106,14 @@ describe('Product Selection Product Functions', () => {
 
     it('throws when neither productSelectionId nor productSelectionKey is given', async () => {
       await expect(
-        readProductSelectionProduct(mockApiRoot, adminContext, {})
+        readProductSelectionAssignments(mockApiRoot, adminContext, {})
       ).rejects.toThrow(
         'Either productSelectionId or productSelectionKey must be provided'
       );
     });
   });
 
-  describe('readProductSelectionProduct (store context)', () => {
+  describe('readProductSelectionAssignments (store context)', () => {
     const storeContext = {projectKey: 'test-project', storeKey: 'my-store'};
 
     it('queries products by selection ID via store context', async () => {
@@ -123,7 +123,7 @@ describe('Product Selection Product Functions', () => {
       };
       mockExecute.mockResolvedValueOnce({body: mockResponse});
 
-      const result = await readProductSelectionProduct(
+      const result = await readProductSelectionAssignments(
         mockApiRoot,
         storeContext,
         {
@@ -141,7 +141,7 @@ describe('Product Selection Product Functions', () => {
       mockExecute.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(
-        readProductSelectionProduct(
+        readProductSelectionAssignments(
           mockApiRoot,
           {projectKey: 'test-project', isAdmin: true},
           {productSelectionId: 'sel-1'}

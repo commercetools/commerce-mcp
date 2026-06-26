@@ -1,7 +1,7 @@
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 
-export const queryProductSelectionProductsById = async (
+export const queryProductSelectionAssignmentsById = async (
   apiRoot: ApiRoot,
   projectKey: string,
   productSelectionId: string,
@@ -30,13 +30,13 @@ export const queryProductSelectionProductsById = async (
     return response.body;
   } catch (error: any) {
     throw new SDKError(
-      'Failed to query product selection products by ID',
+      'Failed to query product selection assignments by ID',
       error
     );
   }
 };
 
-export const queryProductSelectionProductsByKey = async (
+export const queryProductSelectionAssignmentsByKey = async (
   apiRoot: ApiRoot,
   projectKey: string,
   productSelectionKey: string,
@@ -65,7 +65,7 @@ export const queryProductSelectionProductsByKey = async (
     return response.body;
   } catch (error: any) {
     throw new SDKError(
-      'Failed to query product selection products by key',
+      'Failed to query product selection assignments by key',
       error
     );
   }

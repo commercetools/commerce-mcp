@@ -1,4 +1,4 @@
-export const readProductSelectionProductPrompt = `
+export const readProductSelectionAssignmentsPrompt = `
 This tool fetches products assigned to a Product Selection in commercetools.
 
 Product Selections group products for targeted visibility in Stores. This tool retrieves the list of products assigned to a specific Product Selection.

@@ -99,7 +99,7 @@ describe('main function', () => {
           'approval-rule': {read: true, create: true, update: true},
           'associate-role': {read: true, create: true, update: true},
           'order-edit': {read: true, create: true, update: true},
-          'product-selection-product': {read: true},
+          'product-selection-assignment': {read: true},
           'recurrence-policy': {read: true, create: true, update: true},
           states: {read: true, create: true, update: true},
         },

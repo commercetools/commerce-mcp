@@ -7,6 +7,6 @@ Add missing tools
 - approval-rule
 - associate-role
 - order-edit
-- product-selection-product
+- product-selection-assignment
 - recurrence-policy
 - state

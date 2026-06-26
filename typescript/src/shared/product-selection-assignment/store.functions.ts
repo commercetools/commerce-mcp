@@ -2,15 +2,15 @@ import {z} from 'zod';
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {SDKError} from '../errors/sdkError';
 import {
-  queryProductSelectionProductsById,
-  queryProductSelectionProductsByKey,
+  queryProductSelectionAssignmentsById,
+  queryProductSelectionAssignmentsByKey,
 } from './base.functions';
-import {readProductSelectionProductParameters} from './parameters';
+import {readProductSelectionAssignmentsParameters} from './parameters';
 
-export const readProductSelectionProduct = async (
+export const readProductSelectionAssignments = async (
   apiRoot: ApiRoot,
   context: {projectKey: string},
-  params: z.infer<typeof readProductSelectionProductParameters>
+  params: z.infer<typeof readProductSelectionAssignmentsParameters>
 ) => {
   if (!params.productSelectionId && !params.productSelectionKey) {
     throw new Error(
@@ -19,7 +19,7 @@ export const readProductSelectionProduct = async (
   }
   try {
     if (params.productSelectionId) {
-      return await queryProductSelectionProductsById(
+      return await queryProductSelectionAssignmentsById(
         apiRoot,
         context.projectKey,
         params.productSelectionId,
@@ -30,7 +30,7 @@ export const readProductSelectionProduct = async (
         params.expand
       );
     }
-    return await queryProductSelectionProductsByKey(
+    return await queryProductSelectionAssignmentsByKey(
       apiRoot,
       context.projectKey,
       params.productSelectionKey!,
@@ -42,7 +42,7 @@ export const readProductSelectionProduct = async (
     );
   } catch (error: any) {
     throw new SDKError(
-      'Failed to read product selection products as store',
+      'Failed to read product selection assignments as store',
       error
     );
   }
