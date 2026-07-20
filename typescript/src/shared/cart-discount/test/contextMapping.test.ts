@@ -17,9 +17,9 @@ describe('Cart Discount Context Mapping', () => {
     const mapping = contextToCartDiscountFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_cart_discount: admin.readCartDiscount,
-      create_cart_discount: admin.createCartDiscount,
-      update_cart_discount: admin.updateCartDiscount,
+      read_cart_discounts: admin.readCartDiscount,
+      create_cart_discounts: admin.createCartDiscount,
+      update_cart_discounts: admin.updateCartDiscount,
     });
   });
 
@@ -30,9 +30,9 @@ describe('Cart Discount Context Mapping', () => {
     const mapping = contextToCartDiscountFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_cart_discount: store.readCartDiscount,
-      create_cart_discount: store.createCartDiscount,
-      update_cart_discount: store.updateCartDiscount,
+      read_cart_discounts: store.readCartDiscount,
+      create_cart_discounts: store.createCartDiscount,
+      update_cart_discounts: store.updateCartDiscount,
     });
   });
 
@@ -44,9 +44,9 @@ describe('Cart Discount Context Mapping', () => {
     const mapping = contextToCartDiscountFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_cart_discount: store.readCartDiscount,
-      create_cart_discount: store.createCartDiscount,
-      update_cart_discount: store.updateCartDiscount,
+      read_cart_discounts: store.readCartDiscount,
+      create_cart_discounts: store.createCartDiscount,
+      update_cart_discounts: store.updateCartDiscount,
     });
   });
 });

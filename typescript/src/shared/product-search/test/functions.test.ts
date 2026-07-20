@@ -52,30 +52,30 @@ describe('product-search functions', () => {
   describe('contextToProductSearchFunctionMapping', () => {
     it('should return search_products function for admin context', () => {
       const mapping = contextToProductSearchFunctionMapping({isAdmin: true});
-      expect(mapping).toHaveProperty('search_products');
-      expect(mapping.search_products).toBe(admin.searchProducts);
+      expect(mapping).toHaveProperty('read_product_search');
+      expect(mapping.read_product_search).toBe(admin.searchProducts);
     });
 
     it('should return search_products function for customer context', () => {
       const mapping = contextToProductSearchFunctionMapping({
         customerId: 'customer-1',
       });
-      expect(mapping).toHaveProperty('search_products');
-      expect(mapping.search_products).toBe(admin.searchProducts);
+      expect(mapping).toHaveProperty('read_product_search');
+      expect(mapping.read_product_search).toBe(admin.searchProducts);
     });
 
     it('should return search_products function for store context', () => {
       const mapping = contextToProductSearchFunctionMapping({
         storeKey: 'store-1',
       });
-      expect(mapping).toHaveProperty('search_products');
-      expect(mapping.search_products).toBe(admin.searchProducts);
+      expect(mapping).toHaveProperty('read_product_search');
+      expect(mapping.read_product_search).toBe(admin.searchProducts);
     });
 
     it('should return search_products function for empty context', () => {
       const mapping = contextToProductSearchFunctionMapping();
-      expect(mapping).toHaveProperty('search_products');
-      expect(mapping.search_products).toBe(admin.searchProducts);
+      expect(mapping).toHaveProperty('read_product_search');
+      expect(mapping.read_product_search).toBe(admin.searchProducts);
     });
   });
 

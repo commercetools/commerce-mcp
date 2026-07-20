@@ -1,22 +1,17 @@
-import {
-  readPaymentParameters,
-  createPaymentParameters,
-  updatePaymentParameters,
-} from './parameters';
-import {
-  readPaymentPrompt,
-  createPaymentPrompt,
-  updatePaymentPrompt,
-} from './prompts';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {PaymentsHandler} from '@commercetools/tools-core';
+
+const handler = new PaymentsHandler();
 
 const tools: Record<string, Tool> = {
   read_payments: {
     name: 'Read Payment',
-    method: 'read_payments',
-    description: readPaymentPrompt,
-    parameters: readPaymentParameters,
+    method: handler.getToolDefinition('read').name,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       payments: {
         read: true,
@@ -25,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_payments: {
     name: 'Create Payment',
-    method: 'create_payments',
-    description: createPaymentPrompt,
-    parameters: createPaymentParameters,
+    method: handler.getToolDefinition('create').name,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       payments: {
         create: true,
@@ -36,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_payments: {
     name: 'Update Payment',
-    method: 'update_payments',
-    description: updatePaymentPrompt,
-    parameters: updatePaymentParameters,
+    method: handler.getToolDefinition('update').name,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       payments: {
         update: true,

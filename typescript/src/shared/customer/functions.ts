@@ -3,6 +3,9 @@ import {Context, CommercetoolsFuncContext} from '../../types/configuration';
 import * as admin from './admin.functions';
 import * as customer from './customer.functions';
 import * as store from './store.functions';
+import {CustomersHandler} from '@commercetools/tools-core';
+
+const handler = new CustomersHandler();
 
 // Context-to-function mapping
 export const contextToCustomerFunctionMapping = (
@@ -17,21 +20,21 @@ export const contextToCustomerFunctionMapping = (
 > => {
   if (context?.customerId) {
     return {
-      read_customer: customer.readCustomerProfile,
+      [handler.getToolDefinition('read').name]: customer.readCustomerProfile,
     };
   }
   if (context?.storeKey) {
     return {
-      read_customer: store.readCustomerInStore,
-      create_customer: store.createCustomerInStore,
-      update_customer: store.updateCustomerInStore,
+      [handler.getToolDefinition('read').name]: store.readCustomerInStore,
+      [handler.getToolDefinition('create').name]: store.createCustomerInStore,
+      [handler.getToolDefinition('update').name]: store.updateCustomerInStore,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_customer: admin.readCustomer,
-      create_customer: admin.createCustomerAsAdmin,
-      update_customer: admin.updateCustomerAsAdmin,
+      [handler.getToolDefinition('read').name]: admin.readCustomer,
+      [handler.getToolDefinition('create').name]: admin.createCustomerAsAdmin,
+      [handler.getToolDefinition('update').name]: admin.updateCustomerAsAdmin,
     };
   }
   return {};

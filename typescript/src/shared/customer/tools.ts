@@ -1,23 +1,17 @@
-import {
-  createCustomerPrompt,
-  readCustomerPrompt,
-  updateCustomerPrompt,
-} from './prompts';
-
-import {
-  createCustomerParameters,
-  readCustomerParameters,
-  updateCustomerParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {CustomersHandler} from '@commercetools/tools-core';
+
+const handler = new CustomersHandler();
 
 const tools: Record<string, Tool> = {
   create_customer: {
-    method: 'create_customer',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Customer',
-    description: createCustomerPrompt,
-    parameters: createCustomerParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       customer: {
         create: true,
@@ -25,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   read_customer: {
-    method: 'read_customer',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Customer',
-    description: readCustomerPrompt,
-    parameters: readCustomerParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       customer: {
         read: true,
@@ -36,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_customer: {
-    method: 'update_customer',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Customer',
-    description: updateCustomerPrompt,
-    parameters: updateCustomerParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       customer: {
         update: true,

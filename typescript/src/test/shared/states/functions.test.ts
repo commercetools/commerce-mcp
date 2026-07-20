@@ -31,12 +31,12 @@ describe('State Functions', () => {
   describe('contextToStateFunctionMapping', () => {
     it('returns admin functions when isAdmin is true', () => {
       const mapping = contextToStateFunctionMapping({isAdmin: true});
-      expect(mapping).toHaveProperty('read_state');
-      expect(mapping).toHaveProperty('create_state');
-      expect(mapping).toHaveProperty('update_state');
-      expect(mapping.read_state).toBe(adminFunctions.readState);
-      expect(mapping.create_state).toBe(adminFunctions.createState);
-      expect(mapping.update_state).toBe(adminFunctions.updateState);
+      expect(mapping).toHaveProperty('read_states');
+      expect(mapping).toHaveProperty('create_states');
+      expect(mapping).toHaveProperty('update_states');
+      expect(mapping.read_states).toBe(adminFunctions.readState);
+      expect(mapping.create_states).toBe(adminFunctions.createState);
+      expect(mapping.update_states).toBe(adminFunctions.updateState);
     });
 
     it('returns empty object when context is undefined', () => {

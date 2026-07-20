@@ -5,12 +5,15 @@ import * as associate from './as-associate.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {z} from 'zod';
+import {CartsHandler} from '@commercetools/tools-core';
 import {
   readCartParameters,
   createCartParameters,
   updateCartParameters,
   replicateCartParameters,
 } from './parameters';
+
+const handler = new CartsHandler();
 
 // Context mapping function for cart functions
 export const contextToCartFunctionMapping = (
@@ -26,34 +29,34 @@ export const contextToCartFunctionMapping = (
   // Associate cart functions when both customerId and businessUnitKey are present
   if (context?.customerId && context?.businessUnitKey) {
     return {
-      read_cart: associate.readCart,
-      create_cart: associate.createCart,
-      update_cart: associate.updateCart,
-      replicate_cart: associate.replicateCart,
+      [handler.getToolDefinition('read').name]: associate.readCart,
+      [handler.getToolDefinition('create').name]: associate.createCart,
+      [handler.getToolDefinition('update').name]: associate.updateCart,
+      [handler.getToolDefinition('replicate').name]: associate.replicateCart,
     };
   }
   if (context?.customerId) {
     return {
-      read_cart: customer.readCart,
-      create_cart: customer.createCart,
-      update_cart: customer.updateCart,
-      replicate_cart: customer.replicateCart,
+      [handler.getToolDefinition('read').name]: customer.readCart,
+      [handler.getToolDefinition('create').name]: customer.createCart,
+      [handler.getToolDefinition('update').name]: customer.updateCart,
+      [handler.getToolDefinition('replicate').name]: customer.replicateCart,
     };
   }
   if (context?.storeKey) {
     return {
-      read_cart: store.readCart,
-      create_cart: store.createCart,
-      update_cart: store.updateCart,
-      replicate_cart: store.replicateCart,
+      [handler.getToolDefinition('read').name]: store.readCart,
+      [handler.getToolDefinition('create').name]: store.createCart,
+      [handler.getToolDefinition('update').name]: store.updateCart,
+      [handler.getToolDefinition('replicate').name]: store.replicateCart,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_cart: admin.readCart,
-      create_cart: admin.createCart,
-      update_cart: admin.updateCart,
-      replicate_cart: admin.replicateCart,
+      [handler.getToolDefinition('read').name]: admin.readCart,
+      [handler.getToolDefinition('create').name]: admin.createCart,
+      [handler.getToolDefinition('update').name]: admin.updateCart,
+      [handler.getToolDefinition('replicate').name]: admin.replicateCart,
     };
   }
   return {};

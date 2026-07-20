@@ -1,22 +1,17 @@
-import {
-  createSubscriptionParameters,
-  readSubscriptionParameters,
-  updateSubscriptionParameters,
-} from './parameters';
-import {
-  readSubscriptionPrompt,
-  createSubscriptionPrompt,
-  updateSubscriptionPrompt,
-} from './prompts';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {z} from 'zod';
+import {SubscriptionsHandler} from '@commercetools/tools-core';
+
+const handler = new SubscriptionsHandler();
 
 const tools: Record<string, Tool> = {
   read_subscription: {
     name: 'Read Subscription',
-    method: 'read_subscription',
-    parameters: readSubscriptionParameters,
-    description: readSubscriptionPrompt,
+    method: handler.getToolDefinition('read').name,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('read').description,
     actions: {
       subscriptions: {
         read: true,
@@ -25,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_subscription: {
     name: 'Create Subscription',
-    method: 'create_subscription',
-    parameters: createSubscriptionParameters,
-    description: createSubscriptionPrompt,
+    method: handler.getToolDefinition('create').name,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('create').description,
     actions: {
       subscriptions: {
         create: true,
@@ -36,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_subscription: {
     name: 'Update Subscription',
-    method: 'update_subscription',
-    parameters: updateSubscriptionParameters,
-    description: updateSubscriptionPrompt,
+    method: handler.getToolDefinition('update').name,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('update').description,
     actions: {
       subscriptions: {
         update: true,

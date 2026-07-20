@@ -31,9 +31,13 @@ describe('Quote Request Functions Context Routing', () => {
 
       const functions = contextToQuoteRequestFunctionMapping(context);
 
-      expect(functions.read_quote_request).toBe(associate.readQuoteRequest);
-      expect(functions.create_quote_request).toBe(associate.createQuoteRequest);
-      expect(functions.update_quote_request).toBe(associate.updateQuoteRequest);
+      expect(functions.read_quote_requests).toBe(associate.readQuoteRequest);
+      expect(functions.create_quote_requests).toBe(
+        associate.createQuoteRequest
+      );
+      expect(functions.update_quote_requests).toBe(
+        associate.updateQuoteRequest
+      );
     });
 
     it('should return customer functions when only customerId is present', () => {
@@ -43,8 +47,8 @@ describe('Quote Request Functions Context Routing', () => {
 
       const functions = contextToQuoteRequestFunctionMapping(context);
 
-      expect(functions.read_quote_request).toBe(customer.readQuoteRequest);
-      expect(functions.update_quote_request).toBe(customer.updateQuoteRequest);
+      expect(functions.read_quote_requests).toBe(customer.readQuoteRequest);
+      expect(functions.update_quote_requests).toBe(customer.updateQuoteRequest);
     });
 
     it('should return store functions when only storeKey is present', () => {
@@ -54,9 +58,9 @@ describe('Quote Request Functions Context Routing', () => {
 
       const functions = contextToQuoteRequestFunctionMapping(context);
 
-      expect(functions.read_quote_request).toBe(store.readQuoteRequest);
-      expect(functions.create_quote_request).toBe(store.createQuoteRequest);
-      expect(functions.update_quote_request).toBe(store.updateQuoteRequest);
+      expect(functions.read_quote_requests).toBe(store.readQuoteRequest);
+      expect(functions.create_quote_requests).toBe(store.createQuoteRequest);
+      expect(functions.update_quote_requests).toBe(store.updateQuoteRequest);
     });
 
     it('should return admin functions when isAdmin is true', () => {
@@ -66,9 +70,9 @@ describe('Quote Request Functions Context Routing', () => {
 
       const functions = contextToQuoteRequestFunctionMapping(context);
 
-      expect(functions.read_quote_request).toBe(admin.readQuoteRequest);
-      expect(functions.create_quote_request).toBe(admin.createQuoteRequest);
-      expect(functions.update_quote_request).toBe(admin.updateQuoteRequest);
+      expect(functions.read_quote_requests).toBe(admin.readQuoteRequest);
+      expect(functions.create_quote_requests).toBe(admin.createQuoteRequest);
+      expect(functions.update_quote_requests).toBe(admin.updateQuoteRequest);
     });
 
     it('should return empty object when no context is provided', () => {
@@ -96,9 +100,13 @@ describe('Quote Request Functions Context Routing', () => {
       const functions = contextToQuoteRequestFunctionMapping(context);
 
       // Should use associate functions despite other contexts being present
-      expect(functions.read_quote_request).toBe(associate.readQuoteRequest);
-      expect(functions.create_quote_request).toBe(associate.createQuoteRequest);
-      expect(functions.update_quote_request).toBe(associate.updateQuoteRequest);
+      expect(functions.read_quote_requests).toBe(associate.readQuoteRequest);
+      expect(functions.create_quote_requests).toBe(
+        associate.createQuoteRequest
+      );
+      expect(functions.update_quote_requests).toBe(
+        associate.updateQuoteRequest
+      );
     });
   });
 

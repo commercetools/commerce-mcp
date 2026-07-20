@@ -30,9 +30,9 @@ describe('zone functions', () => {
       const result = contextToZoneFunctionMapping(context);
 
       expect(result).toEqual({
-        read_zone: admin.readZone,
-        create_zone: admin.createZone,
-        update_zone: admin.updateZone,
+        read_zones: admin.readZone,
+        create_zones: admin.createZone,
+        update_zones: admin.updateZone,
       });
     });
 

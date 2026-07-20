@@ -1,31 +1,17 @@
-import {
-  readCartPrompt,
-  createCartPrompt,
-  replicateCartPrompt,
-  updateCartPrompt,
-} from './prompts';
-
-import {
-  readCartParameters,
-  createCartParameters,
-  replicateCartParameters,
-  updateCartParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
 import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {CartsHandler} from '@commercetools/tools-core';
+
+const handler = new CartsHandler();
 
 const tools: Record<string, Tool> = {
   read_cart: {
-    method: 'read_cart',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Cart',
-    description: readCartPrompt,
-    parameters: readCartParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       cart: {
         read: true,
@@ -33,15 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_cart: {
-    method: 'create_cart',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Cart',
-    description: createCartPrompt,
-    parameters: createCartParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       cart: {
         create: true,
@@ -49,15 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   replicate_cart: {
-    method: 'replicate_cart',
+    method: handler.getToolDefinition('replicate').name,
     name: 'Replicate Cart',
-    description: replicateCartPrompt,
-    parameters: replicateCartParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('replicate').description,
+    parameters: handler.getToolDefinition('replicate')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       cart: {
         create: true,
@@ -65,15 +43,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_cart: {
-    method: 'update_cart',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Cart',
-    description: updateCartPrompt,
-    parameters: updateCartParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       cart: {
         update: true,

@@ -6,9 +6,9 @@ describe('Custom Objects Functions', () => {
       const context = {isAdmin: true};
       const mapping = contextToCustomObjectFunctionMapping(context);
 
-      expect(mapping).toHaveProperty('read_custom_object');
-      expect(mapping).toHaveProperty('create_custom_object');
-      expect(mapping).toHaveProperty('update_custom_object');
+      expect(mapping).toHaveProperty('read_custom_objects');
+      expect(mapping).toHaveProperty('create_custom_objects');
+      expect(mapping).toHaveProperty('update_custom_objects');
     });
 
     it('should return empty object when isAdmin is false', () => {

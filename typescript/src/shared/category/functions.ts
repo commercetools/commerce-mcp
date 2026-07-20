@@ -8,6 +8,9 @@ import {ApiRoot} from '@commercetools/platform-sdk';
 import * as admin from './admin.functions';
 import * as customer from './customer.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {CategoriesHandler} from '@commercetools/tools-core';
+
+const handler = new CategoriesHandler();
 
 // Context mapping function for category functions
 export const contextToCategoryFunctionMapping = (
@@ -22,18 +25,18 @@ export const contextToCategoryFunctionMapping = (
 > => {
   if (context?.customerId) {
     return {
-      read_category: customer.readCategory,
+      [handler.getToolDefinition('read').name]: customer.readCategory,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_category: admin.readCategory,
-      create_category: admin.createCategory,
-      update_category: admin.updateCategory,
+      [handler.getToolDefinition('read').name]: admin.readCategory,
+      [handler.getToolDefinition('create').name]: admin.createCategory,
+      [handler.getToolDefinition('update').name]: admin.updateCategory,
     };
   }
   return {
-    read_category: customer.readCategory,
+    [handler.getToolDefinition('read').name]: customer.readCategory,
   };
 };
 

@@ -11,16 +11,16 @@ describe('contextToProductTypeFunctionMapping', () => {
     const mapping = contextToProductTypeFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_product_type: admin.readProductType,
-      create_product_type: admin.createProductType,
-      update_product_type: admin.updateProductType,
+      read_product_types: admin.readProductType,
+      create_product_types: admin.createProductType,
+      update_product_types: admin.updateProductType,
     });
   });
 
   it('should return empty object when context is not provided', () => {
     const mapping = contextToProductTypeFunctionMapping();
     expect(mapping).toEqual({
-      read_product_type: admin.readProductType,
+      read_product_types: admin.readProductType,
     });
   });
 
@@ -28,7 +28,7 @@ describe('contextToProductTypeFunctionMapping', () => {
     const context: CommercetoolsFuncContext = {projectKey: 'test-project'};
     const mapping = contextToProductTypeFunctionMapping(context);
     expect(mapping).toEqual({
-      read_product_type: admin.readProductType,
+      read_product_types: admin.readProductType,
     });
   });
 });

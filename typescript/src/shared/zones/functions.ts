@@ -7,6 +7,9 @@ import {
 } from './parameters';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {ZonesHandler} from '@commercetools/tools-core';
+
+const handler = new ZonesHandler();
 
 export const contextToZoneFunctionMapping = (
   context?: Context
@@ -20,9 +23,9 @@ export const contextToZoneFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_zone: admin.readZone,
-      create_zone: admin.createZone,
-      update_zone: admin.updateZone,
+      [handler.getToolDefinition('read').name]: admin.readZone,
+      [handler.getToolDefinition('create').name]: admin.createZone,
+      [handler.getToolDefinition('update').name]: admin.updateZone,
     };
   }
 

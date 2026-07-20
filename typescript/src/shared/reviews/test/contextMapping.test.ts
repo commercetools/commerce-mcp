@@ -7,9 +7,9 @@ describe('Review Context Mapping', () => {
     const mapping = contextToReviewFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_review: admin.readReview,
-      create_review: admin.createReview,
-      update_review: admin.updateReview,
+      read_reviews: admin.readReview,
+      create_reviews: admin.createReview,
+      update_reviews: admin.updateReview,
     });
   });
 

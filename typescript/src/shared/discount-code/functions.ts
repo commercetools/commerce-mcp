@@ -7,6 +7,9 @@ import {
 import {ApiRoot} from '@commercetools/platform-sdk';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {DiscountCodesHandler} from '@commercetools/tools-core';
+
+const handler = new DiscountCodesHandler();
 
 export const contextToDiscountCodeFunctionMapping = (
   context?: Context
@@ -20,9 +23,9 @@ export const contextToDiscountCodeFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_discount_code: admin.readDiscountCode,
-      create_discount_code: admin.createDiscountCode,
-      update_discount_code: admin.updateDiscountCode,
+      [handler.getToolDefinition('read').name]: admin.readDiscountCode,
+      [handler.getToolDefinition('create').name]: admin.createDiscountCode,
+      [handler.getToolDefinition('update').name]: admin.updateDiscountCode,
     };
   }
 

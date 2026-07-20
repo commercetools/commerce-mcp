@@ -1,15 +1,9 @@
-import {
-  readProductTailoringParameters,
-  createProductTailoringParameters,
-  updateProductTailoringParameters,
-} from './parameters';
-import {
-  readProductTailoringPrompt,
-  createProductTailoringPrompt,
-  updateProductTailoringPrompt,
-} from './prompts';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {ProductTailoringHandler} from '@commercetools/tools-core';
+
+const handler = new ProductTailoringHandler();
 
 /**
  * Context-based tool mapping for product tailoring
@@ -17,9 +11,10 @@ import {Context} from '../../types/configuration';
 const tools: Record<string, Tool> = {
   read_product_tailoring: {
     name: 'Read product tailoring',
-    method: 'read_product_tailoring',
-    description: readProductTailoringPrompt,
-    parameters: readProductTailoringParameters,
+    method: handler.getToolDefinition('read').name,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-tailoring': {
         read: true,
@@ -28,9 +23,10 @@ const tools: Record<string, Tool> = {
   },
   create_product_tailoring: {
     name: 'Create product tailoring',
-    method: 'create_product_tailoring',
-    description: createProductTailoringPrompt,
-    parameters: createProductTailoringParameters,
+    method: handler.getToolDefinition('create').name,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-tailoring': {
         create: true,
@@ -39,9 +35,10 @@ const tools: Record<string, Tool> = {
   },
   update_product_tailoring: {
     name: 'Update product tailoring',
-    method: 'update_product_tailoring',
-    description: updateProductTailoringPrompt,
-    parameters: updateProductTailoringParameters,
+    method: handler.getToolDefinition('update').name,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-tailoring': {
         update: true,

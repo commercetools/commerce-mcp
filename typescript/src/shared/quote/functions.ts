@@ -4,6 +4,9 @@ import * as associate from './associate.functions';
 import * as admin from './admin.functions';
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {QuotesHandler} from '@commercetools/tools-core';
+
+const handler = new QuotesHandler();
 
 export const contextToQuoteFunctionMapping = (
   context?: Context
@@ -17,28 +20,28 @@ export const contextToQuoteFunctionMapping = (
 > => {
   if (context?.customerId && context?.businessUnitKey) {
     return {
-      read_quote: associate.readQuote,
-      update_quote: associate.updateQuote,
+      [handler.getToolDefinition('read').name]: associate.readQuote,
+      [handler.getToolDefinition('update').name]: associate.updateQuote,
     };
   }
   if (context?.customerId) {
     return {
-      read_quote: customer.readQuote,
-      update_quote: customer.updateQuote,
+      [handler.getToolDefinition('read').name]: customer.readQuote,
+      [handler.getToolDefinition('update').name]: customer.updateQuote,
     };
   }
   if (context?.storeKey) {
     return {
-      read_quote: store.readQuote,
-      create_quote: store.createQuote,
-      update_quote: store.updateQuote,
+      [handler.getToolDefinition('read').name]: store.readQuote,
+      [handler.getToolDefinition('create').name]: store.createQuote,
+      [handler.getToolDefinition('update').name]: store.updateQuote,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_quote: admin.readQuote,
-      create_quote: admin.createQuote,
-      update_quote: admin.updateQuote,
+      [handler.getToolDefinition('read').name]: admin.readQuote,
+      [handler.getToolDefinition('create').name]: admin.createQuote,
+      [handler.getToolDefinition('update').name]: admin.updateQuote,
     };
   }
   return {};

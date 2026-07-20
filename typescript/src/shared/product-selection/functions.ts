@@ -7,6 +7,9 @@ import {
 import {ApiRoot} from '@commercetools/platform-sdk';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {ProductSelectionsHandler} from '@commercetools/tools-core';
+
+const handler = new ProductSelectionsHandler();
 
 // We only have admin functions for product-selection as requested
 export const contextToProductSelectionFunctionMapping = (
@@ -21,9 +24,9 @@ export const contextToProductSelectionFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_product_selection: admin.readProductSelection,
-      create_product_selection: admin.createProductSelection,
-      update_product_selection: admin.updateProductSelection,
+      [handler.getToolDefinition('read').name]: admin.readProductSelection,
+      [handler.getToolDefinition('create').name]: admin.createProductSelection,
+      [handler.getToolDefinition('update').name]: admin.updateProductSelection,
     };
   }
 

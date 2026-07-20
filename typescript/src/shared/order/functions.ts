@@ -10,6 +10,9 @@ import {
   createOrderParameters,
 } from './parameters';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {OrdersHandler} from '@commercetools/tools-core';
+
+const handler = new OrdersHandler();
 
 export const contextToOrderFunctionMapping = (
   context?: Context
@@ -24,28 +27,28 @@ export const contextToOrderFunctionMapping = (
   // Prioritize as-associate functions when both customerId and businessUnitKey are present
   if (context?.customerId && context?.businessUnitKey) {
     return {
-      read_order: asAssociate.readAssociateOrder,
-      create_order: asAssociate.createAssociateOrder,
-      update_order: asAssociate.updateAssociateOrder,
+      [handler.getToolDefinition('read').name]: asAssociate.readAssociateOrder,
+      [handler.getToolDefinition('create').name]: asAssociate.createAssociateOrder,
+      [handler.getToolDefinition('update').name]: asAssociate.updateAssociateOrder,
     };
   }
   if (context?.customerId) {
     return {
-      read_order: customer.readCustomerOrder,
+      [handler.getToolDefinition('read').name]: customer.readCustomerOrder,
     };
   }
   if (context?.storeKey) {
     return {
-      read_order: store.readStoreOrder,
-      create_order: store.createOrderInStore,
-      update_order: store.updateOrderByIdInStore,
+      [handler.getToolDefinition('read').name]: store.readStoreOrder,
+      [handler.getToolDefinition('create').name]: store.createOrderInStore,
+      [handler.getToolDefinition('update').name]: store.updateOrderByIdInStore,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_order: admin.readOrder,
-      create_order: admin.createOrder,
-      update_order: admin.updateOrder,
+      [handler.getToolDefinition('read').name]: admin.readOrder,
+      [handler.getToolDefinition('create').name]: admin.createOrder,
+      [handler.getToolDefinition('update').name]: admin.updateOrder,
     };
   }
   return {};

@@ -1,22 +1,17 @@
-import {
-  createTaxCategoryParameters,
-  readTaxCategoryParameters,
-  updateTaxCategoryParameters,
-} from './parameters';
-import {
-  readTaxCategoryPrompt,
-  createTaxCategoryPrompt,
-  updateTaxCategoryPrompt,
-} from './prompts';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {z} from 'zod';
+import {TaxCategoriesHandler} from '@commercetools/tools-core';
+
+const handler = new TaxCategoriesHandler();
 
 const tools: Record<string, Tool> = {
   read_tax_category: {
     name: 'Read Tax Category',
-    method: 'read_tax_category',
-    parameters: readTaxCategoryParameters,
-    description: readTaxCategoryPrompt,
+    method: handler.getToolDefinition('read').name,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('read').description,
     actions: {
       'tax-category': {
         read: true,
@@ -25,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_tax_category: {
     name: 'Create Tax Category',
-    method: 'create_tax_category',
-    parameters: createTaxCategoryParameters,
-    description: createTaxCategoryPrompt,
+    method: handler.getToolDefinition('create').name,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('create').description,
     actions: {
       'tax-category': {
         create: true,
@@ -36,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_tax_category: {
     name: 'Update Tax Category',
-    method: 'update_tax_category',
-    parameters: updateTaxCategoryParameters,
-    description: updateTaxCategoryPrompt,
+    method: handler.getToolDefinition('update').name,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('update').description,
     actions: {
       'tax-category': {
         update: true,

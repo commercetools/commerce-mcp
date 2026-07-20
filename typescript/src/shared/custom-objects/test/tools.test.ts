@@ -8,7 +8,7 @@ describe('Custom Objects Tools', () => {
 
       expect(tools).toHaveLength(3);
       expect(tools[0]).toHaveProperty('name', 'Read Custom Object');
-      expect(tools[0]).toHaveProperty('method', 'read_custom_object');
+      expect(tools[0]).toHaveProperty('method', 'read_custom_objects');
       expect(tools[0]).toHaveProperty('actions', {
         'custom-objects': {
           read: true,
@@ -16,7 +16,7 @@ describe('Custom Objects Tools', () => {
       });
 
       expect(tools[1]).toHaveProperty('name', 'Create Custom Object');
-      expect(tools[1]).toHaveProperty('method', 'create_custom_object');
+      expect(tools[1]).toHaveProperty('method', 'create_custom_objects');
       expect(tools[1]).toHaveProperty('actions', {
         'custom-objects': {
           create: true,
@@ -24,7 +24,7 @@ describe('Custom Objects Tools', () => {
       });
 
       expect(tools[2]).toHaveProperty('name', 'Update Custom Object');
-      expect(tools[2]).toHaveProperty('method', 'update_custom_object');
+      expect(tools[2]).toHaveProperty('method', 'update_custom_objects');
       expect(tools[2]).toHaveProperty('actions', {
         'custom-objects': {
           update: true,

@@ -6,9 +6,9 @@ describe('Types Functions', () => {
       const context = {isAdmin: true};
       const mapping = contextToTypeFunctionMapping(context);
 
-      expect(mapping).toHaveProperty('read_type');
-      expect(mapping).toHaveProperty('create_type');
-      expect(mapping).toHaveProperty('update_type');
+      expect(mapping).toHaveProperty('read_types');
+      expect(mapping).toHaveProperty('create_types');
+      expect(mapping).toHaveProperty('update_types');
     });
 
     it('should return empty object when isAdmin is false', () => {

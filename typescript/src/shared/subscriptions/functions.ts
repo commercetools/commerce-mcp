@@ -7,6 +7,9 @@ import {
 } from './parameters';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {SubscriptionsHandler} from '@commercetools/tools-core';
+
+const handler = new SubscriptionsHandler();
 
 export const contextToSubscriptionFunctionMapping = (
   context?: Context
@@ -20,9 +23,9 @@ export const contextToSubscriptionFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_subscription: admin.readSubscription,
-      create_subscription: admin.createSubscription,
-      update_subscription: admin.updateSubscription,
+      [handler.getToolDefinition('read').name]: admin.readSubscription,
+      [handler.getToolDefinition('create').name]: admin.createSubscription,
+      [handler.getToolDefinition('update').name]: admin.updateSubscription,
     };
   }
 

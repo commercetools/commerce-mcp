@@ -1,29 +1,17 @@
 import {Tool} from '../../types/tools';
 import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {CustomerGroupsHandler} from '@commercetools/tools-core';
 
-import {
-  CREATE_CUSTOMER_GROUP_PROMPT,
-  READ_CUSTOMER_GROUP_PROMPT,
-  UPDATE_CUSTOMER_GROUP_PROMPT,
-} from './prompts';
-import {
-  createCustomerGroupParametersSchema,
-  readCustomerGroupParameters,
-  updateCustomerGroupParameters,
-} from './parameters';
+const handler = new CustomerGroupsHandler();
 
 const tools: Record<string, Tool> = {
   read_customer_group: {
-    method: 'read_customer_group',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Customer Group',
-    description: READ_CUSTOMER_GROUP_PROMPT,
-    parameters: readCustomerGroupParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'customer-group': {
         read: true,
@@ -31,15 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_customer_group: {
-    method: 'create_customer_group',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Customer Group',
-    description: CREATE_CUSTOMER_GROUP_PROMPT,
-    parameters: createCustomerGroupParametersSchema as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'customer-group': {
         create: true,
@@ -47,15 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_customer_group: {
-    method: 'update_customer_group',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Customer Group',
-    description: UPDATE_CUSTOMER_GROUP_PROMPT,
-    parameters: updateCustomerGroupParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'customer-group': {
         update: true,

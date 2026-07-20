@@ -1,18 +1,17 @@
-import {
-  createTypeParameters,
-  readTypeParameters,
-  updateTypeParameters,
-} from './parameters';
-import {readTypePrompt, createTypePrompt, updateTypePrompt} from './prompts';
+import {z} from 'zod';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {TypesHandler} from '@commercetools/tools-core';
+
+const handler = new TypesHandler();
 
 const tools: Record<string, Tool> = {
   read_type: {
     name: 'Read Type',
-    method: 'read_type',
-    parameters: readTypeParameters,
-    description: readTypePrompt,
+    method: handler.getToolDefinition('read').name,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('read').description,
     actions: {
       types: {
         read: true,
@@ -21,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_type: {
     name: 'Create Type',
-    method: 'create_type',
-    parameters: createTypeParameters,
-    description: createTypePrompt,
+    method: handler.getToolDefinition('create').name,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('create').description,
     actions: {
       types: {
         create: true,
@@ -32,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_type: {
     name: 'Update Type',
-    method: 'update_type',
-    parameters: updateTypeParameters,
-    description: updateTypePrompt,
+    method: handler.getToolDefinition('update').name,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('update').description,
     actions: {
       types: {
         update: true,

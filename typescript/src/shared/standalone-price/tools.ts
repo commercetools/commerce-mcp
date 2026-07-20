@@ -1,23 +1,17 @@
-import {
-  readStandalonePricePrompt,
-  createStandalonePricePrompt,
-  updateStandalonePricePrompt,
-} from './prompts';
-
-import {
-  readStandalonePriceParameters,
-  createStandalonePriceParameters,
-  updateStandalonePriceParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {StandalonePricesHandler} from '@commercetools/tools-core';
+
+const handler = new StandalonePricesHandler();
 
 const tools: Record<string, Tool> = {
   read_standalone_price: {
-    method: 'read_standalone_price',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Standalone Price',
-    description: readStandalonePricePrompt,
-    parameters: readStandalonePriceParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'standalone-price': {
         read: true,
@@ -25,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_standalone_price: {
-    method: 'create_standalone_price',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Standalone Price',
-    description: createStandalonePricePrompt,
-    parameters: createStandalonePriceParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'standalone-price': {
         create: true,
@@ -36,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_standalone_price: {
-    method: 'update_standalone_price',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Standalone Price',
-    description: updateStandalonePricePrompt,
-    parameters: updateStandalonePriceParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'standalone-price': {
         update: true,

@@ -1,23 +1,17 @@
-import {
-  readProductSelectionPrompt,
-  createProductSelectionPrompt,
-  updateProductSelectionPrompt,
-} from './prompts';
-
-import {
-  readProductSelectionParameters,
-  createProductSelectionParameters,
-  updateProductSelectionParameters,
-} from './parameters';
+import {z} from 'zod';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {ProductSelectionsHandler} from '@commercetools/tools-core';
+
+const handler = new ProductSelectionsHandler();
 
 const tools: Record<string, Tool> = {
   read_product_selection: {
-    method: 'read_product_selection',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Product Selection',
-    description: readProductSelectionPrompt,
-    parameters: readProductSelectionParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-selection': {
         read: true,
@@ -25,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_product_selection: {
-    method: 'create_product_selection',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Product Selection',
-    description: createProductSelectionPrompt,
-    parameters: createProductSelectionParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-selection': {
         create: true,
@@ -36,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_product_selection: {
-    method: 'update_product_selection',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Product Selection',
-    description: updateProductSelectionPrompt,
-    parameters: updateProductSelectionParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-selection': {
         update: true,

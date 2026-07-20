@@ -1,6 +1,9 @@
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
 import * as admin from './admin.functions';
+import {ChannelsHandler} from '@commercetools/tools-core';
+
+const handler = new ChannelsHandler();
 
 export const contextToChannelFunctionMapping = (
   context?: Context
@@ -14,9 +17,9 @@ export const contextToChannelFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_channel: admin.readChannel,
-      create_channel: admin.createChannel,
-      update_channel: admin.updateChannel,
+      [handler.getToolDefinition('read').name]: admin.readChannel,
+      [handler.getToolDefinition('create').name]: admin.createChannel,
+      [handler.getToolDefinition('update').name]: admin.updateChannel,
     };
   }
 

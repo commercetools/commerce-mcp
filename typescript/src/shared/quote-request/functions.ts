@@ -10,6 +10,9 @@ import {
   createQuoteRequestParameters,
   updateQuoteRequestParameters,
 } from './parameters';
+import {QuoteRequestsHandler} from '@commercetools/tools-core';
+
+const handler = new QuoteRequestsHandler();
 
 // Context mapping function for quote request functions
 export const contextToQuoteRequestFunctionMapping = (
@@ -25,29 +28,29 @@ export const contextToQuoteRequestFunctionMapping = (
   // Associate operations (when both customerId and businessUnitKey are present)
   if (context?.customerId && context?.businessUnitKey) {
     return {
-      read_quote_request: associate.readQuoteRequest,
-      create_quote_request: associate.createQuoteRequest,
-      update_quote_request: associate.updateQuoteRequest,
+      [handler.getToolDefinition('read').name]: associate.readQuoteRequest,
+      [handler.getToolDefinition('create').name]: associate.createQuoteRequest,
+      [handler.getToolDefinition('update').name]: associate.updateQuoteRequest,
     };
   }
   if (context?.customerId) {
     return {
-      read_quote_request: customer.readQuoteRequest,
-      update_quote_request: customer.updateQuoteRequest,
+      [handler.getToolDefinition('read').name]: customer.readQuoteRequest,
+      [handler.getToolDefinition('update').name]: customer.updateQuoteRequest,
     };
   }
   if (context?.storeKey) {
     return {
-      read_quote_request: store.readQuoteRequest,
-      create_quote_request: store.createQuoteRequest,
-      update_quote_request: store.updateQuoteRequest,
+      [handler.getToolDefinition('read').name]: store.readQuoteRequest,
+      [handler.getToolDefinition('create').name]: store.createQuoteRequest,
+      [handler.getToolDefinition('update').name]: store.updateQuoteRequest,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_quote_request: admin.readQuoteRequest,
-      create_quote_request: admin.createQuoteRequest,
-      update_quote_request: admin.updateQuoteRequest,
+      [handler.getToolDefinition('read').name]: admin.readQuoteRequest,
+      [handler.getToolDefinition('create').name]: admin.createQuoteRequest,
+      [handler.getToolDefinition('update').name]: admin.updateQuoteRequest,
     };
   }
   return {};

@@ -1,6 +1,9 @@
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
 import * as admin from './admin.functions';
+import {StatesHandler} from '@commercetools/tools-core';
+
+const handler = new StatesHandler();
 
 export const contextToStateFunctionMapping = (
   context?: Context
@@ -14,9 +17,9 @@ export const contextToStateFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_state: admin.readState,
-      create_state: admin.createState,
-      update_state: admin.updateState,
+      [handler.getToolDefinition('read').name]: admin.readState,
+      [handler.getToolDefinition('create').name]: admin.createState,
+      [handler.getToolDefinition('update').name]: admin.updateState,
     };
   }
   return {};

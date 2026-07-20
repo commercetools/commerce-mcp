@@ -1,48 +1,33 @@
-import {readStatePrompt, createStatePrompt, updateStatePrompt} from './prompts';
-import {
-  readStateParameters,
-  createStateParameters,
-  updateStateParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
 import {z} from 'zod';
+import {StatesHandler} from '@commercetools/tools-core';
+
+const handler = new StatesHandler();
 
 const tools: Record<string, Tool> = {
   read_state: {
-    method: 'read_state',
+    method: handler.getToolDefinition('read').name,
     name: 'Read State',
-    description: readStatePrompt,
-    parameters: readStateParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {states: {read: true}},
   },
   create_state: {
-    method: 'create_state',
+    method: handler.getToolDefinition('create').name,
     name: 'Create State',
-    description: createStatePrompt,
-    parameters: createStateParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {states: {create: true}},
   },
   update_state: {
-    method: 'update_state',
+    method: handler.getToolDefinition('update').name,
     name: 'Update State',
-    description: updateStatePrompt,
-    parameters: updateStateParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {states: {update: true}},
   },
 };

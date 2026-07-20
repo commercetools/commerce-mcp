@@ -7,6 +7,9 @@ import {
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {Context, CommercetoolsFuncContext} from '../../types/configuration';
 import * as admin from './admin.functions';
+import {ProductsHandler} from '@commercetools/tools-core';
+
+const handler = new ProductsHandler();
 
 /**
  * Maps context to product functions
@@ -23,13 +26,13 @@ export const contextToProductFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      list_products: admin.listProducts,
-      create_product: admin.createProduct,
-      update_product: admin.updateProduct,
+      [handler.getToolDefinition('read').name]: admin.listProducts,
+      [handler.getToolDefinition('create').name]: admin.createProduct,
+      [handler.getToolDefinition('update').name]: admin.updateProduct,
     };
   }
   return {
-    list_products: admin.listProducts,
+    [handler.getToolDefinition('read').name]: admin.listProducts,
   };
 };
 

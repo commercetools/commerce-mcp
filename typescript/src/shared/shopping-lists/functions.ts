@@ -10,6 +10,9 @@ import * as admin from './admin.functions';
 import * as customer from './customer.functions';
 import * as store from './store.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {ShoppingListsHandler} from '@commercetools/tools-core';
+
+const handler = new ShoppingListsHandler();
 
 export const contextToShoppingListFunctionMapping = (
   context?: Context
@@ -23,23 +26,23 @@ export const contextToShoppingListFunctionMapping = (
 > => {
   if (context?.customerId) {
     return {
-      read_shopping_list: customer.readShoppingList,
-      create_shopping_list: customer.createShoppingList,
-      update_shopping_list: customer.updateShoppingList,
+      [handler.getToolDefinition('read').name]: customer.readShoppingList,
+      [handler.getToolDefinition('create').name]: customer.createShoppingList,
+      [handler.getToolDefinition('update').name]: customer.updateShoppingList,
     };
   }
   if (context?.storeKey) {
     return {
-      read_shopping_list: store.readShoppingList,
-      create_shopping_list: store.createShoppingList,
-      update_shopping_list: store.updateShoppingList,
+      [handler.getToolDefinition('read').name]: store.readShoppingList,
+      [handler.getToolDefinition('create').name]: store.createShoppingList,
+      [handler.getToolDefinition('update').name]: store.updateShoppingList,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_shopping_list: admin.readShoppingList,
-      create_shopping_list: admin.createShoppingList,
-      update_shopping_list: admin.updateShoppingList,
+      [handler.getToolDefinition('read').name]: admin.readShoppingList,
+      [handler.getToolDefinition('create').name]: admin.createShoppingList,
+      [handler.getToolDefinition('update').name]: admin.updateShoppingList,
     };
   }
 

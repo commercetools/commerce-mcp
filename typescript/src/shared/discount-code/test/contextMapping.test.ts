@@ -7,9 +7,9 @@ describe('Discount Code Context Mapping', () => {
     const mapping = contextToDiscountCodeFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_discount_code: admin.readDiscountCode,
-      create_discount_code: admin.createDiscountCode,
-      update_discount_code: admin.updateDiscountCode,
+      read_discount_codes: admin.readDiscountCode,
+      create_discount_codes: admin.createDiscountCode,
+      update_discount_codes: admin.updateDiscountCode,
     });
   });
 

@@ -7,6 +7,9 @@ import {
 } from './parameters';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {InventoryHandler} from '@commercetools/tools-core';
+
+const handler = new InventoryHandler();
 
 export const contextToInventoryFunctionMapping = (
   context?: Context
@@ -20,9 +23,9 @@ export const contextToInventoryFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_inventory: admin.readInventory,
-      create_inventory: admin.createInventory,
-      update_inventory: admin.updateInventory,
+      [handler.getToolDefinition('read').name]: admin.readInventory,
+      [handler.getToolDefinition('create').name]: admin.createInventory,
+      [handler.getToolDefinition('update').name]: admin.updateInventory,
     };
   }
 

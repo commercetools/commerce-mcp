@@ -8,9 +8,9 @@ describe('Extension Tools', () => {
       const tools = contextToExtensionTools(context);
 
       expect(tools).toHaveLength(3);
-      expect(tools[0]).toHaveProperty('method', 'read_extension');
-      expect(tools[1]).toHaveProperty('method', 'create_extension');
-      expect(tools[2]).toHaveProperty('method', 'update_extension');
+      expect(tools[0]).toHaveProperty('method', 'read_extensions');
+      expect(tools[1]).toHaveProperty('method', 'create_extensions');
+      expect(tools[2]).toHaveProperty('method', 'update_extensions');
     });
 
     it('should return all extension tools when no context is provided', () => {
@@ -35,7 +35,7 @@ describe('Extension Tools', () => {
       // Check read tool
       const readTool = tools[0];
       expect(readTool).toHaveProperty('name', 'Read Extension');
-      expect(readTool).toHaveProperty('method', 'read_extension');
+      expect(readTool).toHaveProperty('method', 'read_extensions');
       expect(readTool).toHaveProperty('parameters');
       expect(readTool).toHaveProperty('description');
       expect(readTool).toHaveProperty('actions');
@@ -45,7 +45,7 @@ describe('Extension Tools', () => {
       // Check create tool
       const createTool = tools[1];
       expect(createTool).toHaveProperty('name', 'Create Extension');
-      expect(createTool).toHaveProperty('method', 'create_extension');
+      expect(createTool).toHaveProperty('method', 'create_extensions');
       expect(createTool).toHaveProperty('parameters');
       expect(createTool).toHaveProperty('description');
       expect(createTool).toHaveProperty('actions');
@@ -55,7 +55,7 @@ describe('Extension Tools', () => {
       // Check update tool
       const updateTool = tools[2];
       expect(updateTool).toHaveProperty('name', 'Update Extension');
-      expect(updateTool).toHaveProperty('method', 'update_extension');
+      expect(updateTool).toHaveProperty('method', 'update_extensions');
       expect(updateTool).toHaveProperty('parameters');
       expect(updateTool).toHaveProperty('description');
       expect(updateTool).toHaveProperty('actions');

@@ -14,7 +14,7 @@ describe('contextToCustomerFunctionMapping', () => {
     const mapping = contextToCustomerFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_customer: customer.readCustomerProfile,
+      read_customers: customer.readCustomerProfile,
     });
   });
 
@@ -27,9 +27,9 @@ describe('contextToCustomerFunctionMapping', () => {
     const mapping = contextToCustomerFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_customer: store.readCustomerInStore,
-      create_customer: store.createCustomerInStore,
-      update_customer: store.updateCustomerInStore,
+      read_customers: store.readCustomerInStore,
+      create_customers: store.createCustomerInStore,
+      update_customers: store.updateCustomerInStore,
     });
   });
 
@@ -42,9 +42,9 @@ describe('contextToCustomerFunctionMapping', () => {
     const mapping = contextToCustomerFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_customer: admin.readCustomer,
-      create_customer: admin.createCustomerAsAdmin,
-      update_customer: admin.updateCustomerAsAdmin,
+      read_customers: admin.readCustomer,
+      create_customers: admin.createCustomerAsAdmin,
+      update_customers: admin.updateCustomerAsAdmin,
     });
   });
 

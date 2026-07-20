@@ -12,9 +12,9 @@ describe('Shopping List Tools', () => {
       const tools = contextToShoppingListTools(context);
 
       expect(tools).toHaveLength(3);
-      expect(tools[0]).toHaveProperty('method', 'read_shopping_list');
-      expect(tools[1]).toHaveProperty('method', 'create_shopping_list');
-      expect(tools[2]).toHaveProperty('method', 'update_shopping_list');
+      expect(tools[0]).toHaveProperty('method', 'read_shopping_lists');
+      expect(tools[1]).toHaveProperty('method', 'create_shopping_lists');
+      expect(tools[2]).toHaveProperty('method', 'update_shopping_lists');
     });
 
     it('should return store tools when only storeKey is present', () => {
@@ -26,9 +26,9 @@ describe('Shopping List Tools', () => {
       const tools = contextToShoppingListTools(context);
 
       expect(tools).toHaveLength(3);
-      expect(tools[0]).toHaveProperty('method', 'read_shopping_list');
-      expect(tools[1]).toHaveProperty('method', 'create_shopping_list');
-      expect(tools[2]).toHaveProperty('method', 'update_shopping_list');
+      expect(tools[0]).toHaveProperty('method', 'read_shopping_lists');
+      expect(tools[1]).toHaveProperty('method', 'create_shopping_lists');
+      expect(tools[2]).toHaveProperty('method', 'update_shopping_lists');
     });
 
     it('should return admin tools when isAdmin is true', () => {
@@ -39,9 +39,9 @@ describe('Shopping List Tools', () => {
       const tools = contextToShoppingListTools(context);
 
       expect(tools).toHaveLength(3);
-      expect(tools[0]).toHaveProperty('method', 'read_shopping_list');
-      expect(tools[1]).toHaveProperty('method', 'create_shopping_list');
-      expect(tools[2]).toHaveProperty('method', 'update_shopping_list');
+      expect(tools[0]).toHaveProperty('method', 'read_shopping_lists');
+      expect(tools[1]).toHaveProperty('method', 'create_shopping_lists');
+      expect(tools[2]).toHaveProperty('method', 'update_shopping_lists');
     });
 
     it('should return shopping list tools when no context is provided', () => {
@@ -68,9 +68,9 @@ describe('Shopping List Tools', () => {
       const tools = contextToShoppingListTools(context);
 
       expect(tools).toHaveLength(3);
-      expect(tools[0]).toHaveProperty('method', 'read_shopping_list');
-      expect(tools[1]).toHaveProperty('method', 'create_shopping_list');
-      expect(tools[2]).toHaveProperty('method', 'update_shopping_list');
+      expect(tools[0]).toHaveProperty('method', 'read_shopping_lists');
+      expect(tools[1]).toHaveProperty('method', 'create_shopping_lists');
+      expect(tools[2]).toHaveProperty('method', 'update_shopping_lists');
     });
 
     it('should prioritize store over admin when storeKey is present but customerId is not', () => {
@@ -82,9 +82,9 @@ describe('Shopping List Tools', () => {
       const tools = contextToShoppingListTools(context);
 
       expect(tools).toHaveLength(3);
-      expect(tools[0]).toHaveProperty('method', 'read_shopping_list');
-      expect(tools[1]).toHaveProperty('method', 'create_shopping_list');
-      expect(tools[2]).toHaveProperty('method', 'update_shopping_list');
+      expect(tools[0]).toHaveProperty('method', 'read_shopping_lists');
+      expect(tools[1]).toHaveProperty('method', 'create_shopping_lists');
+      expect(tools[2]).toHaveProperty('method', 'update_shopping_lists');
     });
 
     it('should have correct tool properties', () => {
@@ -99,7 +99,7 @@ describe('Shopping List Tools', () => {
       // Check read tool
       const readTool = tools[0];
       expect(readTool).toHaveProperty('name', 'Read Shopping List');
-      expect(readTool).toHaveProperty('method', 'read_shopping_list');
+      expect(readTool).toHaveProperty('method', 'read_shopping_lists');
       expect(readTool).toHaveProperty('parameters');
       expect(readTool).toHaveProperty('description');
       expect(readTool).toHaveProperty('actions');
@@ -109,7 +109,7 @@ describe('Shopping List Tools', () => {
       // Check create tool
       const createTool = tools[1];
       expect(createTool).toHaveProperty('name', 'Create Shopping List');
-      expect(createTool).toHaveProperty('method', 'create_shopping_list');
+      expect(createTool).toHaveProperty('method', 'create_shopping_lists');
       expect(createTool).toHaveProperty('parameters');
       expect(createTool).toHaveProperty('description');
       expect(createTool).toHaveProperty('actions');
@@ -122,7 +122,7 @@ describe('Shopping List Tools', () => {
       // Check update tool
       const updateTool = tools[2];
       expect(updateTool).toHaveProperty('name', 'Update Shopping List');
-      expect(updateTool).toHaveProperty('method', 'update_shopping_list');
+      expect(updateTool).toHaveProperty('method', 'update_shopping_lists');
       expect(updateTool).toHaveProperty('parameters');
       expect(updateTool).toHaveProperty('description');
       expect(updateTool).toHaveProperty('actions');

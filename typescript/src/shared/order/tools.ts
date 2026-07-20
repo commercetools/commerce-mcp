@@ -1,20 +1,17 @@
-import {readOrderPrompt, createOrderPrompt, updateOrderPrompt} from './prompts';
-
-import {
-  readOrderParameters,
-  createOrderParameters,
-  updateOrderParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
 import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {OrdersHandler} from '@commercetools/tools-core';
+
+const handler = new OrdersHandler();
 
 const tools: Record<string, Tool> = {
   read_order: {
-    method: 'read_order',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Order',
-    description: readOrderPrompt,
-    parameters: readOrderParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       order: {
         read: true,
@@ -22,15 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_order: {
-    method: 'create_order',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Order',
-    description: createOrderPrompt,
-    parameters: createOrderParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       order: {
         create: true,
@@ -38,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_order: {
-    method: 'update_order',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Order',
-    description: updateOrderPrompt,
-    parameters: updateOrderParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       order: {
         update: true,

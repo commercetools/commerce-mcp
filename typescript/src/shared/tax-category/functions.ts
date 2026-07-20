@@ -8,6 +8,9 @@ import {
 } from './parameters';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {TaxCategoriesHandler} from '@commercetools/tools-core';
+
+const handler = new TaxCategoriesHandler();
 
 export const contextToTaxCategoryFunctionMapping = (
   context?: Context
@@ -21,9 +24,9 @@ export const contextToTaxCategoryFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_tax_category: admin.readTaxCategory,
-      create_tax_category: admin.createTaxCategory,
-      update_tax_category: admin.updateTaxCategory,
+      [handler.getToolDefinition('read').name]: admin.readTaxCategory,
+      [handler.getToolDefinition('create').name]: admin.createTaxCategory,
+      [handler.getToolDefinition('update').name]: admin.updateTaxCategory,
     };
   }
 

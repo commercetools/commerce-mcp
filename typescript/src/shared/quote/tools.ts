@@ -1,25 +1,17 @@
-import {readQuotePrompt, createQuotePrompt, updateQuotePrompt} from './prompts';
-
-import {
-  readQuoteParameters,
-  createQuoteParameters,
-  updateQuoteParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
 import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {QuotesHandler} from '@commercetools/tools-core';
+
+const handler = new QuotesHandler();
 
 const tools: Record<string, Tool> = {
   read_quote: {
-    method: 'read_quote',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Quote',
-    description: readQuotePrompt,
-    parameters: readQuoteParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       quote: {
         read: true,
@@ -27,15 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_quote: {
-    method: 'create_quote',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Quote',
-    description: createQuotePrompt,
-    parameters: createQuoteParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       quote: {
         create: true,
@@ -43,15 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_quote: {
-    method: 'update_quote',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Quote',
-    description: updateQuotePrompt,
-    parameters: updateQuoteParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       quote: {
         update: true,

@@ -26,9 +26,9 @@ describe('Subscription Functions', () => {
       const mapping = contextToSubscriptionFunctionMapping(context);
 
       expect(mapping).toEqual({
-        read_subscription: admin.readSubscription,
-        create_subscription: admin.createSubscription,
-        update_subscription: admin.updateSubscription,
+        read_subscriptions: admin.readSubscription,
+        create_subscriptions: admin.createSubscription,
+        update_subscriptions: admin.updateSubscription,
       });
     });
 

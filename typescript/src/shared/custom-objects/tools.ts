@@ -1,22 +1,17 @@
-import {
-  createCustomObjectParameters,
-  readCustomObjectParameters,
-  updateCustomObjectParameters,
-} from './parameters';
-import {
-  readCustomObjectPrompt,
-  createCustomObjectPrompt,
-  updateCustomObjectPrompt,
-} from './prompts';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {CustomObjectsHandler} from '@commercetools/tools-core';
+
+const handler = new CustomObjectsHandler();
 
 const tools: Record<string, Tool> = {
   read_custom_object: {
     name: 'Read Custom Object',
-    method: 'read_custom_object',
-    parameters: readCustomObjectParameters,
-    description: readCustomObjectPrompt,
+    method: handler.getToolDefinition('read').name,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('read').description,
     actions: {
       'custom-objects': {
         read: true,
@@ -25,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_custom_object: {
     name: 'Create Custom Object',
-    method: 'create_custom_object',
-    parameters: createCustomObjectParameters,
-    description: createCustomObjectPrompt,
+    method: handler.getToolDefinition('create').name,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('create').description,
     actions: {
       'custom-objects': {
         create: true,
@@ -36,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_custom_object: {
     name: 'Update Custom Object',
-    method: 'update_custom_object',
-    parameters: updateCustomObjectParameters,
-    description: updateCustomObjectPrompt,
+    method: handler.getToolDefinition('update').name,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('update').description,
     actions: {
       'custom-objects': {
         update: true,
