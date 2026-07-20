@@ -28,8 +28,10 @@ export const contextToOrderFunctionMapping = (
   if (context?.customerId && context?.businessUnitKey) {
     return {
       [handler.getToolDefinition('read').name]: asAssociate.readAssociateOrder,
-      [handler.getToolDefinition('create').name]: asAssociate.createAssociateOrder,
-      [handler.getToolDefinition('update').name]: asAssociate.updateAssociateOrder,
+      [handler.getToolDefinition('create').name]:
+        asAssociate.createAssociateOrder,
+      [handler.getToolDefinition('update').name]:
+        asAssociate.updateAssociateOrder,
     };
   }
   if (context?.customerId) {
