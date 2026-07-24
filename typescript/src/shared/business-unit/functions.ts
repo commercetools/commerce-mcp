@@ -3,26 +3,33 @@ import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {z} from 'zod';
-import {BusinessUnitsHandler} from '@commercetools/tools-core';
+import {
+  BusinessUnitsHandler,
+  IApiClientFactory,
+} from '@commercetools/tools-core';
 import {
   readBusinessUnitParameters,
   createBusinessUnitParameters,
   updateBusinessUnitParameters,
 } from './parameters';
 
-const handler = new BusinessUnitsHandler();
+let handler;
 
 // Context mapping function for business unit functions
 export const contextToBusinessUnitFunctionMapping = (
-  context?: Context
+  context?: Context,
+  clientFactory?: IApiClientFactory
 ): Record<
   string,
   (
     apiRoot: ApiRoot,
     context: CommercetoolsFuncContext,
-    params: any
+    params: any,
+    getApiRoot?: any,
+    clientFactory?: IApiClientFactory
   ) => Promise<any>
 > => {
+  handler = new BusinessUnitsHandler(clientFactory);
   if (context?.storeKey) {
     return {
       [handler.getToolDefinition('read').name]: store.readBusinessUnit,
