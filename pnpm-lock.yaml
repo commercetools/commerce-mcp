@@ -175,6 +175,9 @@ importers:
       '@commercetools/platform-sdk':
         specifier: ^8.13.0
         version: 8.14.0
+      '@commercetools/tools-core':
+        specifier: link:../../mcp-tools/packages/core
+        version: link:../../mcp-tools/packages/core
       '@commercetools/ts-client':
         specifier: ^4.2.0
         version: 4.2.0

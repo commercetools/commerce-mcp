@@ -13,10 +13,10 @@ pnpm run build
 pnpm add link:../typescript
 
 # run the server in terminal
-npx ts-node src/index.ts --tools=products.read --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --authUrl=AUTH_URL --projectKey=PROJECT_KEY --apiUrl=API_URL
+npx ts-node src/index.ts --tools=read_products --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --authUrl=AUTH_URL --projectKey=PROJECT_KEY --apiUrl=API_URL
 
 # test using mcptools : Install mcptools from https://github.com/f/mcptools
-mcp call list_products --params '{"limit": 2}' npx ts-node /<absolute-path>/commerce-agent/modelcontextprotocol/src/index.ts --tools=all \
+mcp call read_products --params '{"limit": 2}' npx ts-node /<absolute-path>/commerce-agent/modelcontextprotocol/src/index.ts --tools=all \
 --projectKey="PROJECT_KEY" \
 --clientSecret="CLIENT_SECRET" \
 --clientId="CLIENT_ID" \

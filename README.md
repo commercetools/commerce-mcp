@@ -18,13 +18,13 @@ npx -y @commercetools/commerce-mcp --tools=all --clientId=CLIENT_ID --clientSecr
 npx -y @commercetools/commerce-mcp --tools=all --authType=client_credentials --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 # To set up all read-only tools
-npx -y @commercetools/commerce-mcp --tools=all.read --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=read_all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 ```
 
 ```bash
 # To set up specific tools
-npx -y @commercetools/commerce-mcp --tools=products.read,products.create --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=read_products,create_products --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 ### Access Token Authentication
@@ -34,7 +34,7 @@ npx -y @commercetools/commerce-mcp --tools=products.read,products.create --clien
 npx -y @commercetools/commerce-mcp --tools=all --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 
 # To set up all read-only tools with access token
-npx -y @commercetools/commerce-mcp --tools=all.read --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx -y @commercetools/commerce-mcp --tools=read_all --authType=auth_token --accessToken=ACCESS_TOKEN --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 Make sure to replace `CLIENT_ID`, `CLIENT_SECRET`, `PROJECT_KEY`, `AUTH_URL`, `API_URL`, and `ACCESS_TOKEN` with your actual values. If using the customerId parameter, replace `CUSTOMER_ID` with the actual customer ID. Alternatively, you could set the API_KEY in your environment variables.
@@ -47,6 +47,16 @@ The MCP server supports two authentication methods:
 | ------------------------------ | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `client_credentials` (default) | `--clientId`, `--clientSecret`                             | Uses API client credentials for authentication. `--authType=client_credentials` is optional since this is the default                |
 | `auth_token`                   | `--accessToken`, (optional `--clientId`, `--clientSecret`) | Uses a pre-existing access token for authentication. Requires `--authType=auth_token` and optional `--clientId` and `--clientSecret` |
+
+### Customer context
+
+Pass `--customerId=CUSTOMER_ID` to run the server in customer self-service mode. When set, tools for customer-owned resources are automatically scoped to that customer and limited to safe operations:
+
+- **customers** — only the customer's own profile can be read.
+- **orders**, **carts**, **recurring-orders** — queries are restricted to the customer's records; look-ups by id/key are ownership-checked.
+- **quotes**, **quote-requests**, **shopping-lists** — restricted to the customer's own records; carts and shopping lists created this way are owned by the customer, and updates verify ownership. Quote updates are limited to customer-permitted actions (accept/decline, request renegotiation).
+
+Resources that are not customer-owned (for example `products` or `categories`) are unaffected. Combine `--customerId` with `--businessUnitKey` to operate as a B2B associate within a Business Unit instead.
 
 ### Usage with Claude Desktop
 
@@ -99,7 +109,7 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 }
 ```
 
-**Alternative: To use only read-only tools, replace `"--tools=all"` with `"--tools=all.read"`**
+**Alternative: To use only read-only tools, replace `"--tools=all"` with `"--tools=read_all"`**
 
 ## Available tools
 
@@ -108,127 +118,127 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 | Tool       | Description                                                      |
 | ---------- | ---------------------------------------------------------------- |
 | `all`      | Enable all available tools (read, create, and update operations) |
-| `all.read` | Enable all read-only tools (safe for read-only access)           |
+| `read_all` | Enable all read-only tools (safe for read-only access)           |
 
 ### Individual Tools
 
 | Tool                       | Description                                                                                                                        |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `approval-flow.read`       | [Read Approval Flow](https://docs.commercetools.com/api/projects/approval-flows#query-approvalflows)                               |
-| `approval-flow.update`     | [Update Approval Flow](https://docs.commercetools.com/api/projects/approval-flows#update-approvalflow-by-id)                       |
-| `approval-rule.read`       | [Read Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#query-approvalrules)                               |
-| `approval-rule.create`     | [Create Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#create-approvalrule)                             |
-| `approval-rule.update`     | [Update Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#update-approvalrule-by-id)                       |
-| `associate-role.read`      | [Read Associate Role](https://docs.commercetools.com/api/projects/associate-roles#query-associate-roles)                           |
-| `associate-role.create`    | [Create Associate Role](https://docs.commercetools.com/api/projects/associate-roles#create-associate-role)                         |
-| `associate-role.update`    | [Update Associate Role](https://docs.commercetools.com/api/projects/associate-roles#update-associate-role-by-id)                   |
-| `order-edit.read`          | [Read Order Edit](https://docs.commercetools.com/api/projects/order-edits#query-orderedits)                                        |
-| `order-edit.create`        | [Create Order Edit](https://docs.commercetools.com/api/projects/order-edits#create-orderedit)                                      |
-| `order-edit.update`        | [Update or Apply Order Edit](https://docs.commercetools.com/api/projects/order-edits#update-orderedit-by-id)                       |
-| `product-selection-assignment.read` | [Read Products in Product Selection](https://docs.commercetools.com/api/projects/product-selections#query-productselection-products) |
-| `recurrence-policy.read`   | [Read Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#query-recurrencepolicies)                 |
-| `recurrence-policy.create` | [Create Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#create-recurrencepolicy)                |
-| `recurrence-policy.update` | [Update Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#update-recurrencepolicy-by-id)          |
-| `states.read`              | [Read State](https://docs.commercetools.com/api/projects/states#query-states)                                                      |
-| `states.create`            | [Create State](https://docs.commercetools.com/api/projects/states#create-state)                                                    |
-| `states.update`            | [Update State](https://docs.commercetools.com/api/projects/states#update-state-by-id)                                              |
-| `products.read`            | [Read product information](https://docs.commercetools.com/api/projects/products#query-products)                                    |
-| `products.create`          | [Create product information](https://docs.commercetools.com/api/projects/products#create-product)                                  |
-| `products.update`          | [Update product information](https://docs.commercetools.com/api/projects/products#update-product)                                  |
-| `project.read`             | [Read project information](https://docs.commercetools.com/api/projects/project#get-project)                                        |
-| `product-search.read`      | [Search products](https://docs.commercetools.com/api/projects/products#search-products)                                            |
-| `category.read`            | [Read category information](https://docs.commercetools.com/api/projects/categories#get-category-by-id)                             |
-| `category.create`          | [Create category](https://docs.commercetools.com/api/projects/categories#create-category)                                          |
-| `category.update`          | [Update category](https://docs.commercetools.com/api/projects/categories#update-category)                                          |
-| `channel.read`             | [Read channel information](https://docs.commercetools.com/api/projects/channels#query-channels)                                    |
-| `channel.create`           | [Create channel](https://docs.commercetools.com/api/projects/channels#create-channel)                                              |
-| `channel.update`           | [Update channel information](https://docs.commercetools.com/api/projects/channels#update-channel)                                  |
-| `product-selection.read`   | [Read product selection](https://docs.commercetools.com/api/projects/product-selections#get-productselection-by-id)                |
-| `product-selection.create` | [Create product selection](https://docs.commercetools.com/api/projects/product-selections#create-a-productselection)               |
-| `product-selection.update` | [Update product selection](https://docs.commercetools.com/api/projects/product-selections#update-productselection)                 |
-| `order.read`               | [Read order information](https://docs.commercetools.com/api/projects/orders#get-order-by-id)                                       |
-| `order.create`             | [Create order](https://docs.commercetools.com/api/projects/orders#create-order-from-cart) (from cart, quote, import)               |
-| `order.update`             | [Update order information](https://docs.commercetools.com/api/projects/orders#update-order)                                        |
-| `cart.read`                | [Read cart information](https://docs.commercetools.com/api/projects/carts#get-cart-by-id)                                          |
-| `cart.create`              | [Create cart](https://docs.commercetools.com/api/projects/carts#create-cart)                                                       |
-| `cart.update`              | [Update cart information](https://docs.commercetools.com/api/projects/carts#update-cart)                                           |
-| `customer.read`            | [Read customer information](https://docs.commercetools.com/api/projects/customers#query-customers)                                 |
-| `customer.create`          | [Create customer](https://docs.commercetools.com/api/projects/customers#create-customer)                                           |
-| `customer.update`          | [Update customer information](https://docs.commercetools.com/api/projects/customers#update-customer)                               |
-| `customer-group.read`      | [Read customer group](https://docs.commercetools.com/api/projects/customerGroups#get-customergroup)                                |
-| `customer-group.create`    | [Create customer group](https://docs.commercetools.com/api/projects/customerGroups#create-customergroup)                           |
-| `customer-group.update`    | [Update customer group](https://docs.commercetools.com/api/projects/customerGroups#update-customergroup)                           |
-| `quote.read`               | [Read quote information](https://docs.commercetools.com/api/projects/quotes#get-quote-by-id)                                       |
-| `quote.create`             | [Create quote](https://docs.commercetools.com/api/projects/quotes#create-quote-from-staged-quote)                                  |
-| `quote.update`             | [Update quote information](https://docs.commercetools.com/api/projects/quotes#update-quote)                                        |
-| `quote-request.read`       | [Read quote request](https://docs.commercetools.com/api/projects/quote-requests#get-quoterequest-by-id)                            |
-| `quote-request.create`     | [Create quote request](https://docs.commercetools.com/api/projects/quote-requests#create-quoterequest)                             |
-| `quote-request.update`     | [Update quote request](https://docs.commercetools.com/api/projects/quote-requests#update-quoterequest)                             |
-| `staged-quote.read`        | [Read staged quote](https://docs.commercetools.com/api/projects/staged-quotes#get-stagedquote-by-id)                               |
-| `staged-quote.create`      | [Create staged quote](https://docs.commercetools.com/api/projects/staged-quotes#create-stagedquote)                                |
-| `staged-quote.update`      | [Update staged quote](https://docs.commercetools.com/api/projects/staged-quotes#update-stagedquote)                                |
-| `standalone-price.read`    | [Read standalone price](https://docs.commercetools.com/api/projects/standalone-prices#get-standaloneprice-by-id)                   |
-| `standalone-price.create`  | [Create standalone price](https://docs.commercetools.com/api/projects/standalone-prices#create-standaloneprice)                    |
-| `standalone-price.update`  | [Update standalone price](https://docs.commercetools.com/api/projects/standalone-prices#update-standaloneprice)                    |
-| `product-discount.read`    | [Read product discount](https://docs.commercetools.com/api/projects/productDiscounts#get-productdiscount-by-id)                    |
-| `product-discount.create`  | [Create product discount](https://docs.commercetools.com/api/projects/productDiscounts#create-productdiscount)                     |
-| `product-discount.update`  | [Update product discount](https://docs.commercetools.com/api/projects/productDiscounts#update-productdiscount)                     |
-| `cart-discount.read`       | [Read cart discount](https://docs.commercetools.com/api/projects/cartDiscounts#get-cartdiscount-by-id)                             |
-| `cart-discount.create`     | [Create cart discount](https://docs.commercetools.com/api/projects/cartDiscounts#create-cartdiscount)                              |
-| `cart-discount.update`     | [Update cart discount](https://docs.commercetools.com/api/projects/cartDiscounts#update-cartdiscount)                              |
-| `discount-code.read`       | [Read discount code information](https://docs.commercetools.com/api/projects/discount-codes#get-discountcode-by-id)                |
-| `discount-code.create`     | [Create discount code](https://docs.commercetools.com/api/projects/discount-codes#create-discountcode)                             |
-| `discount-code.update`     | [Update discount code information](https://docs.commercetools.com/api/projects/discount-codes#update-discountcode)                 |
-| `product-type.read`        | [Read product type](https://docs.commercetools.com/api/projects/productTypes#get-producttype-by-id)                                |
-| `product-type.create`      | [Create product type](https://docs.commercetools.com/api/projects/productTypes#create-producttype)                                 |
-| `product-type.update`      | [Update product type](https://docs.commercetools.com/api/projects/productTypes#update-producttype)                                 |
-| `bulk.create`              | Create entities in bulk                                                                                                            |
-| `bulk.update`              | Update entities in bulk                                                                                                            |
-| `inventory.read`           | [Read inventory information](https://docs.commercetools.com/api/projects/inventory#get-inventoryentry-by-id)                       |
-| `inventory.create`         | [Create inventory](https://docs.commercetools.com/api/projects/inventory#create-inventoryentry)                                    |
-| `inventory.update`         | [Update inventory information](https://docs.commercetools.com/api/projects/inventory#update-inventoryentry)                        |
-| `store.read`               | [Read store](https://docs.commercetools.com/api/projects/stores#get-store-by-id)                                                   |
-| `store.create`             | [Create store](https://docs.commercetools.com/api/projects/stores#create-store)                                                    |
-| `store.update`             | [Update store](https://docs.commercetools.com/api/projects/stores#update-store)                                                    |
-| `business-unit.read`       | [Read business unit](https://docs.commercetools.com/api/projects/business-units#get-businessunit-by-id)                            |
-| `business-unit.create`     | [Create business unit](https://docs.commercetools.com/api/projects/business-units#create-businessunit)                             |
-| `business-unit.update`     | [Update business unit](https://docs.commercetools.com/api/projects/business-units#update-businessunit)                             |
-| `payments.read`            | [Read payment information](https://docs.commercetools.com/api/projects/payments#get-payment-by-id)                                 |
-| `payments.create`          | [Create payment](https://docs.commercetools.com/api/projects/payments#create-payment)                                              |
-| `payments.update`          | [Update payment information](https://docs.commercetools.com/api/projects/payments#update-actions)                                  |
-| `tax-category.read`        | [Read tax category information](https://docs.commercetools.com/api/projects/taxCategories#get-taxcategory-by-id)                   |
-| `tax-category.create`      | [Create tax category](https://docs.commercetools.com/api/projects/taxCategories#create-taxcategory)                                |
-| `tax-category.update`      | [Update tax category information](https://docs.commercetools.com/api/projects/taxCategories#update-taxcategory)                    |
-| `shipping-methods.read`    | [Read shipping method information](https://docs.commercetools.com/api/projects/shippingMethods#get-shippingmethod-by-id)           |
-| `shipping-methods.create`  | [Create shipping method](https://docs.commercetools.com/api/projects/shippingMethods#create-shippingmethod)                        |
-| `shipping-methods.update`  | [Update shipping method information](https://docs.commercetools.com/api/projects/shippingMethods#update-shippingmethod)            |
-| `zone.read`                | [Read zone information](https://docs.commercetools.com/api/projects/zones#get-zone-by-id)                                          |
-| `zone.create`              | [Create zone](https://docs.commercetools.com/api/projects/zones#create-zone)                                                       |
-| `zone.update`              | [Update zone information](https://docs.commercetools.com/api/projects/zones#update-zone)                                           |
-| `recurring-orders.read`    | [Read recurring order information](https://docs.commercetools.com/api/projects/recurring-orders#get-recurringorder-by-id)          |
-| `recurring-orders.create`  | [Create recurring order](https://docs.commercetools.com/api/projects/recurring-orders#create-recurringorder)                       |
-| `recurring-orders.update`  | [Update recurring order information](https://docs.commercetools.com/api/projects/recurring-orders#update-recurringorder)           |
-| `shopping-lists.read`      | [Read shopping list information](https://docs.commercetools.com/api/projects/shoppingLists#get-shoppinglist-by-id)                 |
-| `shopping-lists.create`    | [Create shopping list](https://docs.commercetools.com/api/projects/shoppingLists#create-shoppinglist)                              |
-| `shopping-lists.update`    | [Update shopping list information](https://docs.commercetools.com/api/projects/shoppingLists#update-shoppinglist)                  |
-| `extensions.read`          | [Read extension information](https://docs.commercetools.com/api/projects/extensions#get-extension-by-id)                           |
-| `extensions.create`        | [Create extension](https://docs.commercetools.com/api/projects/extensions#create-an-extension)                                     |
-| `extensions.update`        | [Update extension information](https://docs.commercetools.com/api/projects/extensions#update-an-extension)                         |
-| `subscriptions.read`       | [Read subscription information](https://docs.commercetools.com/api/projects/subscriptions#get-subscription-by-id)                  |
-| `subscriptions.create`     | [Create subscription](https://docs.commercetools.com/api/projects/subscriptions#create-a-subscription)                             |
-| `subscriptions.update`     | [Update subscription information](https://docs.commercetools.com/api/projects/subscriptions#update-subscription)                   |
-| `payment-methods.read`     | [Read payment method information](https://docs.commercetools.com/api/projects/paymentMethods#get-paymentmethod-by-id)              |
-| `payment-methods.create`   | [Create payment method](https://docs.commercetools.com/api/projects/paymentMethods#create-paymentmethod)                           |
-| `payment-methods.update`   | [Update payment method information](https://docs.commercetools.com/api/projects/paymentMethods#update-paymentmethod)               |
-| `product-tailoring.read`   | [Read product tailoring information](https://docs.commercetools.com/api/projects/productTailoring#get-producttailoring-by-id)      |
-| `product-tailoring.create` | [Create product tailoring](https://docs.commercetools.com/api/projects/productTailoring#create-producttailoring)                   |
-| `product-tailoring.update` | [Update product tailoring information](https://docs.commercetools.com/api/projects/productTailoring#update-producttailoring)       |
-| `custom-objects.read`      | [Read custom object information](https://docs.commercetools.com/api/projects/custom-objects#get-customobject-by-container-and-key) |
-| `custom-objects.create`    | [Create custom object](https://docs.commercetools.com/api/projects/custom-objects#create-or-update-customobject)                   |
-| `custom-objects.update`    | [Update custom object information](https://docs.commercetools.com/api/projects/custom-objects#create-or-update-customobject)       |
-| `types.read`               | [Read type information](https://docs.commercetools.com/api/projects/types#get-type-by-id)                                          |
-| `types.create`             | [Create type](https://docs.commercetools.com/api/projects/types#create-type)                                                       |
-| `types.update`             | [Update type information](https://docs.commercetools.com/api/projects/types#update-type)                                           |
+| `read_approval_flows`       | [Read Approval Flow](https://docs.commercetools.com/api/projects/approval-flows#query-approvalflows)                               |
+| `update_approval_flows`     | [Update Approval Flow](https://docs.commercetools.com/api/projects/approval-flows#update-approvalflow-by-id)                       |
+| `read_approval_rules`       | [Read Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#query-approvalrules)                               |
+| `create_approval_rules`     | [Create Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#create-approvalrule)                             |
+| `update_approval_rules`     | [Update Approval Rule](https://docs.commercetools.com/api/projects/approval-rules#update-approvalrule-by-id)                       |
+| `read_associate_roles`      | [Read Associate Role](https://docs.commercetools.com/api/projects/associate-roles#query-associate-roles)                           |
+| `create_associate_roles`    | [Create Associate Role](https://docs.commercetools.com/api/projects/associate-roles#create-associate-role)                         |
+| `update_associate_roles`    | [Update Associate Role](https://docs.commercetools.com/api/projects/associate-roles#update-associate-role-by-id)                   |
+| `read_order_edits`          | [Read Order Edit](https://docs.commercetools.com/api/projects/order-edits#query-orderedits)                                        |
+| `create_order_edits`        | [Create Order Edit](https://docs.commercetools.com/api/projects/order-edits#create-orderedit)                                      |
+| `update_order_edits`        | [Update or Apply Order Edit](https://docs.commercetools.com/api/projects/order-edits#update-orderedit-by-id)                       |
+| `read_product_selection_assignments` | [Read Products in Product Selection](https://docs.commercetools.com/api/projects/product-selections#query-productselection-products) |
+| `read_recurrence_policies`   | [Read Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#query-recurrencepolicies)                 |
+| `create_recurrence_policies` | [Create Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#create-recurrencepolicy)                |
+| `update_recurrence_policies` | [Update Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#update-recurrencepolicy-by-id)          |
+| `read_states`              | [Read State](https://docs.commercetools.com/api/projects/states#query-states)                                                      |
+| `create_states`            | [Create State](https://docs.commercetools.com/api/projects/states#create-state)                                                    |
+| `update_states`            | [Update State](https://docs.commercetools.com/api/projects/states#update-state-by-id)                                              |
+| `read_products`            | [Read product information](https://docs.commercetools.com/api/projects/products#query-products)                                    |
+| `create_products`          | [Create product information](https://docs.commercetools.com/api/projects/products#create-product)                                  |
+| `update_products`          | [Update product information](https://docs.commercetools.com/api/projects/products#update-product)                                  |
+| `read_project`             | [Read project information](https://docs.commercetools.com/api/projects/project#get-project)                                        |
+| `read_product_search`      | [Search products](https://docs.commercetools.com/api/projects/products#search-products)                                            |
+| `read_categories`            | [Read category information](https://docs.commercetools.com/api/projects/categories#get-category-by-id)                             |
+| `create_categories`          | [Create category](https://docs.commercetools.com/api/projects/categories#create-category)                                          |
+| `update_categories`          | [Update category](https://docs.commercetools.com/api/projects/categories#update-category)                                          |
+| `read_channels`             | [Read channel information](https://docs.commercetools.com/api/projects/channels#query-channels)                                    |
+| `create_channels`           | [Create channel](https://docs.commercetools.com/api/projects/channels#create-channel)                                              |
+| `update_channels`           | [Update channel information](https://docs.commercetools.com/api/projects/channels#update-channel)                                  |
+| `read_product_selections`   | [Read product selection](https://docs.commercetools.com/api/projects/product-selections#get-productselection-by-id)                |
+| `create_product_selections` | [Create product selection](https://docs.commercetools.com/api/projects/product-selections#create-a-productselection)               |
+| `update_product_selections` | [Update product selection](https://docs.commercetools.com/api/projects/product-selections#update-productselection)                 |
+| `read_orders`               | [Read order information](https://docs.commercetools.com/api/projects/orders#get-order-by-id)                                       |
+| `create_orders`             | [Create order](https://docs.commercetools.com/api/projects/orders#create-order-from-cart) (from cart, quote, import)               |
+| `update_orders`             | [Update order information](https://docs.commercetools.com/api/projects/orders#update-order)                                        |
+| `read_carts`                | [Read cart information](https://docs.commercetools.com/api/projects/carts#get-cart-by-id)                                          |
+| `create_carts`              | [Create cart](https://docs.commercetools.com/api/projects/carts#create-cart)                                                       |
+| `update_carts`              | [Update cart information](https://docs.commercetools.com/api/projects/carts#update-cart)                                           |
+| `read_customers`            | [Read customer information](https://docs.commercetools.com/api/projects/customers#query-customers)                                 |
+| `create_customers`          | [Create customer](https://docs.commercetools.com/api/projects/customers#create-customer)                                           |
+| `update_customers`          | [Update customer information](https://docs.commercetools.com/api/projects/customers#update-customer)                               |
+| `read_customer_groups`      | [Read customer group](https://docs.commercetools.com/api/projects/customerGroups#get-customergroup)                                |
+| `create_customer_groups`    | [Create customer group](https://docs.commercetools.com/api/projects/customerGroups#create-customergroup)                           |
+| `update_customer_groups`    | [Update customer group](https://docs.commercetools.com/api/projects/customerGroups#update-customergroup)                           |
+| `read_quotes`               | [Read quote information](https://docs.commercetools.com/api/projects/quotes#get-quote-by-id)                                       |
+| `create_quotes`             | [Create quote](https://docs.commercetools.com/api/projects/quotes#create-quote-from-staged-quote)                                  |
+| `update_quotes`             | [Update quote information](https://docs.commercetools.com/api/projects/quotes#update-quote)                                        |
+| `read_quote_requests`       | [Read quote request](https://docs.commercetools.com/api/projects/quote-requests#get-quoterequest-by-id)                            |
+| `create_quote_requests`     | [Create quote request](https://docs.commercetools.com/api/projects/quote-requests#create-quoterequest)                             |
+| `update_quote_requests`     | [Update quote request](https://docs.commercetools.com/api/projects/quote-requests#update-quoterequest)                             |
+| `read_staged_quotes`        | [Read staged quote](https://docs.commercetools.com/api/projects/staged-quotes#get-stagedquote-by-id)                               |
+| `create_staged_quotes`      | [Create staged quote](https://docs.commercetools.com/api/projects/staged-quotes#create-stagedquote)                                |
+| `update_staged_quotes`      | [Update staged quote](https://docs.commercetools.com/api/projects/staged-quotes#update-stagedquote)                                |
+| `read_standalone_prices`    | [Read standalone price](https://docs.commercetools.com/api/projects/standalone-prices#get-standaloneprice-by-id)                   |
+| `create_standalone_prices`  | [Create standalone price](https://docs.commercetools.com/api/projects/standalone-prices#create-standaloneprice)                    |
+| `update_standalone_prices`  | [Update standalone price](https://docs.commercetools.com/api/projects/standalone-prices#update-standaloneprice)                    |
+| `read_product_discounts`    | [Read product discount](https://docs.commercetools.com/api/projects/productDiscounts#get-productdiscount-by-id)                    |
+| `create_product_discounts`  | [Create product discount](https://docs.commercetools.com/api/projects/productDiscounts#create-productdiscount)                     |
+| `update_product_discounts`  | [Update product discount](https://docs.commercetools.com/api/projects/productDiscounts#update-productdiscount)                     |
+| `read_cart_discounts`       | [Read cart discount](https://docs.commercetools.com/api/projects/cartDiscounts#get-cartdiscount-by-id)                             |
+| `create_cart_discounts`     | [Create cart discount](https://docs.commercetools.com/api/projects/cartDiscounts#create-cartdiscount)                              |
+| `update_cart_discounts`     | [Update cart discount](https://docs.commercetools.com/api/projects/cartDiscounts#update-cartdiscount)                              |
+| `read_discount_codes`       | [Read discount code information](https://docs.commercetools.com/api/projects/discount-codes#get-discountcode-by-id)                |
+| `create_discount_codes`     | [Create discount code](https://docs.commercetools.com/api/projects/discount-codes#create-discountcode)                             |
+| `update_discount_codes`     | [Update discount code information](https://docs.commercetools.com/api/projects/discount-codes#update-discountcode)                 |
+| `read_product_types`        | [Read product type](https://docs.commercetools.com/api/projects/productTypes#get-producttype-by-id)                                |
+| `create_product_types`      | [Create product type](https://docs.commercetools.com/api/projects/productTypes#create-producttype)                                 |
+| `update_product_types`      | [Update product type](https://docs.commercetools.com/api/projects/productTypes#update-producttype)                                 |
+| `create_bulk`              | Create entities in bulk                                                                                                            |
+| `update_bulk`              | Update entities in bulk                                                                                                            |
+| `read_inventory`           | [Read inventory information](https://docs.commercetools.com/api/projects/inventory#get-inventoryentry-by-id)                       |
+| `create_inventory`         | [Create inventory](https://docs.commercetools.com/api/projects/inventory#create-inventoryentry)                                    |
+| `update_inventory`         | [Update inventory information](https://docs.commercetools.com/api/projects/inventory#update-inventoryentry)                        |
+| `read_stores`               | [Read store](https://docs.commercetools.com/api/projects/stores#get-store-by-id)                                                   |
+| `create_stores`             | [Create store](https://docs.commercetools.com/api/projects/stores#create-store)                                                    |
+| `update_stores`             | [Update store](https://docs.commercetools.com/api/projects/stores#update-store)                                                    |
+| `read_business_units`       | [Read business unit](https://docs.commercetools.com/api/projects/business-units#get-businessunit-by-id)                            |
+| `create_business_units`     | [Create business unit](https://docs.commercetools.com/api/projects/business-units#create-businessunit)                             |
+| `update_business_units`     | [Update business unit](https://docs.commercetools.com/api/projects/business-units#update-businessunit)                             |
+| `read_payments`            | [Read payment information](https://docs.commercetools.com/api/projects/payments#get-payment-by-id)                                 |
+| `create_payments`          | [Create payment](https://docs.commercetools.com/api/projects/payments#create-payment)                                              |
+| `update_payments`          | [Update payment information](https://docs.commercetools.com/api/projects/payments#update-actions)                                  |
+| `read_tax_categories`        | [Read tax category information](https://docs.commercetools.com/api/projects/taxCategories#get-taxcategory-by-id)                   |
+| `create_tax_categories`      | [Create tax category](https://docs.commercetools.com/api/projects/taxCategories#create-taxcategory)                                |
+| `update_tax_categories`      | [Update tax category information](https://docs.commercetools.com/api/projects/taxCategories#update-taxcategory)                    |
+| `read_shipping_methods`    | [Read shipping method information](https://docs.commercetools.com/api/projects/shippingMethods#get-shippingmethod-by-id)           |
+| `create_shipping_methods`  | [Create shipping method](https://docs.commercetools.com/api/projects/shippingMethods#create-shippingmethod)                        |
+| `update_shipping_methods`  | [Update shipping method information](https://docs.commercetools.com/api/projects/shippingMethods#update-shippingmethod)            |
+| `read_zones`                | [Read zone information](https://docs.commercetools.com/api/projects/zones#get-zone-by-id)                                          |
+| `create_zones`              | [Create zone](https://docs.commercetools.com/api/projects/zones#create-zone)                                                       |
+| `update_zones`              | [Update zone information](https://docs.commercetools.com/api/projects/zones#update-zone)                                           |
+| `read_recurring_orders`    | [Read recurring order information](https://docs.commercetools.com/api/projects/recurring-orders#get-recurringorder-by-id)          |
+| `create_recurring_orders`  | [Create recurring order](https://docs.commercetools.com/api/projects/recurring-orders#create-recurringorder)                       |
+| `update_recurring_orders`  | [Update recurring order information](https://docs.commercetools.com/api/projects/recurring-orders#update-recurringorder)           |
+| `read_shopping_lists`      | [Read shopping list information](https://docs.commercetools.com/api/projects/shoppingLists#get-shoppinglist-by-id)                 |
+| `create_shopping_lists`    | [Create shopping list](https://docs.commercetools.com/api/projects/shoppingLists#create-shoppinglist)                              |
+| `update_shopping_lists`    | [Update shopping list information](https://docs.commercetools.com/api/projects/shoppingLists#update-shoppinglist)                  |
+| `read_extensions`          | [Read extension information](https://docs.commercetools.com/api/projects/extensions#get-extension-by-id)                           |
+| `create_extensions`        | [Create extension](https://docs.commercetools.com/api/projects/extensions#create-an-extension)                                     |
+| `update_extensions`        | [Update extension information](https://docs.commercetools.com/api/projects/extensions#update-an-extension)                         |
+| `read_subscriptions`       | [Read subscription information](https://docs.commercetools.com/api/projects/subscriptions#get-subscription-by-id)                  |
+| `create_subscriptions`     | [Create subscription](https://docs.commercetools.com/api/projects/subscriptions#create-a-subscription)                             |
+| `update_subscriptions`     | [Update subscription information](https://docs.commercetools.com/api/projects/subscriptions#update-subscription)                   |
+| `read_payment_methods`     | [Read payment method information](https://docs.commercetools.com/api/projects/paymentMethods#get-paymentmethod-by-id)              |
+| `create_payment_methods`   | [Create payment method](https://docs.commercetools.com/api/projects/paymentMethods#create-paymentmethod)                           |
+| `update_payment_methods`   | [Update payment method information](https://docs.commercetools.com/api/projects/paymentMethods#update-paymentmethod)               |
+| `read_product_tailoring`   | [Read product tailoring information](https://docs.commercetools.com/api/projects/productTailoring#get-producttailoring-by-id)      |
+| `create_product_tailoring` | [Create product tailoring](https://docs.commercetools.com/api/projects/productTailoring#create-producttailoring)                   |
+| `update_product_tailoring` | [Update product tailoring information](https://docs.commercetools.com/api/projects/productTailoring#update-producttailoring)       |
+| `read_custom_objects`      | [Read custom object information](https://docs.commercetools.com/api/projects/custom-objects#get-customobject-by-container-and-key) |
+| `create_custom_objects`    | [Create custom object](https://docs.commercetools.com/api/projects/custom-objects#create-or-update-customobject)                   |
+| `update_custom_objects`    | [Update custom object information](https://docs.commercetools.com/api/projects/custom-objects#create-or-update-customobject)       |
+| `read_types`               | [Read type information](https://docs.commercetools.com/api/projects/types#get-type-by-id)                                          |
+| `create_types`             | [Create type](https://docs.commercetools.com/api/projects/types#create-type)                                                       |
+| `update_types`             | [Update type information](https://docs.commercetools.com/api/projects/types#update-type)                                           |
 
 To view information on how to develop the MCP server, see [this README](/modelcontextprotocol/README.md).
 
@@ -316,8 +326,8 @@ import { CommercetoolsCommerceAgent } from "@commercetools/commerce-agent/langch
 const commercetoolsCommerceAgent = await CommercetoolsCommerceAgent.create({
   authConfig: {
     type: 'client_credentials',
-    clientId: process.env.CLIENT_ID!,,
-    clientSecret: process.env.CLIENT_SECRET!,,
+    clientId: process.env.CLIENT_ID!,
+    clientSecret: process.env.CLIENT_SECRET!,
     projectKey: process.env.PROJECT_KEY!,
     authUrl: process.env.AUTH_URL!,
     apiUrl: process.env.API_URL!,
@@ -397,8 +407,8 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 const server = await CommercetoolsCommerceAgent.create({
   authConfig: {
     type: 'client_credentials',
-    clientId: process.env.CLIENT_ID!,,
-    clientSecret: process.env.CLIENT_SECRET!,,
+    clientId: process.env.CLIENT_ID!,
+    clientSecret: process.env.CLIENT_SECRET!,
     projectKey: process.env.PROJECT_KEY!,
     authUrl: process.env.AUTH_URL!,
     apiUrl: process.env.API_URL!,
