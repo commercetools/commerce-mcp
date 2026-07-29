@@ -1,4 +1,4 @@
-import {listAllToolMethods} from '../shared/core-bridge';
+import {listAllToolMethods} from '../shared/bridge';
 
 /**
  * Canonical list of selectable tool method names for the MCP CLI `--tools`

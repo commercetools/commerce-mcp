@@ -1,5 +1,5 @@
 import {Context} from '../../types/configuration';
-import {buildBulkTools} from '../core-bridge';
+import {buildBulkTools} from '../bridge';
 
 /**
  * Bulk tools are registered separately by the MCP adapter (they are not part of

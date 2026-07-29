@@ -30,7 +30,7 @@ import {
   deriveCheckoutUrl,
   mergeContextIntoParams,
   resolveMethod,
-} from './core-bridge';
+} from './bridge';
 import type {BaseResourceHandler} from '@commercetools/tools-core';
 import {contextToResourceBasedToolSystemFunctionMapping} from './resource-based-tools-system/functions';
 

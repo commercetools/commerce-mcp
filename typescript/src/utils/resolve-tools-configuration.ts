@@ -1,7 +1,7 @@
 import type {Configuration} from '../types/configuration';
 import type {AvailableNamespaces} from '../types/tools';
 import {ACCEPTED_TOOLS} from './accepted-tools';
-import {resolveMethodToAction} from '../shared/core-bridge';
+import {resolveMethodToAction} from '../shared/bridge';
 
 export type ToolResolutionMode = 'explicit' | 'read_all' | 'all_expand';
 

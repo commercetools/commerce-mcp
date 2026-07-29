@@ -4,13 +4,13 @@ import {
   resolveMethod,
   buildCoreConfiguration,
   deriveCheckoutUrl,
-} from '../core-bridge';
+} from '../bridge';
 import {isToolAllowed} from '../configuration';
 import type {AuthConfig} from '../../types/auth';
 
 const methods = (tools: {method: string}[]) => tools.map((t) => t.method);
 
-describe('core-bridge tool building', () => {
+describe('bridge tool building', () => {
   it('produces plural, namespace-based tool methods with a zod parameters schema', () => {
     const tools = contextToTools({isAdmin: true});
     const customerRead = tools.find((t) => t.method === 'read_customers');
@@ -99,7 +99,7 @@ describe('core-bridge tool building', () => {
   });
 });
 
-describe('core-bridge execution mapping', () => {
+describe('bridge execution mapping', () => {
   it('resolveMethod maps exposed methods to a def + op and rejects others', () => {
     expect(resolveMethod('read_customers')).toMatchObject({
       op: 'read',

@@ -1,5 +1,5 @@
 import {Context} from '../types/configuration';
-import {buildResourceTools} from './core-bridge';
+import {buildResourceTools} from './bridge';
 
 /**
  * Per-resource tool map for the given context, produced from the
