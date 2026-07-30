@@ -132,7 +132,7 @@ describe('bridge execution mapping', () => {
       typeId: 'customer',
       id: 'cust-9',
     });
-    expect(selfService.metadata?.associate).toBeUndefined();
+    expect(selfService.metadata?.businessUnit).toBeUndefined();
     expect(selfService.metadata?.apiUrl).toBe(authConfig.apiUrl as unknown);
     expect(selfService.metadata?.checkoutApiUrl).toBe(
       'https://checkout.europe-west1.gcp.commercetools.com'
@@ -142,9 +142,8 @@ describe('bridge execution mapping', () => {
       customerId: 'cust-9',
       businessUnitKey: 'bu-1',
     });
-    expect(b2b.metadata?.associate).toEqual({
-      typeId: 'customer',
-      id: 'cust-9',
+    expect(b2b.metadata?.businessUnit).toEqual({
+      typeId: 'business-unit',
       key: 'bu-1',
     });
   });

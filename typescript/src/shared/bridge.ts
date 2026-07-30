@@ -548,7 +548,7 @@ export function listAllToolMethods(): string[] {
 /**
  * Builds the core Configuration from commerce-mcp auth + context. Scoping hooks:
  * - `metadata.customer` ← context.customerId (self-service / associate identity)
- * - `metadata.associate.key` ← context.businessUnitKey (B2B associate context)
+ * - `metadata.businessUnit.key` ← context.businessUnitKey (B2B associate context)
  */
 export function buildCoreConfiguration(
   authConfig: AuthConfig,
@@ -568,9 +568,8 @@ export function buildCoreConfiguration(
         customer: {typeId: 'customer' as const, id: context.customerId},
       }),
       ...(context?.businessUnitKey && {
-        associate: {
-          typeId: 'customer' as const,
-          id: context.customerId ?? '',
+        businessUnit: {
+          typeId: 'business-unit' as const,
           key: context.businessUnitKey,
         },
       }),
