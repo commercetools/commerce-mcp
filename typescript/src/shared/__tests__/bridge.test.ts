@@ -43,14 +43,26 @@ describe('bridge tool building', () => {
     ]);
   });
 
-  it('customerId context restricts customer-owned resources to reads', () => {
+  it('customerId context scopes customer-owned resources (create/update are ownership-scoped in core)', () => {
     const resources = contextToResourceTools({customerId: 'cust-1'});
 
-    expect(methods(resources.customer)).toEqual(['read_customers']);
-    expect(methods(resources.order)).toEqual(['read_orders']);
-    expect(methods(resources['recurring-orders'])).toEqual([
-      'read_recurring_orders',
+    // customers: own profile read + update, but no create (rejected in core).
+    expect(methods(resources.customer).sort()).toEqual([
+      'read_customers',
+      'update_customers',
     ]);
+    // orders / recurring-orders: full read/create/update (all scoped in core).
+    expect(methods(resources.order).sort()).toEqual([
+      'create_orders',
+      'read_orders',
+      'update_orders',
+    ]);
+    expect(methods(resources['recurring-orders']).sort()).toEqual([
+      'create_recurring_orders',
+      'read_recurring_orders',
+      'update_recurring_orders',
+    ]);
+    // quotes / quote-requests: read + update only (create not self-scoped).
     expect(methods(resources.quote).sort()).toEqual([
       'read_quotes',
       'update_quotes',

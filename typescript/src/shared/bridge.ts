@@ -132,7 +132,9 @@ const RESOURCE_DEFS: ResourceDef[] = [
     baseOps: RCU,
     overrides: {
       associate: ['read'],
-      customer: ['read'],
+      // Self-service: a customer may read + update their own profile, but not
+      // create customers (core rejects create in self-service context).
+      customer: ['read', 'update'],
       store: ['read', 'create'],
     },
   },
@@ -153,7 +155,8 @@ const RESOURCE_DEFS: ResourceDef[] = [
     coreNamespace: 'orders',
     Handler: OrdersHandler,
     baseOps: RCU,
-    overrides: {customer: ['read']},
+    // Self-service create/update are ownership-scoped in core, so the customer
+    // branch uses the base read/create/update set.
   },
   {
     nsKey: 'inventory',
@@ -277,7 +280,8 @@ const RESOURCE_DEFS: ResourceDef[] = [
     coreNamespace: 'recurring-orders',
     Handler: RecurringOrdersHandler,
     baseOps: RCU,
-    overrides: {customer: ['read']},
+    // Self-service create/update are ownership-scoped in core, so the customer
+    // branch uses the base read/create/update set.
   },
   {
     nsKey: 'shopping-lists',
