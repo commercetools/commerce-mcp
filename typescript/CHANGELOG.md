@@ -1,5 +1,18 @@
 # @commercetools/commerce-agent
 
+## 3.1.0
+
+### Minor Changes
+
+- [#42](https://github.com/commercetools/commerce-mcp/pull/42) [`14c35c9`](https://github.com/commercetools/commerce-mcp/commit/14c35c971e4197d69d0a73bc22af884518fb5abf) Thanks [@behnamt](https://github.com/behnamt)! - Add missing tools
+  - approval-flow
+  - approval-rule
+  - associate-role
+  - order-edit
+  - product-selection-assignment
+  - recurrence-policy
+  - state
+
 ## 3.0.0
 
 ### Major Changes
