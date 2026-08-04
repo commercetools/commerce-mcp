@@ -15,8 +15,8 @@ describe('Quote Functions Context Routing', () => {
       const result = contextToQuoteFunctionMapping(context);
 
       expect(result).toEqual({
-        read_quote: associate.readQuote,
-        update_quote: associate.updateQuote,
+        read_quotes: associate.readQuote,
+        update_quotes: associate.updateQuote,
       });
     });
 
@@ -28,8 +28,8 @@ describe('Quote Functions Context Routing', () => {
       const result = contextToQuoteFunctionMapping(context);
 
       expect(result).toEqual({
-        read_quote: customer.readQuote,
-        update_quote: customer.updateQuote,
+        read_quotes: customer.readQuote,
+        update_quotes: customer.updateQuote,
       });
     });
 
@@ -41,9 +41,9 @@ describe('Quote Functions Context Routing', () => {
       const result = contextToQuoteFunctionMapping(context);
 
       expect(result).toEqual({
-        read_quote: store.readQuote,
-        create_quote: store.createQuote,
-        update_quote: store.updateQuote,
+        read_quotes: store.readQuote,
+        create_quotes: store.createQuote,
+        update_quotes: store.updateQuote,
       });
     });
 
@@ -55,9 +55,9 @@ describe('Quote Functions Context Routing', () => {
       const result = contextToQuoteFunctionMapping(context);
 
       expect(result).toEqual({
-        read_quote: admin.readQuote,
-        create_quote: admin.createQuote,
-        update_quote: admin.updateQuote,
+        read_quotes: admin.readQuote,
+        create_quotes: admin.createQuote,
+        update_quotes: admin.updateQuote,
       });
     });
 
@@ -86,8 +86,8 @@ describe('Quote Functions Context Routing', () => {
       const result = contextToQuoteFunctionMapping(context);
 
       expect(result).toEqual({
-        read_quote: associate.readQuote,
-        update_quote: associate.updateQuote,
+        read_quotes: associate.readQuote,
+        update_quotes: associate.updateQuote,
       });
     });
   });

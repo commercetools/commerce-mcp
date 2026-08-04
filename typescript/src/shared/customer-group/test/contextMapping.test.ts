@@ -7,9 +7,9 @@ describe('Customer Group Context Mapping', () => {
     const mapping = contextToCustomerGroupFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_customer_group: admin.readCustomerGroup,
-      create_customer_group: admin.createCustomerGroup,
-      update_customer_group: admin.updateCustomerGroup,
+      read_customer_groups: admin.readCustomerGroup,
+      create_customer_groups: admin.createCustomerGroup,
+      update_customer_groups: admin.updateCustomerGroup,
     });
   });
 

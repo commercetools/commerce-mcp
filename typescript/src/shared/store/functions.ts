@@ -8,6 +8,9 @@ import {
   createStoreParameters,
   updateStoreParameters,
 } from './parameters';
+import {StoresHandler} from '@commercetools/tools-core';
+
+const handler = new StoresHandler();
 
 export const contextToStoreFunctionMapping = (
   context?: Context
@@ -21,15 +24,15 @@ export const contextToStoreFunctionMapping = (
 > => {
   if (context?.storeKey) {
     return {
-      read_store: store.readStore,
-      update_store: store.updateStore,
+      [handler.getToolDefinition('read').name]: store.readStore,
+      [handler.getToolDefinition('update').name]: store.updateStore,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_store: admin.readStore,
-      create_store: admin.createStore,
-      update_store: admin.updateStore,
+      [handler.getToolDefinition('read').name]: admin.readStore,
+      [handler.getToolDefinition('create').name]: admin.createStore,
+      [handler.getToolDefinition('update').name]: admin.updateStore,
     };
   }
   return {};

@@ -4,34 +4,44 @@ import {CommercetoolsFuncContext, Context} from '../../types/configuration';
 import {ApiRoot} from '@commercetools/platform-sdk';
 import {z} from 'zod';
 import {
+  BusinessUnitsHandler,
+  IApiClientFactory,
+} from '@commercetools/tools-core';
+import {
   readBusinessUnitParameters,
   createBusinessUnitParameters,
   updateBusinessUnitParameters,
 } from './parameters';
 
+let handler;
+
 // Context mapping function for business unit functions
 export const contextToBusinessUnitFunctionMapping = (
-  context?: Context
+  context?: Context,
+  clientFactory?: IApiClientFactory
 ): Record<
   string,
   (
     apiRoot: ApiRoot,
     context: CommercetoolsFuncContext,
-    params: any
+    params: any,
+    getApiRoot?: any,
+    clientFactory?: IApiClientFactory
   ) => Promise<any>
 > => {
+  handler = new BusinessUnitsHandler(clientFactory);
   if (context?.storeKey) {
     return {
-      read_business_unit: store.readBusinessUnit,
-      create_business_unit: store.createBusinessUnit,
-      update_business_unit: store.updateBusinessUnit,
+      [handler.getToolDefinition('read').name]: store.readBusinessUnit,
+      [handler.getToolDefinition('create').name]: store.createBusinessUnit,
+      [handler.getToolDefinition('update').name]: store.updateBusinessUnit,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_business_unit: admin.readBusinessUnit,
-      create_business_unit: admin.createBusinessUnit,
-      update_business_unit: admin.updateBusinessUnit,
+      [handler.getToolDefinition('read').name]: admin.readBusinessUnit,
+      [handler.getToolDefinition('create').name]: admin.createBusinessUnit,
+      [handler.getToolDefinition('update').name]: admin.updateBusinessUnit,
     };
   }
   return {};

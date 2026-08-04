@@ -6,7 +6,7 @@ describe('tools', () => {
     // Find search_products tool in the combined tools array
     const tools = contextToTools({isAdmin: true});
     const searchProductsTool = tools.find(
-      (tool) => tool.method === 'search_products'
+      (tool) => tool.method === 'read_product_search'
     );
 
     const productSearchTools = contextToProductSearchTools({isAdmin: true});
@@ -18,11 +18,11 @@ describe('tools', () => {
   it('should have correct structure for search_products tool', () => {
     const tools = contextToTools({isAdmin: true});
     const searchProductsTool = tools.find(
-      (tool) => tool.method === 'search_products'
+      (tool) => tool.method === 'read_product_search'
     );
 
     expect(searchProductsTool).toMatchObject({
-      method: 'search_products',
+      method: 'read_product_search',
       name: 'Search Products',
       actions: {
         'product-search': {

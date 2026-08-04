@@ -11,9 +11,9 @@ describe('Shopping List Functions', () => {
 
       const mapping = contextToShoppingListFunctionMapping(context);
 
-      expect(mapping).toHaveProperty('read_shopping_list');
-      expect(mapping).toHaveProperty('create_shopping_list');
-      expect(mapping).toHaveProperty('update_shopping_list');
+      expect(mapping).toHaveProperty('read_shopping_lists');
+      expect(mapping).toHaveProperty('create_shopping_lists');
+      expect(mapping).toHaveProperty('update_shopping_lists');
       expect(Object.keys(mapping)).toHaveLength(3);
     });
 
@@ -25,9 +25,9 @@ describe('Shopping List Functions', () => {
 
       const mapping = contextToShoppingListFunctionMapping(context);
 
-      expect(mapping).toHaveProperty('read_shopping_list');
-      expect(mapping).toHaveProperty('create_shopping_list');
-      expect(mapping).toHaveProperty('update_shopping_list');
+      expect(mapping).toHaveProperty('read_shopping_lists');
+      expect(mapping).toHaveProperty('create_shopping_lists');
+      expect(mapping).toHaveProperty('update_shopping_lists');
       expect(Object.keys(mapping)).toHaveLength(3);
     });
 
@@ -38,9 +38,9 @@ describe('Shopping List Functions', () => {
 
       const mapping = contextToShoppingListFunctionMapping(context);
 
-      expect(mapping).toHaveProperty('read_shopping_list');
-      expect(mapping).toHaveProperty('create_shopping_list');
-      expect(mapping).toHaveProperty('update_shopping_list');
+      expect(mapping).toHaveProperty('read_shopping_lists');
+      expect(mapping).toHaveProperty('create_shopping_lists');
+      expect(mapping).toHaveProperty('update_shopping_lists');
       expect(Object.keys(mapping)).toHaveLength(3);
     });
 
@@ -67,9 +67,9 @@ describe('Shopping List Functions', () => {
 
       const mapping = contextToShoppingListFunctionMapping(context);
 
-      expect(mapping).toHaveProperty('read_shopping_list');
-      expect(mapping).toHaveProperty('create_shopping_list');
-      expect(mapping).toHaveProperty('update_shopping_list');
+      expect(mapping).toHaveProperty('read_shopping_lists');
+      expect(mapping).toHaveProperty('create_shopping_lists');
+      expect(mapping).toHaveProperty('update_shopping_lists');
       expect(Object.keys(mapping)).toHaveLength(3);
     });
 
@@ -81,9 +81,9 @@ describe('Shopping List Functions', () => {
 
       const mapping = contextToShoppingListFunctionMapping(context);
 
-      expect(mapping).toHaveProperty('read_shopping_list');
-      expect(mapping).toHaveProperty('create_shopping_list');
-      expect(mapping).toHaveProperty('update_shopping_list');
+      expect(mapping).toHaveProperty('read_shopping_lists');
+      expect(mapping).toHaveProperty('create_shopping_lists');
+      expect(mapping).toHaveProperty('update_shopping_lists');
       expect(Object.keys(mapping)).toHaveLength(3);
     });
   });

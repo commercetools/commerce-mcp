@@ -22,9 +22,9 @@ describe('Extension Functions', () => {
       const mapping = contextToExtensionFunctionMapping(context);
 
       expect(mapping).toEqual({
-        read_extension: admin.readExtension,
-        create_extension: admin.createExtension,
-        update_extension: admin.updateExtension,
+        read_extensions: admin.readExtension,
+        create_extensions: admin.createExtension,
+        update_extensions: admin.updateExtension,
       });
     });
 

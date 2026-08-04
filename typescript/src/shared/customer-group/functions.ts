@@ -2,9 +2,12 @@ import {ApiRoot} from '@commercetools/platform-sdk';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
 import {CustomerGroupUpdateAction} from './base.functions';
+import {CustomerGroupsHandler} from '@commercetools/tools-core';
 
 // Re-export the CustomerGroupUpdateAction type for use in tests
 export type {CustomerGroupUpdateAction};
+
+const handler = new CustomerGroupsHandler();
 
 export const contextToCustomerGroupFunctionMapping = (
   context?: Context
@@ -18,9 +21,9 @@ export const contextToCustomerGroupFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_customer_group: admin.readCustomerGroup,
-      create_customer_group: admin.createCustomerGroup,
-      update_customer_group: admin.updateCustomerGroup,
+      [handler.getToolDefinition('read').name]: admin.readCustomerGroup,
+      [handler.getToolDefinition('create').name]: admin.createCustomerGroup,
+      [handler.getToolDefinition('update').name]: admin.updateCustomerGroup,
     };
   }
 

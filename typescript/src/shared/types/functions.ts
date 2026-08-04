@@ -7,6 +7,9 @@ import {
 } from './parameters';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {TypesHandler} from '@commercetools/tools-core';
+
+const handler = new TypesHandler();
 
 export const contextToTypeFunctionMapping = (
   context?: Context
@@ -20,9 +23,9 @@ export const contextToTypeFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_type: admin.readType,
-      create_type: admin.createType,
-      update_type: admin.updateType,
+      [handler.getToolDefinition('read').name]: admin.readType,
+      [handler.getToolDefinition('create').name]: admin.createType,
+      [handler.getToolDefinition('update').name]: admin.updateType,
     };
   }
 

@@ -19,18 +19,21 @@ import {
   Introspect,
 } from '../types/auth';
 import pkg from '../../package.json';
+import {IApiClientFactory} from '@commercetools/tools-core';
+import {CommerceClientFactory} from '../utils/commerce-client-factory';
 
 class CommercetoolsAPI {
   private client: Client | undefined;
   private authConfig: AuthConfig;
   private context: Context;
   public apiRoot: ApiRoot;
+  private apiClientFactory: IApiClientFactory;
 
   constructor(authConfig: AuthConfig, context?: Context) {
     this.context = context!;
     this.authConfig = authConfig;
     this.client = this.createClient();
-
+    this.apiClientFactory = new CommerceClientFactory(this.client);
     if (!this.client) {
       throw new Error('Failed to create client');
     }

@@ -81,7 +81,8 @@
     "pluralize": "^8.0.0",
     "qs": "^6.14.2",
     "zod": "^3.24.2",
-    "zod-to-json-schema": "^3.24.3"
+    "zod-to-json-schema": "^3.24.3",
+    "@commercetools/tools-core": "^0.2.3"
   },
   "peerDependencies": {
     "@langchain/core": "^0.3.6",

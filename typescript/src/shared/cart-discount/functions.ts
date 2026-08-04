@@ -8,6 +8,9 @@ import {
   updateCartDiscountParameters,
 } from './parameters';
 import * as store from './store.functions';
+import {CartDiscountsHandler} from '@commercetools/tools-core';
+
+const handler = new CartDiscountsHandler();
 
 // Context mapping function for cart-discount functions
 export const contextToCartDiscountFunctionMapping = (
@@ -22,16 +25,16 @@ export const contextToCartDiscountFunctionMapping = (
 > => {
   if (context?.storeKey) {
     return {
-      read_cart_discount: store.readCartDiscount,
-      create_cart_discount: store.createCartDiscount,
-      update_cart_discount: store.updateCartDiscount,
+      [handler.getToolDefinition('read').name]: store.readCartDiscount,
+      [handler.getToolDefinition('create').name]: store.createCartDiscount,
+      [handler.getToolDefinition('update').name]: store.updateCartDiscount,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_cart_discount: admin.readCartDiscount,
-      create_cart_discount: admin.createCartDiscount,
-      update_cart_discount: admin.updateCartDiscount,
+      [handler.getToolDefinition('read').name]: admin.readCartDiscount,
+      [handler.getToolDefinition('create').name]: admin.createCartDiscount,
+      [handler.getToolDefinition('update').name]: admin.updateCartDiscount,
     };
   }
   return {};

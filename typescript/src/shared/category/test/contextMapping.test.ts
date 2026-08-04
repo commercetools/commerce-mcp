@@ -8,7 +8,7 @@ describe('Category Context Mapping', () => {
     const mapping = contextToCategoryFunctionMapping();
 
     expect(mapping).toEqual({
-      read_category: customer.readCategory,
+      read_categories: customer.readCategory,
     });
   });
 
@@ -19,9 +19,9 @@ describe('Category Context Mapping', () => {
     const mapping = contextToCategoryFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_category: admin.readCategory,
-      create_category: admin.createCategory,
-      update_category: admin.updateCategory,
+      read_categories: admin.readCategory,
+      create_categories: admin.createCategory,
+      update_categories: admin.updateCategory,
     });
   });
 
@@ -32,12 +32,12 @@ describe('Category Context Mapping', () => {
     const mapping = contextToCategoryFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_category: customer.readCategory,
+      read_categories: customer.readCategory,
     });
 
     // Ensure update and create are not included
-    expect(mapping).not.toHaveProperty('create_category');
-    expect(mapping).not.toHaveProperty('update_category');
+    expect(mapping).not.toHaveProperty('create_categories');
+    expect(mapping).not.toHaveProperty('update_categories');
   });
 
   it('should prioritize customer context even if isAdmin is true', () => {
@@ -48,7 +48,7 @@ describe('Category Context Mapping', () => {
     const mapping = contextToCategoryFunctionMapping(context);
 
     expect(mapping).toEqual({
-      read_category: customer.readCategory,
+      read_categories: customer.readCategory,
     });
   });
 });

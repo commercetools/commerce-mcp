@@ -11,9 +11,9 @@ describe('contextToProductSelectionFunctionMapping', () => {
     const result = contextToProductSelectionFunctionMapping(context);
 
     expect(result).toEqual({
-      read_product_selection: admin.readProductSelection,
-      create_product_selection: admin.createProductSelection,
-      update_product_selection: admin.updateProductSelection,
+      read_product_selections: admin.readProductSelection,
+      create_product_selections: admin.createProductSelection,
+      update_product_selections: admin.updateProductSelection,
     });
   });
 

@@ -7,6 +7,9 @@ import {
 } from './parameters';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {ReviewsHandler} from '@commercetools/tools-core';
+
+const handler = new ReviewsHandler();
 
 export const contextToReviewFunctionMapping = (
   context?: Context
@@ -20,9 +23,9 @@ export const contextToReviewFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_review: admin.readReview,
-      create_review: admin.createReview,
-      update_review: admin.updateReview,
+      [handler.getToolDefinition('read').name]: admin.readReview,
+      [handler.getToolDefinition('create').name]: admin.createReview,
+      [handler.getToolDefinition('update').name]: admin.updateReview,
     };
   }
 

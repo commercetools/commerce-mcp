@@ -1,22 +1,17 @@
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
-import {
-  readPaymentMethodParameters,
-  createPaymentMethodParameters,
-  updatePaymentMethodParameters,
-} from './parameters';
-import {
-  readPaymentMethodPrompt,
-  createPaymentMethodPrompt,
-  updatePaymentMethodPrompt,
-} from './prompts';
+import {PaymentMethodsHandler} from '@commercetools/tools-core';
+
+const handler = new PaymentMethodsHandler();
 
 const tools: Record<string, Tool> = {
   read_payment_methods: {
-    method: 'read_payment_methods',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Payment Method',
-    description: readPaymentMethodPrompt,
-    parameters: readPaymentMethodParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'payment-methods': {
         read: true,
@@ -24,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_payment_methods: {
-    method: 'create_payment_methods',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Payment Method',
-    description: createPaymentMethodPrompt,
-    parameters: createPaymentMethodParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'payment-methods': {
         create: true,
@@ -35,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_payment_methods: {
-    method: 'update_payment_methods',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Payment Method',
-    description: updatePaymentMethodPrompt,
-    parameters: updatePaymentMethodParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'payment-methods': {
         update: true,

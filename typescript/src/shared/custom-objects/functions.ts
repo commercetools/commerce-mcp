@@ -7,6 +7,9 @@ import {
 } from './parameters';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {CustomObjectsHandler} from '@commercetools/tools-core';
+
+const handler = new CustomObjectsHandler();
 
 export const contextToCustomObjectFunctionMapping = (
   context?: Context
@@ -20,9 +23,9 @@ export const contextToCustomObjectFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_custom_object: admin.readCustomObject,
-      create_custom_object: admin.createCustomObject,
-      update_custom_object: admin.updateCustomObject,
+      [handler.getToolDefinition('read').name]: admin.readCustomObject,
+      [handler.getToolDefinition('create').name]: admin.createCustomObject,
+      [handler.getToolDefinition('update').name]: admin.updateCustomObject,
     };
   }
 

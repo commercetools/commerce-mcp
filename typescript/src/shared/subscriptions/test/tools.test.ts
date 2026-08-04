@@ -8,9 +8,9 @@ describe('Subscription Tools', () => {
       const tools = contextToSubscriptionTools(context);
 
       expect(tools).toHaveLength(3);
-      expect(tools[0]).toHaveProperty('method', 'read_subscription');
-      expect(tools[1]).toHaveProperty('method', 'create_subscription');
-      expect(tools[2]).toHaveProperty('method', 'update_subscription');
+      expect(tools[0]).toHaveProperty('method', 'read_subscriptions');
+      expect(tools[1]).toHaveProperty('method', 'create_subscriptions');
+      expect(tools[2]).toHaveProperty('method', 'update_subscriptions');
     });
 
     it('should return subscription tools when no context is provided', () => {
@@ -35,7 +35,7 @@ describe('Subscription Tools', () => {
       // Check read tool
       const readTool = tools[0];
       expect(readTool).toHaveProperty('name', 'Read Subscription');
-      expect(readTool).toHaveProperty('method', 'read_subscription');
+      expect(readTool).toHaveProperty('method', 'read_subscriptions');
       expect(readTool).toHaveProperty('parameters');
       expect(readTool).toHaveProperty('description');
       expect(readTool).toHaveProperty('actions');
@@ -45,7 +45,7 @@ describe('Subscription Tools', () => {
       // Check create tool
       const createTool = tools[1];
       expect(createTool).toHaveProperty('name', 'Create Subscription');
-      expect(createTool).toHaveProperty('method', 'create_subscription');
+      expect(createTool).toHaveProperty('method', 'create_subscriptions');
       expect(createTool).toHaveProperty('parameters');
       expect(createTool).toHaveProperty('description');
       expect(createTool).toHaveProperty('actions');
@@ -55,7 +55,7 @@ describe('Subscription Tools', () => {
       // Check update tool
       const updateTool = tools[2];
       expect(updateTool).toHaveProperty('name', 'Update Subscription');
-      expect(updateTool).toHaveProperty('method', 'update_subscription');
+      expect(updateTool).toHaveProperty('method', 'update_subscriptions');
       expect(updateTool).toHaveProperty('parameters');
       expect(updateTool).toHaveProperty('description');
       expect(updateTool).toHaveProperty('actions');

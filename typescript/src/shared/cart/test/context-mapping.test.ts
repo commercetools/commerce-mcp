@@ -78,19 +78,19 @@ describe('Cart Function Context Mapping', () => {
         customerId: 'customer-1',
       });
 
-      expect(functionMap.read_cart).toBe(customer.readCart);
-      expect(functionMap.create_cart).toBe(customer.createCart);
-      expect(functionMap.update_cart).toBe(customer.updateCart);
-      expect(functionMap.replicate_cart).toBe(customer.replicateCart);
+      expect(functionMap.read_carts).toBe(customer.readCart);
+      expect(functionMap.create_carts).toBe(customer.createCart);
+      expect(functionMap.update_carts).toBe(customer.updateCart);
+      expect(functionMap.replicate_carts).toBe(customer.replicateCart);
     });
 
     it('returns store functions when storeKey is provided', () => {
       const functionMap = contextToCartFunctionMapping({storeKey: 'store-1'});
 
-      expect(functionMap.read_cart).toBe(store.readCart);
-      expect(functionMap.create_cart).toBe(store.createCart);
-      expect(functionMap.update_cart).toBe(store.updateCart);
-      expect(functionMap.replicate_cart).toBe(store.replicateCart);
+      expect(functionMap.read_carts).toBe(store.readCart);
+      expect(functionMap.create_carts).toBe(store.createCart);
+      expect(functionMap.update_carts).toBe(store.updateCart);
+      expect(functionMap.replicate_carts).toBe(store.replicateCart);
     });
 
     it('returns admin functions when neither customerId nor storeKey is provided', () => {
@@ -105,10 +105,10 @@ describe('Cart Function Context Mapping', () => {
         storeKey: 'store-1',
       });
 
-      expect(functionMap.read_cart).toBe(customer.readCart);
-      expect(functionMap.create_cart).toBe(customer.createCart);
-      expect(functionMap.update_cart).toBe(customer.updateCart);
-      expect(functionMap.replicate_cart).toBe(customer.replicateCart);
+      expect(functionMap.read_carts).toBe(customer.readCart);
+      expect(functionMap.create_carts).toBe(customer.createCart);
+      expect(functionMap.update_carts).toBe(customer.updateCart);
+      expect(functionMap.replicate_carts).toBe(customer.replicateCart);
     });
   });
 

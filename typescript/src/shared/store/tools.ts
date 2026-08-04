@@ -1,25 +1,17 @@
-import {readStorePrompt, createStorePrompt, updateStorePrompt} from './prompts';
-
-import {
-  readStoreParameters,
-  createStoreParameters,
-  updateStoreParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
 import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {StoresHandler} from '@commercetools/tools-core';
+
+const handler = new StoresHandler();
 
 const tools: Record<string, Tool> = {
   read_store: {
-    method: 'read_store',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Store',
-    description: readStorePrompt,
-    parameters: readStoreParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       store: {
         read: true,
@@ -27,15 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_store: {
-    method: 'create_store',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Store',
-    description: createStorePrompt,
-    parameters: createStoreParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       store: {
         create: true,
@@ -43,15 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_store: {
-    method: 'update_store',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Store',
-    description: updateStorePrompt,
-    parameters: updateStoreParameters as unknown as z.ZodObject<
-      any,
-      any,
-      any,
-      any
-    >,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       store: {
         update: true,

@@ -1,20 +1,17 @@
 import {z} from 'zod';
-import {
-  CREATE_BULK_DESCRIPTION,
-  CREATE_BULK_PROMPT,
-  UPDATE_BULK_DESCRIPTION,
-  UPDATE_BULK_PROMPT,
-} from './prompts';
-import {bulkCreateParameters, bulkUpdateParameters} from './parameters';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {BulkHandler} from '@commercetools/tools-core';
+
+const handler = new BulkHandler();
 
 const tools: Record<string, Tool> = {
   bulk_create: {
-    method: 'bulk_create',
+    method: handler.getToolDefinition('create').name,
     name: 'Bulk Create',
-    description: CREATE_BULK_DESCRIPTION,
-    parameters: bulkCreateParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       bulk: {
         create: true,
@@ -22,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   bulk_update: {
-    method: 'bulk_update',
+    method: handler.getToolDefinition('update').name,
     name: 'Bulk Update',
-    description: UPDATE_BULK_DESCRIPTION,
-    parameters: bulkUpdateParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       bulk: {
         update: true,

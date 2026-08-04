@@ -1,22 +1,17 @@
-import {
-  createShippingMethodParameters,
-  readShippingMethodParameters,
-  updateShippingMethodParameters,
-} from './parameters';
-import {
-  readShippingMethodPrompt,
-  createShippingMethodPrompt,
-  updateShippingMethodPrompt,
-} from './prompts';
+import {z} from 'zod';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {ShippingMethodsHandler} from '@commercetools/tools-core';
+
+const handler = new ShippingMethodsHandler();
 
 const tools: Record<string, Tool> = {
   read_shipping_methods: {
     name: 'Read Shipping Method',
-    method: 'read_shipping_methods',
-    description: readShippingMethodPrompt,
-    parameters: readShippingMethodParameters,
+    method: handler.getToolDefinition('read').name,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'shipping-methods': {
         read: true,
@@ -25,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_shipping_methods: {
     name: 'Create Shipping Method',
-    method: 'create_shipping_methods',
-    description: createShippingMethodPrompt,
-    parameters: createShippingMethodParameters,
+    method: handler.getToolDefinition('create').name,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'shipping-methods': {
         create: true,
@@ -36,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_shipping_methods: {
     name: 'Update Shipping Method',
-    method: 'update_shipping_methods',
-    description: updateShippingMethodPrompt,
-    parameters: updateShippingMethodParameters,
+    method: handler.getToolDefinition('update').name,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'shipping-methods': {
         update: true,

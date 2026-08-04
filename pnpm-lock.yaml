@@ -175,6 +175,9 @@ importers:
       '@commercetools/platform-sdk':
         specifier: ^8.13.0
         version: 8.14.0
+      '@commercetools/tools-core':
+        specifier: ^0.2.3
+        version: 0.2.3
       '@commercetools/ts-client':
         specifier: ^4.2.0
         version: 4.2.0
@@ -683,8 +686,24 @@ packages:
     resolution: {integrity: sha512-sJ2vL001cFfpzqvK6jifMNnYcDpiq76y1znp6ufDuteYqIP8GvGeRaPf3bDyZiHU6AieKmi0W09UBApzerzrDQ==}
     engines: {node: '>=18'}
 
+  '@commercetools/checkout-sdk@1.9.0':
+    resolution: {integrity: sha512-oN3q6iAJAtWlhfa3hfe4/4GNAp5+daJFU7UNjBwAkG6w1U4XWIWPd6RVxYhb1DlFfsG7aJgTPmI3Afh9r7mnUQ==}
+    engines: {node: '>=18'}
+
   '@commercetools/platform-sdk@8.14.0':
     resolution: {integrity: sha512-nlUVjtNNfBJEGsvHa2yqfXuF0+3j6hJcdKGlZ9smKCFOjIk0gSKwFjUvQYEovxfXpIiX1n5J3L2Fpl6DmC2NxA==}
+    engines: {node: '>=18'}
+
+  '@commercetools/platform-sdk@8.27.0':
+    resolution: {integrity: sha512-yjFrBnUo+WKuAuKueRwv6xha6mUEORxPfC78ZjF+hlX2URtsH2w8i0UowHYnvrgYY+WBEEYEb6UK412zWqU/sw==}
+    engines: {node: '>=18'}
+
+  '@commercetools/tools-core@0.2.3':
+    resolution: {integrity: sha512-X5hE4u5OiRTX3780nuIzBpwsEFxCRUh7Xps5/42KQUoo0DnqF3mUUR9JJxZ2YsU0feYf7mB+hCHGcuc2OEyHlg==}
+    engines: {node: '>=18'}
+
+  '@commercetools/ts-client@4.10.0':
+    resolution: {integrity: sha512-iFeibX+SBLgtkCUVEo83bO2LFZlSdeOqTGwpZ71dcQnfQ1IOVHAVLIG5Z60Qi+KLwWnH4Kp8vZZJU7EteNevRw==}
     engines: {node: '>=18'}
 
   '@commercetools/ts-client@4.2.0':
@@ -6046,9 +6065,28 @@ snapshots:
     dependencies:
       '@commercetools/ts-client': 4.3.0
 
+  '@commercetools/checkout-sdk@1.9.0':
+    dependencies:
+      '@commercetools/ts-client': 4.10.0
+
   '@commercetools/platform-sdk@8.14.0':
     dependencies:
       '@commercetools/ts-client': 4.2.0
+
+  '@commercetools/platform-sdk@8.27.0':
+    dependencies:
+      '@commercetools/ts-client': 4.10.0
+
+  '@commercetools/tools-core@0.2.3':
+    dependencies:
+      '@commercetools/checkout-sdk': 1.9.0
+      '@commercetools/platform-sdk': 8.27.0
+      '@commercetools/ts-client': 4.10.0
+      zod: 3.25.76
+
+  '@commercetools/ts-client@4.10.0':
+    dependencies:
+      buffer: 6.0.3
 
   '@commercetools/ts-client@4.2.0':
     dependencies:

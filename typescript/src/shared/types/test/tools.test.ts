@@ -8,7 +8,7 @@ describe('Types Tools', () => {
 
       expect(tools).toHaveLength(3);
       expect(tools[0]).toHaveProperty('name', 'Read Type');
-      expect(tools[0]).toHaveProperty('method', 'read_type');
+      expect(tools[0]).toHaveProperty('method', 'read_types');
       expect(tools[0]).toHaveProperty('actions', {
         types: {
           read: true,
@@ -16,7 +16,7 @@ describe('Types Tools', () => {
       });
 
       expect(tools[1]).toHaveProperty('name', 'Create Type');
-      expect(tools[1]).toHaveProperty('method', 'create_type');
+      expect(tools[1]).toHaveProperty('method', 'create_types');
       expect(tools[1]).toHaveProperty('actions', {
         types: {
           create: true,
@@ -24,7 +24,7 @@ describe('Types Tools', () => {
       });
 
       expect(tools[2]).toHaveProperty('name', 'Update Type');
-      expect(tools[2]).toHaveProperty('method', 'update_type');
+      expect(tools[2]).toHaveProperty('method', 'update_types');
       expect(tools[2]).toHaveProperty('actions', {
         types: {
           update: true,

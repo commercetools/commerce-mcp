@@ -20,9 +20,9 @@ describe('contextToTransactionFunctionMapping', () => {
       isAdmin: true,
     };
     const result = contextToTransactionFunctionMapping(context);
-    expect(result).toHaveProperty('read_transaction');
-    expect(result).toHaveProperty('create_transaction');
-    expect(typeof result.read_transaction).toBe('function');
-    expect(typeof result.create_transaction).toBe('function');
+    expect(result).toHaveProperty('read_transactions');
+    expect(result).toHaveProperty('create_transactions');
+    expect(typeof result.read_transactions).toBe('function');
+    expect(typeof result.create_transactions).toBe('function');
   });
 });

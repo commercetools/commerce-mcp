@@ -175,13 +175,13 @@ describe('contextToStandalonePriceFunctionMapping', () => {
     const context = {isAdmin: true};
     const functionMapping = contextToStandalonePriceFunctionMapping(context);
 
-    expect(functionMapping.read_standalone_price).toBe(
+    expect(functionMapping.read_standalone_prices).toBe(
       admin.readStandalonePrice
     );
-    expect(functionMapping.create_standalone_price).toBe(
+    expect(functionMapping.create_standalone_prices).toBe(
       admin.createStandalonePrice
     );
-    expect(functionMapping.update_standalone_price).toBe(
+    expect(functionMapping.update_standalone_prices).toBe(
       admin.updateStandalonePrice
     );
   });

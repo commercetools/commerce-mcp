@@ -11,16 +11,16 @@ describe('contextToProductFunctionMapping', () => {
     const mapping = contextToProductFunctionMapping(context);
 
     expect(mapping).toEqual({
-      list_products: admin.listProducts,
-      create_product: admin.createProduct,
-      update_product: admin.updateProduct,
+      read_products: admin.listProducts,
+      create_products: admin.createProduct,
+      update_products: admin.updateProduct,
     });
   });
 
   it('should return empty object when context is not provided', () => {
     const mapping = contextToProductFunctionMapping();
     expect(mapping).toEqual({
-      list_products: admin.listProducts,
+      read_products: admin.listProducts,
     });
   });
 
@@ -28,7 +28,7 @@ describe('contextToProductFunctionMapping', () => {
     const context: CommercetoolsFuncContext = {projectKey: 'test-project'};
     const mapping = contextToProductFunctionMapping(context);
     expect(mapping).toEqual({
-      list_products: admin.listProducts,
+      read_products: admin.listProducts,
     });
   });
 });

@@ -518,23 +518,21 @@ describe('CustomerGroup Functions', () => {
   describe('Schema Validations: tools.ts', () => {
     // Find the updateCustomerGroupParameters schema from the imported tools array
     const updateToolSchema = contextToCustomerGroupTools({isAdmin: true}).find(
-      (tool) => tool.method === 'update_customer_group'
+      (tool) => tool.method === 'update_customer_groups'
     )?.parameters;
 
     if (updateToolSchema) {
       describe('updateCustomerGroupParameters (from tools.ts)', () => {
-        it('should fail validation if neither id nor key is provided', () => {
+        // The schema is now sourced from @commercetools/tools-core, which no
+        // longer enforces id/key presence at the Zod level. That requirement
+        // is enforced at runtime instead (see admin.functions.ts), so schema
+        // validation now succeeds here.
+        it('should pass schema validation if neither id nor key is provided (enforced at runtime instead)', () => {
           const result = (updateToolSchema as z.ZodSchema<any>).safeParse({
             version: 1,
             actions: [{action: 'changeName', name: 'new name'}],
           });
-          expect(result.success).toBe(false);
-          if (!result.success) {
-            const formErrors = result.error.formErrors.fieldErrors;
-            expect(result.error.errors[0].message).toBe(
-              'Either id or key must be provided'
-            );
-          }
+          expect(result.success).toBe(true);
         });
 
         it('should pass validation if id is provided', () => {

@@ -1,23 +1,17 @@
-import {
-  readProductDiscountPrompt,
-  createProductDiscountPrompt,
-  updateProductDiscountPrompt,
-} from './prompts';
-
-import {
-  readProductDiscountParameters,
-  createProductDiscountParameters,
-  updateProductDiscountParameters,
-} from './parameters';
+import {z} from 'zod';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {ProductDiscountsHandler} from '@commercetools/tools-core';
+
+const handler = new ProductDiscountsHandler();
 
 const tools: Record<string, Tool> = {
   read_product_discount: {
-    method: 'read_product_discount',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Product Discount',
-    description: readProductDiscountPrompt,
-    parameters: readProductDiscountParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-discount': {
         read: true,
@@ -25,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_product_discount: {
-    method: 'create_product_discount',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Product Discount',
-    description: createProductDiscountPrompt,
-    parameters: createProductDiscountParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-discount': {
         create: true,
@@ -36,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_product_discount: {
-    method: 'update_product_discount',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Product Discount',
-    description: updateProductDiscountPrompt,
-    parameters: updateProductDiscountParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-discount': {
         update: true,

@@ -1,22 +1,17 @@
-import {
-  createShoppingListParameters,
-  readShoppingListParameters,
-  updateShoppingListParameters,
-} from './parameters';
-import {
-  readShoppingListPrompt,
-  createShoppingListPrompt,
-  updateShoppingListPrompt,
-} from './prompts';
+import {z} from 'zod';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {ShoppingListsHandler} from '@commercetools/tools-core';
+
+const handler = new ShoppingListsHandler();
 
 const tools: Record<string, Tool> = {
   read_shopping_list: {
     name: 'Read Shopping List',
-    method: 'read_shopping_list',
-    parameters: readShoppingListParameters,
-    description: readShoppingListPrompt,
+    method: handler.getToolDefinition('read').name,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('read').description,
     actions: {
       'shopping-lists': {
         read: true,
@@ -25,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_shopping_list: {
     name: 'Create Shopping List',
-    method: 'create_shopping_list',
-    parameters: createShoppingListParameters,
-    description: createShoppingListPrompt,
+    method: handler.getToolDefinition('create').name,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('create').description,
     actions: {
       'shopping-lists': {
         create: true,
@@ -36,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_shopping_list: {
     name: 'Update Shopping List',
-    method: 'update_shopping_list',
-    parameters: updateShoppingListParameters,
-    description: updateShoppingListPrompt,
+    method: handler.getToolDefinition('update').name,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('update').description,
     actions: {
       'shopping-lists': {
         update: true,

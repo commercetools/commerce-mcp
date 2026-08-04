@@ -1,17 +1,17 @@
-import {
-  createTransactionParameters,
-  readTransactionParameters,
-} from './parameters';
-import {readTransactionPrompt, createTransactionPrompt} from './prompts';
+import {z} from 'zod';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {TransactionsHandler} from '@commercetools/tools-core';
+
+const handler = new TransactionsHandler();
 
 const tools: Record<string, Tool> = {
   read_transaction: {
     name: 'Read Transaction',
-    method: 'read_transaction',
-    parameters: readTransactionParameters,
-    description: readTransactionPrompt,
+    method: handler.getToolDefinition('read').name,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('read').description,
     actions: {
       transactions: {
         read: true,
@@ -20,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_transaction: {
     name: 'Create Transaction',
-    method: 'create_transaction',
-    parameters: createTransactionParameters,
-    description: createTransactionPrompt,
+    method: handler.getToolDefinition('create').name,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('create').description,
     actions: {
       transactions: {
         create: true,

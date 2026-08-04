@@ -7,6 +7,9 @@ import {
 } from './parameters';
 import * as admin from './admin.functions';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
+import {ExtensionsHandler} from '@commercetools/tools-core';
+
+const handler = new ExtensionsHandler();
 
 export const contextToExtensionFunctionMapping = (
   context?: Context
@@ -20,9 +23,9 @@ export const contextToExtensionFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_extension: admin.readExtension,
-      create_extension: admin.createExtension,
-      update_extension: admin.updateExtension,
+      [handler.getToolDefinition('read').name]: admin.readExtension,
+      [handler.getToolDefinition('create').name]: admin.createExtension,
+      [handler.getToolDefinition('update').name]: admin.updateExtension,
     };
   }
 

@@ -3,6 +3,9 @@ import {z} from 'zod';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
 import * as admin from './admin.functions';
 import {searchProductsParameters} from './parameters';
+import {ProductSearchHandler} from '@commercetools/tools-core';
+
+const handler = new ProductSearchHandler();
 
 export const contextToProductSearchFunctionMapping = (
   context?: Context
@@ -16,7 +19,7 @@ export const contextToProductSearchFunctionMapping = (
 > => {
   // Product search is available to all contexts (customer, store, admin)
   return {
-    search_products: admin.searchProducts,
+    [handler.getToolDefinition('read').name]: admin.searchProducts,
   };
 };
 

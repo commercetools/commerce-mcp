@@ -1,18 +1,17 @@
-import {
-  createZoneParameters,
-  readZoneParameters,
-  updateZoneParameters,
-} from './parameters';
-import {readZonePrompt, createZonePrompt, updateZonePrompt} from './prompts';
+import {z} from 'zod';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {ZonesHandler} from '@commercetools/tools-core';
+
+const handler = new ZonesHandler();
 
 const tools: Record<string, Tool> = {
   read_zone: {
     name: 'Read Zone',
-    method: 'read_zone',
-    parameters: readZoneParameters,
-    description: readZonePrompt,
+    method: handler.getToolDefinition('read').name,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('read').description,
     actions: {
       zone: {
         read: true,
@@ -21,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_zone: {
     name: 'Create Zone',
-    method: 'create_zone',
-    parameters: createZoneParameters,
-    description: createZonePrompt,
+    method: handler.getToolDefinition('create').name,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('create').description,
     actions: {
       zone: {
         create: true,
@@ -32,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_zone: {
     name: 'Update Zone',
-    method: 'update_zone',
-    parameters: updateZoneParameters,
-    description: updateZonePrompt,
+    method: handler.getToolDefinition('update').name,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('update').description,
     actions: {
       zone: {
         update: true,

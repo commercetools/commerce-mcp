@@ -12,6 +12,9 @@ import {
 import {SDKError} from '../errors/sdkError';
 import {CommercetoolsFuncContext, Context} from '../../types/configuration';
 import * as admin from './admin.functions';
+import {StandalonePricesHandler} from '@commercetools/tools-core';
+
+const handler = new StandalonePricesHandler();
 
 export const contextToStandalonePriceFunctionMapping = (
   context?: Context
@@ -25,9 +28,9 @@ export const contextToStandalonePriceFunctionMapping = (
 > => {
   if (context?.isAdmin) {
     return {
-      read_standalone_price: admin.readStandalonePrice,
-      create_standalone_price: admin.createStandalonePrice,
-      update_standalone_price: admin.updateStandalonePrice,
+      [handler.getToolDefinition('read').name]: admin.readStandalonePrice,
+      [handler.getToolDefinition('create').name]: admin.createStandalonePrice,
+      [handler.getToolDefinition('update').name]: admin.updateStandalonePrice,
     };
   }
 

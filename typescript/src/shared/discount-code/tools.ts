@@ -1,23 +1,17 @@
-import {
-  readDiscountCodePrompt,
-  createDiscountCodePrompt,
-  updateDiscountCodePrompt,
-} from './prompts';
-
-import {
-  readDiscountCodeParameters,
-  createDiscountCodeParameters,
-  updateDiscountCodeParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {DiscountCodesHandler} from '@commercetools/tools-core';
+
+const handler = new DiscountCodesHandler();
 
 const tools: Record<string, Tool> = {
   read_discount_code: {
-    method: 'read_discount_code',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Discount Code',
-    description: readDiscountCodePrompt,
-    parameters: readDiscountCodeParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'discount-code': {
         read: true,
@@ -25,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_discount_code: {
-    method: 'create_discount_code',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Discount Code',
-    description: createDiscountCodePrompt,
-    parameters: createDiscountCodeParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'discount-code': {
         create: true,
@@ -36,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_discount_code: {
-    method: 'update_discount_code',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Discount Code',
-    description: updateDiscountCodePrompt,
-    parameters: updateDiscountCodeParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'discount-code': {
         update: true,

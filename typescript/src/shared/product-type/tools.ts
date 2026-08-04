@@ -1,23 +1,17 @@
-import {
-  readProductTypePrompt,
-  createProductTypePrompt,
-  updateProductTypePrompt,
-} from './prompts';
-
-import {
-  readProductTypeParameters,
-  createProductTypeParameters,
-  updateProductTypeParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {ProductTypesHandler} from '@commercetools/tools-core';
+
+const handler = new ProductTypesHandler();
 
 const tools: Record<string, Tool> = {
   read_product_type: {
-    method: 'read_product_type',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Product Type',
-    description: readProductTypePrompt,
-    parameters: readProductTypeParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-type': {
         read: true,
@@ -25,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_product_type: {
-    method: 'create_product_type',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Product Type',
-    description: createProductTypePrompt,
-    parameters: createProductTypeParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-type': {
         create: true,
@@ -36,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_product_type: {
-    method: 'update_product_type',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Product Type',
-    description: updateProductTypePrompt,
-    parameters: updateProductTypeParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       'product-type': {
         update: true,

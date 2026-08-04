@@ -1,22 +1,17 @@
-import {
-  createReviewParameters,
-  readReviewParameters,
-  updateReviewParameters,
-} from './parameters';
-import {
-  readReviewPrompt,
-  createReviewPrompt,
-  updateReviewPrompt,
-} from './prompts';
+import {z} from 'zod';
 import {Tool} from '../../types/tools';
 import {Context} from '../../types/configuration';
+import {ReviewsHandler} from '@commercetools/tools-core';
+
+const handler = new ReviewsHandler();
 
 const tools: Record<string, Tool> = {
   read_review: {
     name: 'Read Review',
-    method: 'read_review',
-    parameters: readReviewParameters,
-    description: readReviewPrompt,
+    method: handler.getToolDefinition('read').name,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('read').description,
     actions: {
       review: {
         read: true,
@@ -25,9 +20,10 @@ const tools: Record<string, Tool> = {
   },
   create_review: {
     name: 'Create Review',
-    method: 'create_review',
-    parameters: createReviewParameters,
-    description: createReviewPrompt,
+    method: handler.getToolDefinition('create').name,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('create').description,
     actions: {
       review: {
         create: true,
@@ -36,9 +32,10 @@ const tools: Record<string, Tool> = {
   },
   update_review: {
     name: 'Update Review',
-    method: 'update_review',
-    parameters: updateReviewParameters,
-    description: updateReviewPrompt,
+    method: handler.getToolDefinition('update').name,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
+    description: handler.getToolDefinition('update').description,
     actions: {
       review: {
         update: true,

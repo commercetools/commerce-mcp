@@ -8,6 +8,9 @@ import {
   createStagedQuoteParameters,
   updateStagedQuoteParameters,
 } from './parameters';
+import {StagedQuotesHandler} from '@commercetools/tools-core';
+
+const handler = new StagedQuotesHandler();
 
 // Context mapping function for staged quote functions
 export const contextToStagedQuoteFunctionMapping = (
@@ -22,16 +25,16 @@ export const contextToStagedQuoteFunctionMapping = (
 > => {
   if (context?.storeKey) {
     return {
-      read_staged_quote: store.readStagedQuote,
-      create_staged_quote: store.createStagedQuote,
-      update_staged_quote: store.updateStagedQuote,
+      [handler.getToolDefinition('read').name]: store.readStagedQuote,
+      [handler.getToolDefinition('create').name]: store.createStagedQuote,
+      [handler.getToolDefinition('update').name]: store.updateStagedQuote,
     };
   }
   if (context?.isAdmin) {
     return {
-      read_staged_quote: admin.readStagedQuote,
-      create_staged_quote: admin.createStagedQuote,
-      update_staged_quote: admin.updateStagedQuote,
+      [handler.getToolDefinition('read').name]: admin.readStagedQuote,
+      [handler.getToolDefinition('create').name]: admin.createStagedQuote,
+      [handler.getToolDefinition('update').name]: admin.updateStagedQuote,
     };
   }
   return {};

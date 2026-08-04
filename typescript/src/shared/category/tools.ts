@@ -1,23 +1,17 @@
-import {
-  readCategoryPrompt,
-  createCategoryPrompt,
-  updateCategoryPrompt,
-} from './prompts';
-
-import {
-  readCategoryParameters,
-  createCategoryParameters,
-  updateCategoryParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {CategoriesHandler} from '@commercetools/tools-core';
+
+const handler = new CategoriesHandler();
 
 const tools: Record<string, Tool> = {
   read_category: {
-    method: 'read_category',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Category',
-    description: readCategoryPrompt,
-    parameters: readCategoryParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       category: {
         read: true,
@@ -25,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_category: {
-    method: 'create_category',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Category',
-    description: createCategoryPrompt,
-    parameters: createCategoryParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       category: {
         create: true,
@@ -36,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_category: {
-    method: 'update_category',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Category',
-    description: updateCategoryPrompt,
-    parameters: updateCategoryParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       category: {
         update: true,

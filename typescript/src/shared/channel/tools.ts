@@ -1,23 +1,17 @@
-import {
-  readChannelPrompt,
-  createChannelPrompt,
-  updateChannelPrompt,
-} from './prompts';
-
-import {
-  readChannelParameters,
-  createChannelParameters,
-  updateChannelParameters,
-} from './parameters';
 import {Tool} from '../../types/tools';
+import {z} from 'zod';
 import {Context} from '../../types/configuration';
+import {ChannelsHandler} from '@commercetools/tools-core';
+
+const handler = new ChannelsHandler();
 
 const tools: Record<string, Tool> = {
   read_channel: {
-    method: 'read_channel',
+    method: handler.getToolDefinition('read').name,
     name: 'Read Channel',
-    description: readChannelPrompt,
-    parameters: readChannelParameters,
+    description: handler.getToolDefinition('read').description,
+    parameters: handler.getToolDefinition('read')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       channel: {
         read: true,
@@ -25,10 +19,11 @@ const tools: Record<string, Tool> = {
     },
   },
   create_channel: {
-    method: 'create_channel',
+    method: handler.getToolDefinition('create').name,
     name: 'Create Channel',
-    description: createChannelPrompt,
-    parameters: createChannelParameters,
+    description: handler.getToolDefinition('create').description,
+    parameters: handler.getToolDefinition('create')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       channel: {
         create: true,
@@ -36,10 +31,11 @@ const tools: Record<string, Tool> = {
     },
   },
   update_channel: {
-    method: 'update_channel',
+    method: handler.getToolDefinition('update').name,
     name: 'Update Channel',
-    description: updateChannelPrompt,
-    parameters: updateChannelParameters,
+    description: handler.getToolDefinition('update').description,
+    parameters: handler.getToolDefinition('update')
+      .inputSchema as unknown as z.ZodObject<any, any, any, any>,
     actions: {
       channel: {
         update: true,
