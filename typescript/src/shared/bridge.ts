@@ -403,9 +403,7 @@ function titleCase(def: ResourceDef, op: Op): string {
  * the passed configuration/authToken and delegates to the resolver bound to a
  * live CommercetoolsAPI instance.
  */
-export class BridgeApiClientFactory
-  implements IApiClientFactory<CoreConfiguration>
-{
+export class BridgeApiClientFactory implements IApiClientFactory<CoreConfiguration> {
   constructor(private readonly resolve: (apiKind: ApiKind) => Client) {}
 
   getClient(
