@@ -5,11 +5,14 @@ import {generateText} from 'ai';
 require('dotenv').config();
 
 const commercetoolsCommerceAgent = new CommercetoolsCommerceAgent({
-  clientId: process.env.CLIENT_ID!,
-  clientSecret: process.env.CLIENT_SECRET!,
-  authUrl: process.env.AUTH_URL!,
-  projectKey: process.env.PROJECT_KEY!,
-  apiUrl: process.env.API_URL!,
+  authConfig: {
+    type: 'client_credentials',
+    clientId: process.env.CLIENT_ID!,
+    clientSecret: process.env.CLIENT_SECRET!,
+    authUrl: process.env.AUTH_URL!,
+    projectKey: process.env.PROJECT_KEY!,
+    apiUrl: process.env.API_URL!,
+  },
   configuration: {
     actions: {
       products: {

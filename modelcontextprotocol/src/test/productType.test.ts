@@ -28,11 +28,11 @@ describe('Product Type Tools', () => {
     process.env = {};
   });
 
-  it('should initialize the server with product-type.read tool correctly', async () => {
+  it('should initialize the server with read_product_types tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-type.read',
+      '--tools=read_product_types',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -64,11 +64,11 @@ describe('Product Type Tools', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with product-type.create tool correctly', async () => {
+  it('should initialize the server with create_product_types tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-type.create',
+      '--tools=create_product_types',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -98,11 +98,11 @@ describe('Product Type Tools', () => {
     });
   });
 
-  it('should initialize the server with product-type.update tool correctly', async () => {
+  it('should initialize the server with update_product_types tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-type.update',
+      '--tools=update_product_types',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -136,7 +136,7 @@ describe('Product Type Tools', () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-type.read,product-type.create,product-type.update',
+      '--tools=read_product_types,create_product_types,update_product_types',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -170,7 +170,7 @@ describe('Product Type Tools', () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-type.read',
+      '--tools=read_product_types',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',

@@ -16,6 +16,7 @@ export default class CommercetoolsCommerceAgentStreamable {
   private server: (sessionId?: string) => Promise<CommercetoolsCommerceAgent>;
   private transports: {[sessionId: string]: StreamableHTTPServerTransport} = {};
   private stateless: boolean;
+  private enforceAuthHeader: boolean;
 
   private configuration: Configuration;
 
@@ -27,11 +28,13 @@ export default class CommercetoolsCommerceAgentStreamable {
     streamableHttpOptions,
     server,
     app,
+    enforceAuthHeader = true,
   }: IStreamServerOptions) {
     this.server = server!;
     this.authConfig = authConfig!;
     this.configuration = configuration!;
     this.stateless = stateless;
+    this.enforceAuthHeader = enforceAuthHeader;
 
     // initialize express app
     this.app = app ?? express();
@@ -42,19 +45,43 @@ export default class CommercetoolsCommerceAgentStreamable {
      */
     this.app.post('/mcp', async (req, res) => {
       try {
-        let transport: StreamableHTTPServerTransport;
-        let serverInstance = await this.getServer();
         const authHeader = req.headers.authorization as string | undefined;
-        const token = authHeader?.split(' ')[1] as string;
+        const token = this.extractBearerToken(authHeader);
+
         /**
-         * if token already exists in the config,
-         * use it else use header provided token
+         * Mandate a valid Authorization header for all network requests.
+         * The server must never fall back to its startup/system credentials
+         * for over-the-network transports, otherwise an unauthenticated actor
+         * would inherit the configured token's privileges.
          */
-        this.authConfig = {
-          ...this.authConfig,
-          // prioritize Authorization header Token
-          accessToken: token || (this.authConfig as E)?.accessToken,
-        } as E;
+        if (this.enforceAuthHeader && !token) {
+          return res.status(401).json({
+            jsonrpc: '2.0',
+            error: {
+              code: -32001,
+              message:
+                'Unauthorized: A valid Authorization Bearer token is required',
+            },
+            id: null,
+          });
+        }
+
+        /**
+         * Build a per-request auth config from the caller's token. We never
+         * mutate the shared `this.authConfig` (which would leak one request's
+         * token into others). Forcing `type: 'auth_token'` ensures the caller's
+         * bearer token is the one forwarded to the commercetools API.
+         */
+        const requestAuthConfig: AuthConfig = token
+          ? ({
+              ...this.authConfig,
+              type: 'auth_token',
+              accessToken: token,
+            } as E)
+          : this.authConfig;
+
+        let transport: StreamableHTTPServerTransport;
+        let serverInstance = await this.getServer(undefined, requestAuthConfig);
 
         if (stateless) {
           transport = new StreamableHTTPServerTransport({
@@ -89,7 +116,10 @@ export default class CommercetoolsCommerceAgentStreamable {
                 this.transports[sessionId] = transport;
 
                 // connect server to the transport
-                serverInstance = await this.getServer(sessionId);
+                serverInstance = await this.getServer(
+                  sessionId,
+                  requestAuthConfig
+                );
                 await serverInstance.connect(transport);
               },
             });
@@ -136,16 +166,45 @@ export default class CommercetoolsCommerceAgentStreamable {
      * TODO:
      * decide on how to handle SSE requests
      */
-    this.app.get('/mcp', async (req, res) => {
+    this.app.get('/mcp', (req, res) => {
+      const authHeader = req.headers.authorization as string | undefined;
+      if (this.enforceAuthHeader && !this.extractBearerToken(authHeader)) {
+        return res.status(401).json({
+          jsonrpc: '2.0',
+          error: {
+            code: -32001,
+            message:
+              'Unauthorized: A valid Authorization Bearer token is required',
+          },
+          id: null,
+        });
+      }
       /* noop */
     });
   }
 
+  /**
+   * Extracts the bearer token from an Authorization header. Returns the token
+   * only for a well-formed `Bearer <non-empty-token>` value (scheme is
+   * case-insensitive); otherwise returns undefined. Structural validation only
+   * — the token's actual validity is enforced by the commercetools API.
+   */
+  private extractBearerToken(authHeader?: string): string | undefined {
+    if (!authHeader) return undefined;
+    const [scheme, ...rest] = authHeader.trim().split(/\s+/);
+    if (scheme?.toLowerCase() !== 'bearer') return undefined;
+    const token = rest.join(' ').trim();
+    return token.length > 0 ? token : undefined;
+  }
+
   // eslint-disable-next-line require-await
-  private async getServer(id?: string): Promise<CommercetoolsCommerceAgent> {
+  private async getServer(
+    id?: string,
+    authConfig: AuthConfig = this.authConfig
+  ): Promise<CommercetoolsCommerceAgent> {
     if (this.server) return this.server(id);
     return CommercetoolsCommerceAgent.create({
-      authConfig: this.authConfig,
+      authConfig,
       configuration: {
         ...this.configuration,
         context: {

@@ -152,7 +152,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       postHandler = postCall[1];
 
       mockReq = {
-        headers: {},
+        headers: {authorization: 'Bearer test-token'},
         body: {method: 'test'},
       };
 
@@ -184,14 +184,47 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       );
     });
 
-    test('should handle request without authorization token', async () => {
+    test('should reject request without authorization token with 401', async () => {
+      mockReq.headers = {};
+
       await postHandler(mockReq, mockRes);
 
-      expect(mockTransport.handleRequest).toHaveBeenCalledWith(
-        mockReq,
-        mockRes,
-        mockReq.body
+      expect(mockRes.status).toHaveBeenCalledWith(401);
+      expect(mockRes.json).toHaveBeenCalledWith({
+        jsonrpc: '2.0',
+        error: {
+          code: -32001,
+          message:
+            'Unauthorized: A valid Authorization Bearer token is required',
+        },
+        id: null,
+      });
+      expect(mockServer).not.toHaveBeenCalled();
+      expect(mockTransport.handleRequest).not.toHaveBeenCalled();
+    });
+
+    test('should reject request with a malformed authorization header with 401', async () => {
+      // Missing scheme and empty bearer token are both malformed.
+      const malformedHeaders = ['token-without-scheme', 'Bearer ', 'Bearer'];
+      await Promise.all(
+        malformedHeaders.map((header) => {
+          const req = {
+            headers: {authorization: header},
+            body: {method: 'test'},
+          };
+          const res = {
+            on: jest.fn(),
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn().mockReturnThis(),
+            headersSent: false,
+          };
+          return Promise.resolve(postHandler(req, res)).then(() => {
+            expect(res.status).toHaveBeenCalledWith(401);
+          });
+        })
       );
+      expect(mockServer).not.toHaveBeenCalled();
+      expect(mockTransport.handleRequest).not.toHaveBeenCalled();
     });
 
     test('should setup cleanup on response close', async () => {
@@ -256,7 +289,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       postHandler = postCall[1];
 
       mockReq = {
-        headers: {},
+        headers: {authorization: 'Bearer test-token'},
         body: {method: 'initialize', params: {}},
       };
 
@@ -308,7 +341,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
 
     test('should return 400 for invalid session request', async () => {
       (isInitializeRequest as unknown as jest.Mock).mockReturnValue(false);
-      mockReq.headers = {}; // No session ID
+      mockReq.headers = {authorization: 'Bearer test-token'}; // No session ID
 
       await postHandler(mockReq, mockRes);
 
@@ -332,7 +365,10 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       transportCall.onsessioninitialized('existing-session-id');
 
       jest.clearAllMocks();
-      mockReq.headers = {'mcp-session-id': 'existing-session-id'};
+      mockReq.headers = {
+        authorization: 'Bearer test-token',
+        'mcp-session-id': 'existing-session-id',
+      };
 
       await postHandler(mockReq, mockRes);
 
@@ -490,7 +526,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       expect(getCall[1]).toBeInstanceOf(Function);
     });
 
-    test('should handle GET requests (noop)', async () => {
+    test('should handle authorized GET requests (noop)', () => {
       new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
@@ -502,7 +538,36 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       );
 
       const getHandler = getCall[1];
-      await expect(getHandler({}, {})).resolves.toBeUndefined();
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+      };
+      const result = getHandler(
+        {headers: {authorization: 'Bearer test-token'}},
+        mockRes
+      );
+      expect(result).toBeUndefined();
+      expect(mockRes.status).not.toHaveBeenCalledWith(401);
+    });
+
+    test('should reject unauthorized GET requests with 401', async () => {
+      new CommercetoolsCommerceAgentStreamable({
+        authConfig: mockAuthConfig,
+        configuration: mockConfiguration,
+        server: mockServer,
+      } as any);
+
+      const getCall = mockApp.get.mock.calls.find(
+        (call: any) => call[0] === '/mcp'
+      );
+
+      const getHandler = getCall[1];
+      const mockRes = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+      };
+      await getHandler({headers: {}}, mockRes);
+      expect(mockRes.status).toHaveBeenCalledWith(401);
     });
   });
 
@@ -523,7 +588,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       postHandler = postCall[1];
     });
 
-    test('should prioritize authorization header token', async () => {
+    test('should accept request with authorization header token', async () => {
       const mockReq = {
         headers: {authorization: 'Bearer header-token'},
         body: {},
@@ -537,9 +602,10 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
 
       await postHandler(mockReq, mockRes);
       expect(mockServer).toHaveBeenCalled();
+      expect(mockRes.status).not.toHaveBeenCalledWith(401);
     });
 
-    test('should fallback to config token when no header', async () => {
+    test('should NOT fall back to config token when no header (401)', async () => {
       const mockReq = {
         headers: {},
         body: {},
@@ -552,7 +618,83 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       };
 
       await postHandler(mockReq, mockRes);
+      expect(mockRes.status).toHaveBeenCalledWith(401);
+      expect(mockServer).not.toHaveBeenCalled();
+    });
+
+    test('should forward the header token (type auth_token) to the bootstrapped server', async () => {
+      // Reset so the post handler we look up belongs to the instance below,
+      // not the one constructed in beforeEach (shared mockApp accumulates).
+      jest.clearAllMocks();
+      // No injected `server` factory, so the bootstrapped path is used and
+      // CommercetoolsCommerceAgent.create receives the per-request authConfig.
+      new CommercetoolsCommerceAgentStreamable({
+        authConfig: {
+          ...mockAuthConfig,
+          type: 'client_credentials',
+          clientId: 'startup-client',
+          clientSecret: 'startup-secret',
+        },
+        configuration: mockConfiguration,
+      } as any);
+
+      const postCall = mockApp.post.mock.calls.find(
+        (call: any) => call[0] === '/mcp'
+      );
+      const handler = postCall[1];
+
+      const mockReq = {
+        headers: {authorization: 'Bearer caller-token'},
+        body: {},
+      };
+      const mockRes = {
+        on: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        headersSent: false,
+      };
+
+      await handler(mockReq, mockRes);
+
+      expect(CommercetoolsCommerceAgent.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authConfig: expect.objectContaining({
+            type: 'auth_token',
+            accessToken: 'caller-token',
+          }),
+        })
+      );
+    });
+
+    test('should allow header-less requests when enforceAuthHeader is false', async () => {
+      // Reset so the post handler we look up belongs to the instance below.
+      jest.clearAllMocks();
+      new CommercetoolsCommerceAgentStreamable({
+        authConfig: {...mockAuthConfig, accessToken: 'original-token'},
+        configuration: mockConfiguration,
+        server: mockServer,
+        enforceAuthHeader: false,
+      } as any);
+
+      const postCall = mockApp.post.mock.calls.find(
+        (call: any) => call[0] === '/mcp'
+      );
+      const handler = postCall[1];
+
+      const mockReq = {
+        headers: {},
+        body: {},
+      };
+      const mockRes = {
+        on: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        headersSent: false,
+      };
+
+      await handler(mockReq, mockRes);
       expect(mockServer).toHaveBeenCalled();
+      expect(mockRes.status).not.toHaveBeenCalledWith(401);
     });
   });
 });

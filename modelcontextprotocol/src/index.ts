@@ -58,6 +58,7 @@ const PUBLIC_ARGS = [
   'apiUrl',
   'dynamicToolLoadingThreshold',
   'toolOutputFormat',
+  'logging',
 ];
 
 const ACCEPTED_ARGS = [...PUBLIC_ARGS, ...HIDDEN_ARGS];
@@ -137,12 +138,13 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
     if (!process.env.TOOLS) {
       throw new Error('The --tools arguments must be provided.');
     }
+
     options.tools = process.env.TOOLS.split(',');
   }
 
   // Validate tools against accepted enum values
   options.tools.forEach((tool: string) => {
-    if (tool == 'all' || tool == 'all.read') {
+    if (tool == 'all' || tool == 'read_all') {
       return;
     }
     if (!ACCEPTED_TOOLS.includes(tool.trim())) {

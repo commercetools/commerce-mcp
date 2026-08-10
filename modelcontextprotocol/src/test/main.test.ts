@@ -59,7 +59,7 @@ describe('main function', () => {
       configuration: {
         actions: {
           products: {read: true, create: true, update: true},
-          project: {read: true},
+          project: {read: true, update: true},
           'product-search': {read: true},
           category: {read: true, create: true, update: true},
           'product-selection': {read: true, create: true, update: true},
@@ -95,6 +95,13 @@ describe('main function', () => {
           'custom-objects': {read: true, create: true, update: true},
           'payment-intents': {update: true},
           transactions: {read: true, create: true},
+          'approval-flow': {read: true, update: true},
+          'approval-rule': {read: true, create: true, update: true},
+          'associate-role': {read: true, create: true, update: true},
+          'order-edit': {read: true, create: true, update: true},
+          'product-selection-assignment': {read: true},
+          'recurrence-policy': {read: true, create: true, update: true},
+          states: {read: true, create: true, update: true},
         },
         context: {
           isAdmin: true,
@@ -115,7 +122,7 @@ describe('main function', () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=products.read',
+      '--tools=read_products',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -152,7 +159,7 @@ describe('main function', () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=products.read',
+      '--tools=read_products',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -185,11 +192,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (products.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_products)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=products.read',
+      '--tools=read_products',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -221,11 +228,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (products.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_products)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=products.create',
+      '--tools=create_products',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -257,11 +264,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (shopping-lists.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_shopping_lists)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=shopping-lists.create',
+      '--tools=create_shopping_lists',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -293,11 +300,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (products.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_products)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=products.update',
+      '--tools=update_products',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -329,11 +336,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (project.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_project)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=project.read',
+      '--tools=read_project',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -365,11 +372,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (product-search.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_product_search)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-search.read',
+      '--tools=read_product_search',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -401,11 +408,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (category.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_categories)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=category.read',
+      '--tools=read_categories',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -437,11 +444,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (category.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_categories)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=category.create',
+      '--tools=create_categories',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -473,11 +480,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (category.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_categories)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=category.update',
+      '--tools=update_categories',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -509,11 +516,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (product-selection.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_product_selections)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-selection.read',
+      '--tools=read_product_selections',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -545,11 +552,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (product-selection.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_product_selections)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-selection.create',
+      '--tools=create_product_selections',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -581,11 +588,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (product-selection.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_product_selections)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-selection.update',
+      '--tools=update_product_selections',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -617,11 +624,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (order.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_orders)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=order.read',
+      '--tools=read_orders',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -653,11 +660,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (order.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_orders)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=order.create',
+      '--tools=create_orders',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -689,11 +696,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (order.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_orders)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=order.update',
+      '--tools=update_orders',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -725,11 +732,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with cart.read tool correctly', async () => {
+  it('should initialize the server with read_carts tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=cart.read',
+      '--tools=read_carts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -761,11 +768,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with cart.create tool correctly', async () => {
+  it('should initialize the server with create_carts tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=cart.create',
+      '--tools=create_carts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -797,11 +804,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with cart.update tool correctly', async () => {
+  it('should initialize the server with update_carts tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=cart.update',
+      '--tools=update_carts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -833,11 +840,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (customer.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_customers)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=customer.create',
+      '--tools=create_customers',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -869,11 +876,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (customer.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_customers)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=customer.read',
+      '--tools=read_customers',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -905,11 +912,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (customer.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_customers)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=customer.update',
+      '--tools=update_customers',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -941,11 +948,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with customer-group.read tool correctly', async () => {
+  it('should initialize the server with read_customer_groups tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=customer-group.read',
+      '--tools=read_customer_groups',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -977,11 +984,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with customer-group.create tool correctly', async () => {
+  it('should initialize the server with create_customer_groups tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=customer-group.create',
+      '--tools=create_customer_groups',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1013,11 +1020,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with customer-group.update tool correctly', async () => {
+  it('should initialize the server with update_customer_groups tool correctly', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=customer-group.update',
+      '--tools=update_customer_groups',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1049,11 +1056,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (standalone-price.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_standalone_prices)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=standalone-price.read',
+      '--tools=read_standalone_prices',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1085,11 +1092,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (standalone-price.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_standalone_prices)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=standalone-price.create',
+      '--tools=create_standalone_prices',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1121,11 +1128,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (standalone-price.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_standalone_prices)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=standalone-price.update',
+      '--tools=update_standalone_prices',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1157,11 +1164,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (product-discount.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_product_discounts)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-discount.read',
+      '--tools=read_product_discounts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1193,11 +1200,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (product-discount.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_product_discounts)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-discount.create',
+      '--tools=create_product_discounts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1229,11 +1236,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (product-discount.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_product_discounts)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=product-discount.update',
+      '--tools=update_product_discounts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1265,11 +1272,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (cart-discount.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_cart_discounts)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=cart-discount.read',
+      '--tools=read_cart_discounts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1301,11 +1308,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (cart-discount.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_cart_discounts)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=cart-discount.create',
+      '--tools=create_cart_discounts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1337,11 +1344,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (cart-discount.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_cart_discounts)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=cart-discount.update',
+      '--tools=update_cart_discounts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1373,11 +1380,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (discount-code.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_discount_codes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=discount-code.read',
+      '--tools=read_discount_codes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1409,11 +1416,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (discount-code.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_discount_codes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=discount-code.create',
+      '--tools=create_discount_codes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1445,11 +1452,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (discount-code.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_discount_codes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=discount-code.update',
+      '--tools=update_discount_codes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1481,11 +1488,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (bulk.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_bulk)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=bulk.create',
+      '--tools=create_bulk',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1517,11 +1524,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (bulk.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_bulk)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=bulk.update',
+      '--tools=update_bulk',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1553,11 +1560,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (inventory.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_inventory)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=inventory.read',
+      '--tools=read_inventory',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1589,11 +1596,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (inventory.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_inventory)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=inventory.create',
+      '--tools=create_inventory',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1625,11 +1632,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (inventory.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_inventory)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=inventory.update',
+      '--tools=update_inventory',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1661,11 +1668,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (store.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_stores)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=store.read',
+      '--tools=read_stores',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1697,11 +1704,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (store.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_stores)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=store.create',
+      '--tools=create_stores',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1733,11 +1740,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (store.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_stores)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=store.update',
+      '--tools=update_stores',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1769,11 +1776,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (quote.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_quotes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=quote.read',
+      '--tools=read_quotes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1805,11 +1812,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (quote.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_quotes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=quote.create',
+      '--tools=create_quotes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1841,11 +1848,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (quote.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_quotes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=quote.update',
+      '--tools=update_quotes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1877,11 +1884,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (staged-quote.read)', async () => {
+  it('should initialize the server with specific tools correctly (read_staged_quotes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=staged-quote.read',
+      '--tools=read_staged_quotes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1913,11 +1920,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (staged-quote.create)', async () => {
+  it('should initialize the server with specific tools correctly (create_staged_quotes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=staged-quote.create',
+      '--tools=create_staged_quotes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1949,11 +1956,11 @@ describe('main function', () => {
     expect(StdioServerTransport).toHaveBeenCalled();
   });
 
-  it('should initialize the server with specific tools correctly (staged-quote.update)', async () => {
+  it('should initialize the server with specific tools correctly (update_staged_quotes)', async () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=staged-quote.update',
+      '--tools=update_staged_quotes',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -1989,7 +1996,7 @@ describe('main function', () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=products.read,order.read,cart.read',
+      '--tools=read_products,read_orders,read_carts',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -2063,7 +2070,7 @@ describe('main function', () => {
       process.argv = [
         'node',
         'index.js',
-        '--tools=products.read',
+        '--tools=read_products',
         ...authArgs,
         '--authUrl=https://auth.commercetools.com',
         '--projectKey=test_project',
@@ -2092,7 +2099,7 @@ describe('main function', () => {
     process.argv = [
       'node',
       'index.js',
-      '--tools=products.read',
+      '--tools=read_products',
       '--clientId=test_client_id',
       '--clientSecret=test_client_secret',
       '--authUrl=https://auth.commercetools.com',
@@ -2176,7 +2183,7 @@ describe('main function', () => {
         process.argv = [
           'node',
           'index.js',
-          '--tools=products.read',
+          '--tools=read_products',
           ...authArgs,
           '--authUrl=https://auth.commercetools.com',
           '--projectKey=test_project',
@@ -2205,7 +2212,7 @@ describe('main function', () => {
       process.argv = [
         'node',
         'index.js',
-        '--tools=products.read',
+        '--tools=read_products',
         '--authType=password',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',
@@ -2224,7 +2231,7 @@ describe('main function', () => {
       process.argv = [
         'node',
         'index.js',
-        '--tools=products.read',
+        '--tools=read_products',
         '--authType=',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',

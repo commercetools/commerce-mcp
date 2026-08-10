@@ -13,17 +13,26 @@ describe('resolveToolsForConfiguration', () => {
     });
   });
 
-  it('all.read without isAdmin is all_read', () => {
-    expect(resolveToolsForConfiguration(['all.read'], false)).toEqual({
-      mode: 'all_read',
+  it('read_all without isAdmin is read_all', () => {
+    expect(resolveToolsForConfiguration(['read_all'], false)).toEqual({
+      mode: 'read_all',
       explicitTools: [],
     });
   });
 
-  it('all,all.read without isAdmin is all_read', () => {
-    expect(resolveToolsForConfiguration(['all', 'all.read'], false)).toEqual({
-      mode: 'all_read',
+  it('all,read_all without isAdmin is read_all', () => {
+    expect(resolveToolsForConfiguration(['all', 'read_all'], false)).toEqual({
+      mode: 'read_all',
       explicitTools: [],
+    });
+  });
+
+  it('explicit underscore method names pass through', () => {
+    expect(
+      resolveToolsForConfiguration(['read_products', 'create_products'], false)
+    ).toEqual({
+      mode: 'explicit',
+      explicitTools: ['read_products', 'create_products'],
     });
   });
 });
@@ -40,12 +49,33 @@ describe('applyResolvedToolsToConfiguration', () => {
     expect(configuration.actions?.products?.create).toBe(true);
   });
 
+  it('read_all fills only read actions', () => {
+    const configuration: Configuration = {actions: {}, context: {}};
+    applyResolvedToolsToConfiguration(
+      configuration,
+      {mode: 'read_all', explicitTools: []},
+      ACCEPTED_TOOLS
+    );
+    expect(configuration.actions?.products?.read).toBe(true);
+    expect(configuration.actions?.products?.create).toBeUndefined();
+  });
+
+  it('maps underscore method names to namespace/action actions', () => {
+    const configuration: Configuration = {actions: {}, context: {}};
+    applyResolvedToolsToConfiguration(configuration, {
+      mode: 'explicit',
+      explicitTools: ['read_customers', 'update_carts'],
+    });
+    expect(configuration.actions?.customer?.read).toBe(true);
+    expect(configuration.actions?.cart?.update).toBe(true);
+  });
+
   it('honors custom acceptedTools array', () => {
     const configuration: Configuration = {actions: {}, context: {}};
     applyResolvedToolsToConfiguration(
       configuration,
-      {mode: 'explicit', explicitTools: ['products.read']},
-      ['products.read', 'products.create']
+      {mode: 'explicit', explicitTools: ['read_products']},
+      ['read_products', 'create_products']
     );
     expect(configuration.actions?.products?.read).toBe(true);
     expect(configuration.actions?.products?.create).toBeUndefined();

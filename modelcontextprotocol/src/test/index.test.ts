@@ -44,9 +44,9 @@ describe('parseArgs function', () => {
       expect(env.apiUrl).toBe('https://api.commercetools.com');
     });
 
-    it('should parse all.read tool correctly', () => {
+    it('should parse read_all tool correctly', () => {
       const args = [
-        '--tools=all.read',
+        '--tools=read_all',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',
         '--authUrl=https://auth.commercetools.com',
@@ -54,12 +54,12 @@ describe('parseArgs function', () => {
         '--apiUrl=https://api.commercetools.com',
       ];
       const {options} = parseArgs(args);
-      expect(options.tools).toEqual(['all.read']);
+      expect(options.tools).toEqual(['read_all']);
     });
 
     it('should parse tools argument correctly', () => {
       const args = [
-        '--tools=products.read',
+        '--tools=read_products',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',
         '--authUrl=https://auth.commercetools.com',
@@ -67,12 +67,12 @@ describe('parseArgs function', () => {
         '--apiUrl=https://api.commercetools.com',
       ];
       const {options} = parseArgs(args);
-      expect(options.tools).toEqual(['products.read']);
+      expect(options.tools).toEqual(['read_products']);
     });
 
-    it('should accept all.read as a valid tool without throwing validation error', () => {
+    it('should accept read_all as a valid tool without throwing validation error', () => {
       const args = [
-        '--tools=all.read',
+        '--tools=read_all',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',
         '--authUrl=https://auth.commercetools.com',
@@ -82,12 +82,12 @@ describe('parseArgs function', () => {
 
       expect(() => parseArgs(args)).not.toThrow();
       const {options} = parseArgs(args);
-      expect(options.tools).toEqual(['all.read']);
+      expect(options.tools).toEqual(['read_all']);
     });
 
-    it('should accept all.read in combination with other tools', () => {
+    it('should accept read_all in combination with other tools', () => {
       const args = [
-        '--tools=all.read,products.create',
+        '--tools=read_all,create_products',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',
         '--authUrl=https://auth.commercetools.com',
@@ -97,7 +97,7 @@ describe('parseArgs function', () => {
 
       expect(() => parseArgs(args)).not.toThrow();
       const {options} = parseArgs(args);
-      expect(options.tools).toEqual(['all.read', 'products.create']);
+      expect(options.tools).toEqual(['read_all', 'create_products']);
     });
 
     it('should use environment variables when arguments are not provided', () => {
@@ -379,44 +379,44 @@ describe('parseArgs function', () => {
     it('ignores all when explicit tools are also listed', () => {
       expect(
         resolveToolsForConfiguration(
-          ['all', 'products.read', 'cart.read'],
+          ['all', 'read_products', 'read_carts'],
           false
         )
       ).toEqual({
         mode: 'explicit',
-        explicitTools: ['products.read', 'cart.read'],
+        explicitTools: ['read_products', 'read_carts'],
       });
     });
 
-    it('ignores all and all.read when any explicit tool is listed', () => {
+    it('ignores all and read_all when any explicit tool is listed', () => {
       expect(
-        resolveToolsForConfiguration(['all', 'all.read', 'quotes.read'], true)
+        resolveToolsForConfiguration(['all', 'read_all', 'read_quotes'], true)
       ).toEqual({
         mode: 'explicit',
-        explicitTools: ['quotes.read'],
+        explicitTools: ['read_quotes'],
       });
     });
 
-    it('keeps all.read without requiring isAdmin', () => {
-      expect(resolveToolsForConfiguration(['all.read'], false)).toEqual({
-        mode: 'all_read',
+    it('keeps read_all without requiring isAdmin', () => {
+      expect(resolveToolsForConfiguration(['read_all'], false)).toEqual({
+        mode: 'read_all',
         explicitTools: [],
       });
     });
 
-    it('treats all,all.read without isAdmin as all_read (all.read still applies)', () => {
-      expect(resolveToolsForConfiguration(['all', 'all.read'], false)).toEqual({
-        mode: 'all_read',
+    it('treats all,read_all without isAdmin as read_all (read_all still applies)', () => {
+      expect(resolveToolsForConfiguration(['all', 'read_all'], false)).toEqual({
+        mode: 'read_all',
         explicitTools: [],
       });
     });
 
     it('applies explicit tools even when isAdmin is false', () => {
       expect(
-        resolveToolsForConfiguration(['products.create', 'quotes.read'], false)
+        resolveToolsForConfiguration(['create_products', 'read_quotes'], false)
       ).toEqual({
         mode: 'explicit',
-        explicitTools: ['products.create', 'quotes.read'],
+        explicitTools: ['create_products', 'read_quotes'],
       });
     });
   });
@@ -426,7 +426,7 @@ describe('parseArgs function', () => {
       const configuration: Configuration = {actions: {}, context: {}};
       applyResolvedToolsToConfiguration(configuration, {
         mode: 'explicit',
-        explicitTools: ['products.read', 'quote.read'],
+        explicitTools: ['read_products', 'read_quotes'],
       });
       expect(configuration.actions?.products?.read).toBe(true);
       expect(
@@ -453,7 +453,7 @@ describe('parseArgs function', () => {
       jest.clearAllMocks();
     });
 
-    it('should build configuration with only read operations for all.read', () => {
+    it('should build configuration with only read operations for read_all', () => {
       let capturedConfiguration: Configuration;
 
       const createSpy = jest
@@ -470,7 +470,7 @@ describe('parseArgs function', () => {
       process.argv = [
         'node',
         'index.js',
-        '--tools=all.read',
+        '--tools=read_all',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',
         '--authUrl=https://auth.commercetools.com',
@@ -604,7 +604,7 @@ describe('parseArgs function', () => {
       process.argv = [
         'node',
         'index.js',
-        '--tools=all,products.read,cart.read,quote.read',
+        '--tools=all,read_products,read_carts,read_quotes',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',
         '--authUrl=https://auth.commercetools.com',
@@ -657,7 +657,7 @@ describe('parseArgs function', () => {
         '--apiUrl=https://api.commercetools.com',
       ];
       expect(() => parseArgs(args)).toThrow(
-        'Invalid tool: invalid.tool. Accepted tools are: business-unit.read, business-unit.create, business-unit.update, products.read, products.create, products.update, project.read, product-search.read, category.read, category.create, category.update, channel.read, channel.create, channel.update, product-selection.read, product-selection.create, product-selection.update, order.read, order.create, order.update, cart.read, cart.create, cart.update, customer.create, customer.read, customer.update, customer-group.read, customer-group.create, customer-group.update, quote.read, quote.create, quote.update, quote-request.read, quote-request.create, quote-request.update, staged-quote.read, staged-quote.create, staged-quote.update, standalone-price.read, standalone-price.create, standalone-price.update, product-discount.read, product-discount.create, product-discount.update, cart-discount.read, cart-discount.create, cart-discount.update, discount-code.read, discount-code.create, discount-code.update, product-type.read, product-type.create, product-type.update, bulk.create, bulk.update, inventory.read, inventory.create, inventory.update, store.read, store.create, store.update'
+        `Invalid tool: invalid.tool. Accepted tools are: ${ACCEPTED_TOOLS.join(', ')}`
       );
     });
 
@@ -683,9 +683,9 @@ describe('parseArgs function', () => {
       );
     });
 
-    it('should not throw validation error for all.read when mixed with invalid tools', () => {
+    it('should not throw validation error for read_all when mixed with invalid tools', () => {
       const args = [
-        '--tools=all.read,invalid.tool',
+        '--tools=read_all,invalid.tool',
         '--clientId=test_client_id',
         '--clientSecret=test_client_secret',
         '--authUrl=https://auth.commercetools.com',

@@ -15,7 +15,7 @@ const isFieldFilteringManager = (
 ): config is FieldFilteringManager => {
   return Boolean(
     (config as FieldFilteringManager)?.filterFields &&
-      (config as FieldFilteringManager)?.filterUrlFields
+    (config as FieldFilteringManager)?.filterUrlFields
   );
 };
 

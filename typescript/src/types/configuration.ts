@@ -81,6 +81,13 @@ type IWithServerInstance = {
   stateless?: boolean;
   streamableHttpOptions: StreamableHTTPServerTransportOptions;
   app?: IApp;
+  /**
+   * When true (default), every HTTP request must carry a valid
+   * `Authorization: Bearer <token>` header or it is rejected with 401.
+   * Set to false only when the embedding application handles authentication
+   * itself (e.g. via the injected `server` factory).
+   */
+  enforceAuthHeader?: boolean;
 };
 
 type IWithServerConfig = {
@@ -90,6 +97,13 @@ type IWithServerConfig = {
   stateless?: boolean;
   streamableHttpOptions: StreamableHTTPServerTransportOptions;
   app?: IApp;
+  /**
+   * When true (default), every HTTP request must carry a valid
+   * `Authorization: Bearer <token>` header or it is rejected with 401.
+   * Set to false only when the embedding application handles authentication
+   * itself (e.g. via the injected `server` factory).
+   */
+  enforceAuthHeader?: boolean;
 };
 
 export type IStreamServerOptions = IWithServerInstance | IWithServerConfig;
