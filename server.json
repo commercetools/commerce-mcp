@@ -20,7 +20,7 @@
           "type": "named",
           "name": "--tools",
           "value": "{TOOLS}",
-          "description": "Comma-separated list of tools to enable (e.g., 'all', 'all.read', or 'products.read,products.create')",
+          "description": "Comma-separated list of tools to enable (e.g., 'all', 'read_all', or 'read_products,create_products')",
           "isRequired": true
         },
         {
@@ -124,7 +124,7 @@
           "name": "ACCESS_TOKEN"
         },
         {
-          "description": "Comma-separated list of tools to enable (e.g., 'all', 'all.read', or 'products.read,products.create')",
+          "description": "Comma-separated list of tools to enable (e.g., 'all', 'read_all', or 'read_products,create_products')",
           "isRequired": true,
           "format": "string",
           "isSecret": false,

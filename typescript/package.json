@@ -76,6 +76,7 @@
   "dependencies": {
     "@commercetools/checkout-sdk": "^1.0.0",
     "@commercetools/platform-sdk": "^8.13.0",
+    "@commercetools/tools-core": "^0.3.0",
     "@commercetools/ts-client": "^4.2.0",
     "express": "^5.1.0",
     "pluralize": "^8.0.0",
