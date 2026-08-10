@@ -1,5 +1,17 @@
 # @commercetools/commerce-mcp
 
+## 4.0.0
+
+### Major Changes
+
+- [#51](https://github.com/commercetools/commerce-mcp/pull/51) [`d27f7c0`](https://github.com/commercetools/commerce-mcp/commit/d27f7c0520b37c1e11234175d2366e543f96ffb3) Thanks [@ajimae](https://github.com/ajimae)! - Update packages to use the shared tools package
+  [Feat][DEVX-842] Use standalone @commercetools/tools-core packages
+
+### Patch Changes
+
+- Updated dependencies [[`d27f7c0`](https://github.com/commercetools/commerce-mcp/commit/d27f7c0520b37c1e11234175d2366e543f96ffb3)]:
+  - @commercetools/commerce-agent@4.0.0
+
 ## 3.0.1
 
 ### Patch Changes
