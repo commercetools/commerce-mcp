@@ -10,6 +10,7 @@ import {
   AuthConfig,
   DEFAULT_HOST,
   LOOPBACK_HOSTNAMES,
+  normalizeBindHost,
   resolveToolsForConfiguration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 import {
@@ -442,6 +443,28 @@ function warnIfPubliclyBound(host: string) {
   );
 }
 
+type MaybeServer = {
+  address?: () => unknown;
+  on?: (
+    event: string,
+    listener: (error: NodeJS.ErrnoException) => void
+  ) => void;
+};
+
+/** True once the server actually holds an address. */
+function isBound(server: unknown): boolean {
+  const address = (server as MaybeServer)?.address;
+  return typeof address === 'function' ? address.call(server) !== null : true;
+}
+
+function onServerError(
+  server: unknown,
+  listener: (error: NodeJS.ErrnoException) => void
+) {
+  const on = (server as MaybeServer)?.on;
+  if (typeof on === 'function') on.call(server, 'error', listener);
+}
+
 function handleError(error: any) {
   console.error(red('\n🚨  Error initializing commercetools MCP server:\n'));
   console.error(yellow(`   ${error.message}\n`));
@@ -499,12 +522,41 @@ export async function main() {
     });
 
     const port = env.port || 8080;
-    const host = env.host!;
+    // `*` and an empty value mean "every interface"; the OS needs 0.0.0.0.
+    const host = normalizeBindHost(env.host);
 
     warnIfPubliclyBound(host);
 
-    streamServer.listen(port, host, function () {
+    /**
+     * Kept in a holder so the listen callback can read the server without a
+     * binding that is still in its temporal dead zone should an app
+     * implementation invoke the callback synchronously.
+     */
+    const bound: {server?: unknown} = {};
+
+    bound.server = streamServer.listen(port, host, function () {
+      /**
+       * Express runs this callback even when the bind failed (an unresolvable
+       * host leaves `address()` null), so confirm before claiming success —
+       * the error handler below reports the failure instead.
+       */
+      if (!isBound(bound.server)) return;
+
       console.error(`Stream server listening on ${host}:${port}`);
+    });
+
+    /**
+     * A bind failure — port already taken, address not available, a host that
+     * does not resolve — arrives as an 'error' event. Left unhandled it kills
+     * the process with no explanation of what went wrong.
+     */
+    onServerError(bound.server, (error) => {
+      handleError(
+        new Error(
+          `Unable to bind ${host}:${port}${error.code ? ` (${error.code})` : ''}. ${error.message}`
+        )
+      );
+      process.exitCode = 1;
     });
   } else {
     const server = await getServer();

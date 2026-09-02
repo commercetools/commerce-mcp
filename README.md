@@ -520,9 +520,15 @@ now network-reachable, with a louder one for `0.0.0.0`/`::` since a wildcard bin
 covers interfaces you may not have had in mind. `HOST` works as an environment variable
 equivalent.
 
+`--host` takes an interface address. `--host=*` is accepted as a shorthand and binds
+`0.0.0.0`; `--host=` (empty) falls back to the loopback default rather than opening the
+server up. Note that `*` means something different in `--allowedHosts` below, where it
+disables the check rather than selecting an interface.
+
 Prefer `127.0.0.1` over `localhost`: on many systems `localhost` resolves to the IPv6
 loopback (`::1`) first, so the server would bind IPv6 only and IPv4 clients could not
-connect.
+connect. A host that cannot be resolved or an address already in use is reported as
+`Unable to bind <host>:<port>` and the process exits non-zero.
 
 #### Host and Origin allow-lists
 

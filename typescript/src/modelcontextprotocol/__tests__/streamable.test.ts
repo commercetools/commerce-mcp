@@ -892,6 +892,23 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       expect(mockApp.listen).toHaveBeenCalledWith(8080, '0.0.0.0', callback);
     });
 
+    it.each(['*', ''])(
+      'binds every interface when given the %p shorthand',
+      (host) => {
+        // A literal `*` reaches dns.lookup() and never binds.
+        build().listen(8080, host);
+
+        expect(mockApp.listen).toHaveBeenCalledWith(8080, '0.0.0.0', undefined);
+      }
+    );
+
+    test('returns the server so callers can watch for bind failures', () => {
+      const server = {address: () => null};
+      mockApp.listen.mockReturnValue(server);
+
+      expect(build().listen(8080)).toBe(server);
+    });
+
     test('exposes the loopback default it applies', () => {
       expect(DEFAULT_HOST).toBe('127.0.0.1');
     });

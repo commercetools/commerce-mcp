@@ -2445,4 +2445,142 @@ describe('main function', () => {
       });
     });
   });
+
+  describe('remote bind failures and wildcard hosts', () => {
+    let listenSpy: jest.SpyInstance;
+    let errorSpy: jest.SpyInstance;
+
+    const remoteArgs = (extra: string[] = []) => [
+      'node',
+      'index.js',
+      '--tools=read_products',
+      '--clientId=test_client_id',
+      '--clientSecret=test_client_secret',
+      '--authUrl=https://auth.commercetools.com',
+      '--projectKey=test_project',
+      '--apiUrl=https://api.commercetools.com',
+      '--remote=true',
+      ...extra,
+    ];
+
+    /**
+     * Stands in for the http.Server express returns: `address()` is null until
+     * the bind succeeds, and failures arrive as an 'error' event.
+     */
+    const fakeServer = ({
+      address = null,
+      error,
+    }: {address?: unknown; error?: NodeJS.ErrnoException} = {}) => ({
+      address: () => address,
+      on: (event: string, listener: (err: NodeJS.ErrnoException) => void) => {
+        if (event === 'error' && error) listener(error);
+      },
+    });
+
+    const loggedLines = () => errorSpy.mock.calls.flat().map(String);
+
+    beforeEach(() => {
+      errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      listenSpy?.mockRestore();
+      errorSpy.mockRestore();
+      process.exitCode = undefined;
+    });
+
+    it('binds every interface for --host=*', async () => {
+      listenSpy = jest
+        .spyOn(CommercetoolsCommerceAgentStreamable.prototype, 'listen')
+        .mockImplementation(() => fakeServer({address: {port: 8080}}));
+
+      process.argv = remoteArgs(['--host=*']);
+      await main();
+
+      expect(listenSpy).toHaveBeenCalledWith(
+        8080,
+        '0.0.0.0',
+        expect.any(Function)
+      );
+      // The warning must name the address actually bound, not the shorthand.
+      expect(
+        loggedLines().some((line) => line.includes('bound to 0.0.0.0'))
+      ).toBe(true);
+    });
+
+    it('falls back to loopback for an empty --host= rather than opening up', async () => {
+      listenSpy = jest
+        .spyOn(CommercetoolsCommerceAgentStreamable.prototype, 'listen')
+        .mockImplementation(() => fakeServer({address: {port: 8080}}));
+
+      process.argv = remoteArgs(['--host=']);
+      await main();
+
+      expect(listenSpy).toHaveBeenCalledWith(
+        8080,
+        '127.0.0.1',
+        expect.any(Function)
+      );
+    });
+
+    it('keeps a wildcard shorthand out of the Host allow-list', async () => {
+      listenSpy = jest
+        .spyOn(CommercetoolsCommerceAgentStreamable.prototype, 'listen')
+        .mockImplementation(() => fakeServer({address: {port: 8080}}));
+
+      process.argv = remoteArgs(['--host=*']);
+      await main();
+
+      const allowed = listenSpy.mock.instances[0].allowedHosts;
+      expect(allowed).not.toContain('*');
+      expect(allowed).not.toContain('0.0.0.0');
+    });
+
+    it('reports a bind failure instead of exiting silently', async () => {
+      listenSpy = jest
+        .spyOn(CommercetoolsCommerceAgentStreamable.prototype, 'listen')
+        .mockImplementation(() =>
+          fakeServer({
+            error: Object.assign(new Error('listen EADDRINUSE'), {
+              code: 'EADDRINUSE',
+            }),
+          })
+        );
+
+      process.argv = remoteArgs(['--port=8080']);
+      await main();
+
+      expect(
+        loggedLines().some((line) =>
+          line.includes('Unable to bind 127.0.0.1:8080 (EADDRINUSE)')
+        )
+      ).toBe(true);
+      expect(process.exitCode).toBe(1);
+    });
+
+    it.each([
+      {address: null, bound: false},
+      {address: {port: 8080}, bound: true},
+    ])(
+      'logs "listening" only once the bind took (address: $address)',
+      async ({address, bound}) => {
+        listenSpy = jest
+          .spyOn(CommercetoolsCommerceAgentStreamable.prototype, 'listen')
+          .mockImplementation((_port, _host, cb) => {
+            const server = fakeServer({address});
+            // Express invokes this asynchronously, once the bind resolved.
+            setImmediate(() => (cb as () => void)?.());
+            return server;
+          });
+
+        process.argv = remoteArgs();
+        await main();
+        await new Promise(setImmediate);
+
+        expect(
+          loggedLines().some((line) => line.includes('listening on'))
+        ).toBe(bound);
+      }
+    );
+  });
 });
