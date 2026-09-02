@@ -48,6 +48,8 @@ The MCP server supports two authentication methods:
 | `client_credentials` (default) | `--clientId`, `--clientSecret`                             | Uses API client credentials for authentication. `--authType=client_credentials` is optional since this is the default                |
 | `auth_token`                   | `--accessToken`, (optional `--clientId`, `--clientSecret`) | Uses a pre-existing access token for authentication. Requires `--authType=auth_token` and optional `--clientId` and `--clientSecret` |
 
+With `--authType=auth_token`, `--accessToken` (or `ACCESS_TOKEN`) is only required for the stdio transport, which has no way to receive a token later. A remote server (`--remote=true`) does not necessarily need it at startup: every request must carry its own `Authorization: Bearer <token>` header, and that token is used for the request. Passing `--accessToken` alongside `--remote=true` is still allowed, but per-request tokens always take precedence.
+
 ### Customer context
 
 Pass `--customerId=CUSTOMER_ID` to run the server in customer self-service mode. When set, tools for customer-owned resources are automatically scoped to that customer and limited to safe operations:
@@ -540,6 +542,13 @@ You can connect to the running remote server using Claude by specifying the belo
 > Advanced embedders who perform their own authentication can opt out of this check by
 > passing `enforceAuthHeader: false` to `CommercetoolsCommerceAgentStreamable` (see the
 > SDK usage below). This is **not** recommended for network-exposed deployments.
+>
+> The startup credentials are frozen at construction and every request derives its own
+> copy, so one request can never influence the credentials used by the next. In stateful
+> mode (`--stateless=false`) a session additionally remembers the token it was opened
+> with — knowing a session ID is not enough to continue someone else's session, and a
+> mismatch is rejected with `403 Forbidden`. Callers that rotate their token mid-session
+> should open a new session.
 
 You can also use the Streamable HTTP server with the Commerce Agent like an SDK and develop on it.
 

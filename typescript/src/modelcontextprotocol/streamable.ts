@@ -1,4 +1,4 @@
-import {randomUUID} from 'node:crypto';
+import {createHash, randomUUID} from 'node:crypto';
 import express from 'express';
 import {
   AuthConfig,
@@ -12,9 +12,10 @@ import {ExistingTokenAuth as E} from '../types/auth';
 
 export default class CommercetoolsCommerceAgentStreamable {
   private app: IApp;
-  private authConfig: AuthConfig;
+  private readonly authConfig: AuthConfig;
   private server: (sessionId?: string) => Promise<CommercetoolsCommerceAgent>;
   private transports: {[sessionId: string]: StreamableHTTPServerTransport} = {};
+  private sessionTokens: {[sessionId: string]: string} = {};
   private stateless: boolean;
   private enforceAuthHeader: boolean;
 
@@ -31,7 +32,9 @@ export default class CommercetoolsCommerceAgentStreamable {
     enforceAuthHeader = true,
   }: IStreamServerOptions) {
     this.server = server!;
-    this.authConfig = authConfig!;
+    // Freeze a copy: our shared config cannot be mutated from here, and the
+    // caller's object is left alone.
+    this.authConfig = authConfig ? Object.freeze({...authConfig}) : authConfig!;
     this.configuration = configuration!;
     this.stateless = stateless;
     this.enforceAuthHeader = enforceAuthHeader;
@@ -80,6 +83,22 @@ export default class CommercetoolsCommerceAgentStreamable {
             } as E)
           : this.authConfig;
 
+        /**
+         * A stateful session holds an agent already bound to the credentials
+         * of the caller that opened it, so knowing a session id must not be
+         * enough to borrow those credentials: the token has to match too.
+         */
+        if (!this.isSessionOpener(req.headers['mcp-session-id'], token)) {
+          return res.status(403).json({
+            jsonrpc: '2.0',
+            error: {
+              code: -32003,
+              message: 'Forbidden: this session belongs to another caller',
+            },
+            id: null,
+          });
+        }
+
         let transport: StreamableHTTPServerTransport;
         let serverInstance = await this.getServer(undefined, requestAuthConfig);
 
@@ -115,6 +134,12 @@ export default class CommercetoolsCommerceAgentStreamable {
                 // Store the transport by session ID
                 this.transports[sessionId] = transport;
 
+                // Remember who may keep using this session
+                const fingerprint = this.fingerprintToken(token);
+                if (fingerprint) {
+                  this.sessionTokens[sessionId] = fingerprint;
+                }
+
                 // connect server to the transport
                 serverInstance = await this.getServer(
                   sessionId,
@@ -128,6 +153,7 @@ export default class CommercetoolsCommerceAgentStreamable {
             transport.onclose = () => {
               if (transport.sessionId) {
                 delete this.transports[transport.sessionId];
+                delete this.sessionTokens[transport.sessionId];
               }
             };
           } else {
@@ -195,6 +221,29 @@ export default class CommercetoolsCommerceAgentStreamable {
     if (scheme?.toLowerCase() !== 'bearer') return undefined;
     const token = rest.join(' ').trim();
     return token.length > 0 ? token : undefined;
+  }
+
+  /**
+   * Whether `token` may use the given session. Sessions opened without a
+   * bearer token (only possible when `enforceAuthHeader` is off) are left
+   * unrestricted; every other session requires the token it was opened with.
+   */
+  private isSessionOpener(
+    sessionId: string | string[] | undefined,
+    token?: string
+  ): boolean {
+    if (typeof sessionId !== 'string') return true;
+
+    const opener = this.sessionTokens[sessionId];
+    if (!opener) return true;
+
+    return opener === this.fingerprintToken(token);
+  }
+
+  /** Truncated SHA-256 of a token, so raw tokens are never held in memory here. */
+  private fingerprintToken(token?: string): string | undefined {
+    if (!token) return undefined;
+    return createHash('sha256').update(token).digest('hex').slice(0, 32);
   }
 
   // eslint-disable-next-line require-await

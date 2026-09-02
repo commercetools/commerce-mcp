@@ -344,6 +344,72 @@ describe('parseArgs function', () => {
         }
       );
 
+      it.each([
+        {source: 'the --remote flag', args: ['--remote=true'], env: {}},
+        {source: 'the REMOTE env var', args: [], env: {REMOTE: 'true'}},
+      ])(
+        'should not require an access token when authType=auth_token and remote is enabled via $source',
+        ({args, env: envVars}) => {
+          Object.assign(process.env, envVars);
+
+          const testArgs = [
+            '--tools=all',
+            '--authType=auth_token',
+            ...args,
+            '--authUrl=https://auth.commercetools.com',
+            '--projectKey=test_project',
+            '--apiUrl=https://api.commercetools.com',
+          ];
+
+          const {env} = parseArgs(testArgs);
+          expect(env.authType).toBe('auth_token');
+          expect(env.remote).toBe(true);
+          expect(env.accessToken).toBeUndefined();
+        }
+      );
+
+      it('should still require an access token when authType=auth_token and remote is explicitly false', () => {
+        const args = [
+          '--tools=all',
+          '--authType=auth_token',
+          '--remote=false',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+        expect(() => parseArgs(args)).toThrow(
+          'Missing required access token when "authType" is "auth_token".'
+        );
+      });
+
+      it('should keep a provided access token when authType=auth_token and remote is enabled', () => {
+        const args = [
+          '--tools=all',
+          '--authType=auth_token',
+          '--remote=true',
+          '--accessToken=test_access_token',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+        const {env} = parseArgs(args);
+        expect(env.accessToken).toBe('test_access_token');
+      });
+
+      it('should still require client credentials when authType=client_credentials and remote is enabled', () => {
+        const args = [
+          '--tools=all',
+          '--authType=client_credentials',
+          '--remote=true',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+        expect(() => parseArgs(args)).toThrow(
+          'Missing required client credentials when "authType" is "client_credentials".'
+        );
+      });
+
       it('should throw an error for unsupported authType value', () => {
         const args = [
           '--tools=all',

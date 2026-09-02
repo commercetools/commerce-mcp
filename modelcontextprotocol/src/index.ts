@@ -16,7 +16,10 @@ import {
   FieldFilteringHandler,
 } from '@commercetools/processors';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
-import {red, yellow} from 'colors';
+import colors from 'colors';
+
+const red = colors.red;
+const yellow = colors.yellow;
 
 type Options = {
   tools?: string[];
@@ -212,7 +215,7 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
       }
       break;
     case 'auth_token':
-      if (!env.accessToken) {
+      if (!env.remote && !env.accessToken) {
         throw new Error(
           'Missing required access token when "authType" is "auth_token". Please make sure to provide the value for "accessToken" or via environment variable (ACCESS_TOKEN).'
         );

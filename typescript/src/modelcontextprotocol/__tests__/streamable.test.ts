@@ -7,6 +7,7 @@ import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
 import {CommercetoolsCommerceAgent} from '../../modelcontextprotocol';
 
 jest.mock('node:crypto', () => ({
+  ...jest.requireActual('node:crypto'),
   randomUUID: jest.fn(),
 }));
 
@@ -390,6 +391,196 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       // Simulate transport close
       mockTransport.onclose();
       expect(mockTransport.onclose).toBeDefined();
+    });
+  });
+
+  describe('shared auth config hardening (COM-15-010)', () => {
+    test('freezes the startup config so a request cannot mutate it', () => {
+      const authConfig = {...mockAuthConfig, accessToken: 'startup-token'};
+      const instance = new CommercetoolsCommerceAgentStreamable({
+        authConfig,
+        configuration: mockConfiguration,
+        server: mockServer,
+      } as any);
+
+      const shared = (instance as any).authConfig;
+      expect(Object.isFrozen(shared)).toBe(true);
+      expect(() => {
+        shared.accessToken = 'leaked-token';
+      }).toThrow(TypeError);
+      expect(shared.accessToken).toBe('startup-token');
+    });
+
+    test('leaves the startup config untouched after serving a request', async () => {
+      jest.clearAllMocks();
+      const authConfig = {...mockAuthConfig, accessToken: 'startup-token'};
+      const instance = new CommercetoolsCommerceAgentStreamable({
+        authConfig,
+        configuration: mockConfiguration,
+        server: mockServer,
+      } as any);
+      const postCalls = mockApp.post.mock.calls.filter(
+        (call: any) => call[0] === '/mcp'
+      );
+      const handler = postCalls[postCalls.length - 1][1];
+
+      await handler(
+        {headers: {authorization: 'Bearer caller-token'}, body: {}},
+        {
+          on: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          json: jest.fn().mockReturnThis(),
+          headersSent: false,
+        }
+      );
+
+      expect((instance as any).authConfig.accessToken).toBe('startup-token');
+    });
+  });
+
+  describe('POST /mcp endpoint - session binding (stateful)', () => {
+    const newRes = () =>
+      ({
+        on: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        headersSent: false,
+      }) as any;
+
+    const buildInstance = (options: Record<string, unknown> = {}) => {
+      jest.clearAllMocks();
+      const instance = new CommercetoolsCommerceAgentStreamable({
+        authConfig: mockAuthConfig,
+        configuration: mockConfiguration,
+        server: mockServer,
+        stateless: false,
+        streamableHttpOptions: mockStreamableHttpOptions,
+        ...options,
+      } as any);
+
+      const postCalls = mockApp.post.mock.calls.filter(
+        (call: any) => call[0] === '/mcp'
+      );
+      return {instance, handler: postCalls[postCalls.length - 1][1]};
+    };
+
+    const openSession = async (
+      handler: (req: any, res: any) => Promise<void>,
+      token: string | undefined,
+      sessionId: string
+    ) => {
+      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(true);
+      await handler(
+        {
+          headers: token ? {authorization: `Bearer ${token}`} : {},
+          body: {method: 'initialize', params: {}},
+        },
+        newRes()
+      );
+
+      const transportOptions = (
+        StreamableHTTPServerTransport as jest.Mock
+      ).mock.calls.slice(-1)[0][0];
+      await transportOptions.onsessioninitialized(sessionId);
+      await new Promise(setImmediate);
+    };
+
+    const continueSession = async (
+      handler: (req: any, res: any) => Promise<void>,
+      token: string | undefined,
+      sessionId: string
+    ) => {
+      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(false);
+      const res = newRes();
+      mockTransport.handleRequest.mockClear();
+      await handler(
+        {
+          headers: {
+            ...(token ? {authorization: `Bearer ${token}`} : {}),
+            'mcp-session-id': sessionId,
+          },
+          body: {method: 'tools/list', params: {}},
+        },
+        res
+      );
+      return res;
+    };
+
+    test('rejects another caller reusing a session id with 403', async () => {
+      const {handler} = buildInstance();
+      await openSession(handler, 'victim-token', 'session-1');
+
+      const res = await continueSession(handler, 'attacker-token', 'session-1');
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({
+        jsonrpc: '2.0',
+        error: {
+          code: -32003,
+          message: 'Forbidden: this session belongs to another caller',
+        },
+        id: null,
+      });
+      expect(mockTransport.handleRequest).not.toHaveBeenCalled();
+    });
+
+    test('rejects a session-id-only request when the header is dropped', async () => {
+      const {handler} = buildInstance({enforceAuthHeader: false});
+      await openSession(handler, 'victim-token', 'session-1');
+
+      const res = await continueSession(handler, undefined, 'session-1');
+
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(mockTransport.handleRequest).not.toHaveBeenCalled();
+    });
+
+    test('lets the opener keep using its own session', async () => {
+      const {handler} = buildInstance();
+      await openSession(handler, 'victim-token', 'session-1');
+
+      const res = await continueSession(handler, 'victim-token', 'session-1');
+
+      expect(res.status).not.toHaveBeenCalledWith(403);
+      expect(mockTransport.handleRequest).toHaveBeenCalled();
+    });
+
+    test('does not restrict sessions opened without a token', async () => {
+      const {handler} = buildInstance({enforceAuthHeader: false});
+      await openSession(handler, undefined, 'session-1');
+
+      const res = await continueSession(handler, 'any-token', 'session-1');
+
+      expect(res.status).not.toHaveBeenCalledWith(403);
+    });
+
+    test('forgets the session token when the transport closes', async () => {
+      const {instance, handler} = buildInstance();
+      await openSession(handler, 'victim-token', 'session-1');
+
+      expect((instance as any).sessionTokens['session-1']).toBeDefined();
+
+      mockTransport.sessionId = 'session-1';
+      mockTransport.onclose();
+
+      expect((instance as any).sessionTokens['session-1']).toBeUndefined();
+      expect((instance as any).transports['session-1']).toBeUndefined();
+    });
+
+    test('never keeps the raw token in the session map', async () => {
+      const {instance, handler} = buildInstance();
+      await openSession(handler, 'victim-token', 'session-1');
+
+      expect(Object.values((instance as any).sessionTokens)).not.toContain(
+        'victim-token'
+      );
+    });
+
+    test('ignores an unknown session id, leaving the 400 path intact', async () => {
+      const {handler} = buildInstance();
+
+      const res = await continueSession(handler, 'some-token', 'never-opened');
+
+      expect(res.status).toHaveBeenCalledWith(400);
     });
   });
 
