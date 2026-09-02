@@ -2,6 +2,7 @@ import {main} from '../index';
 import {
   AuthConfig,
   CommercetoolsCommerceAgent,
+  CommercetoolsCommerceAgentStreamable,
   Configuration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -2262,6 +2263,106 @@ describe('main function', () => {
       });
 
       expect(StdioServerTransport).toHaveBeenCalled();
+    });
+  });
+
+  describe('remote host binding', () => {
+    let listenSpy: jest.SpyInstance;
+
+    const remoteArgs = (extra: string[] = []) => [
+      'node',
+      'index.js',
+      '--tools=read_products',
+      '--clientId=test_client_id',
+      '--clientSecret=test_client_secret',
+      '--authUrl=https://auth.commercetools.com',
+      '--projectKey=test_project',
+      '--apiUrl=https://api.commercetools.com',
+      '--remote=true',
+      ...extra,
+    ];
+
+    beforeEach(() => {
+      listenSpy = jest
+        .spyOn(CommercetoolsCommerceAgentStreamable.prototype, 'listen')
+        .mockImplementation(() => undefined);
+    });
+
+    afterEach(() => listenSpy.mockRestore());
+
+    it('binds loopback by default', async () => {
+      process.argv = remoteArgs();
+
+      await main();
+
+      expect(listenSpy).toHaveBeenCalledWith(
+        8080,
+        '127.0.0.1',
+        expect.any(Function)
+      );
+    });
+
+    it('binds the host given via --host', async () => {
+      process.argv = remoteArgs(['--host=0.0.0.0', '--port=9000']);
+
+      await main();
+
+      expect(listenSpy).toHaveBeenCalledWith(
+        9000,
+        '0.0.0.0',
+        expect.any(Function)
+      );
+    });
+
+    it.each([
+      {host: '0.0.0.0', expected: 'every network interface on this machine'},
+      {host: '::', expected: 'every network interface on this machine'},
+      {host: '192.168.1.10', expected: 'reachable from outside this machine'},
+    ])(
+      'names the exposure specific to --host=$host',
+      async ({host, expected}) => {
+        const errorSpy = jest
+          .spyOn(console, 'error')
+          .mockImplementation(() => {});
+
+        process.argv = remoteArgs([`--host=${host}`]);
+        await main();
+
+        const warning = errorSpy.mock.calls
+          .flat()
+          .map(String)
+          .find((line) => line.includes('The MCP server is'));
+
+        errorSpy.mockRestore();
+
+        expect(warning).toContain(host);
+        expect(warning).toContain(expected);
+      }
+    );
+
+    it('warns when bound beyond loopback, and stays quiet otherwise', async () => {
+      const errorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+
+      process.argv = remoteArgs(['--host=0.0.0.0']);
+      await main();
+      const warned = errorSpy.mock.calls
+        .flat()
+        .some((arg) => String(arg).includes('The MCP server is bound to'));
+
+      errorSpy.mockClear();
+
+      process.argv = remoteArgs();
+      await main();
+      const quiet = !errorSpy.mock.calls
+        .flat()
+        .some((arg) => String(arg).includes('The MCP server is bound to'));
+
+      errorSpy.mockRestore();
+
+      expect(warned).toBe(true);
+      expect(quiet).toBe(true);
     });
   });
 });

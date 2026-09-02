@@ -8,6 +8,7 @@ import {
   CommercetoolsCommerceAgent,
   CommercetoolsCommerceAgentStreamable,
   AuthConfig,
+  DEFAULT_HOST,
   resolveToolsForConfiguration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 import {
@@ -43,6 +44,7 @@ type EnvVars = {
   remote?: boolean;
   stateless?: boolean;
   port?: number;
+  host?: string;
   logging?: boolean;
   accessToken?: string;
   authType?: 'client_credentials' | 'auth_token';
@@ -62,6 +64,8 @@ const PUBLIC_ARGS = [
   'dynamicToolLoadingThreshold',
   'toolOutputFormat',
   'logging',
+  'host',
+  'port',
 ];
 
 const ACCEPTED_ARGS = [...PUBLIC_ARGS, ...HIDDEN_ARGS];
@@ -104,6 +108,8 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
         env.remote = value == 'true';
       } else if (key == 'stateless') {
         env.stateless = value == 'true';
+      } else if (key == 'host') {
+        env.host = value;
       } else if (key == 'port') {
         env.port = Number(value);
       } else if (key == 'customerId') {
@@ -174,6 +180,7 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
   env.remote = env.remote || process.env.REMOTE == 'true';
   env.logging = env.logging || process.env.LOGGING == 'true';
   env.stateless = env.stateless || process.env.STATELESS == 'true';
+  env.host = env.host || process.env.HOST || DEFAULT_HOST;
   env.port = env.port || Number(process.env.PORT);
 
   options.businessUnitKey =
@@ -357,15 +364,50 @@ function createAuthConfig(env: EnvVars): AuthConfig {
   }
 }
 
+const LOOPBACK_HOSTS = ['127.0.0.1', 'localhost', '::1', '::ffff:127.0.0.1'];
+
+/** Hosts that mean "listen on every interface" rather than a single address. */
+const WILDCARD_HOSTS = ['0.0.0.0', '::', '::0', '*', ''];
+
+function isLoopbackHost(host: string): boolean {
+  return LOOPBACK_HOSTS.includes(host) || host.startsWith('127.');
+}
+
+function isWildcardHost(host: string): boolean {
+  return WILDCARD_HOSTS.includes(host.trim());
+}
+
+/**
+ * Binding beyond loopback puts the server on the network, where anything that
+ * can reach the port can talk to it. That is a legitimate choice behind a
+ * gateway, but it should never happen without the operator noticing — and a
+ * wildcard bind deserves a louder warning than a single chosen interface,
+ * since it also covers interfaces the operator may not have had in mind.
+ */
+function warnIfPubliclyBound(host: string) {
+  if (isLoopbackHost(host)) return;
+
+  const exposure = isWildcardHost(host)
+    ? `bound to ${host || '0.0.0.0'} — every network interface on this machine, including\n` +
+      `   any that is publicly routable`
+    : `bound to ${host}, so it is reachable from outside this machine`;
+
+  console.error(
+    yellow(
+      `\n\u26a0\ufe0f  The MCP server is ${exposure}.\n` +
+        `   Callers still need a valid "Authorization: Bearer <token>" header, but make sure the port\n` +
+        `   is only exposed to networks you trust. Use --host=127.0.0.1 to keep it local.\n`
+    )
+  );
+}
+
 function handleError(error: any) {
   console.error(red('\n🚨  Error initializing commercetools MCP server:\n'));
   console.error(yellow(`   ${error.message}\n`));
 }
 
 export async function main() {
-  require('dotenv').config({
-    quiet: true,
-  });
+  require('dotenv').config({quiet: true});
   const {options, env} = parseArgs(process.argv.slice(2));
 
   // Create the CommercetoolsCommerceAgent instance
@@ -414,8 +456,12 @@ export async function main() {
     });
 
     const port = env.port || 8080;
-    streamServer.listen(port, function () {
-      console.error(`Stream server listening on`, port);
+    const host = env.host!;
+
+    warnIfPubliclyBound(host);
+
+    streamServer.listen(port, host, function () {
+      console.error(`Stream server listening on ${host}:${port}`);
     });
   } else {
     const server = await getServer();

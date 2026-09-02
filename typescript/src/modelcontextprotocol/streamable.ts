@@ -5,6 +5,9 @@ import {
   CommercetoolsCommerceAgent,
   Configuration,
 } from '../modelcontextprotocol';
+// Imported from the module that owns it, not via the barrel: the barrel
+// re-exports this file, and a value read through that cycle is undefined.
+import {DEFAULT_HOST} from '../shared/constants';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
 import {IApp, IStreamServerOptions} from '../types/configuration';
@@ -265,7 +268,17 @@ export default class CommercetoolsCommerceAgentStreamable {
     });
   }
 
-  listen(port: number, cb?: () => void) {
-    this.app.listen(port, cb);
+  /**
+   * Binds the HTTP server. Without an explicit `host` the server listens on
+   * loopback only; widening it to other interfaces has to be asked for.
+   * The `(port, callback)` form is still accepted.
+   */
+  listen(port: number, cb?: () => void): void;
+  listen(port: number, host?: string, cb?: () => void): void;
+  listen(port: number, hostOrCb?: string | (() => void), maybeCb?: () => void) {
+    const host = typeof hostOrCb === 'string' ? hostOrCb : DEFAULT_HOST;
+    const cb = typeof hostOrCb === 'function' ? hostOrCb : maybeCb;
+
+    this.app.listen(port, host, cb);
   }
 }

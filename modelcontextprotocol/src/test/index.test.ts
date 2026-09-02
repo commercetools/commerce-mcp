@@ -297,6 +297,66 @@ describe('parseArgs function', () => {
       delete process.env.API_URL;
     });
 
+    describe('host binding', () => {
+      it('defaults to loopback when no host is given', () => {
+        const args = [
+          '--tools=all',
+          '--clientId=test_client_id',
+          '--clientSecret=test_client_secret',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+
+        expect(parseArgs(args).env.host).toBe('127.0.0.1');
+      });
+
+      it('accepts an explicit --host', () => {
+        const args = [
+          '--tools=all',
+          '--host=0.0.0.0',
+          '--clientId=test_client_id',
+          '--clientSecret=test_client_secret',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+
+        expect(parseArgs(args).env.host).toBe('0.0.0.0');
+      });
+
+      it('falls back to the HOST environment variable', () => {
+        process.env.HOST = '192.168.1.10';
+
+        const args = [
+          '--tools=all',
+          '--clientId=test_client_id',
+          '--clientSecret=test_client_secret',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+
+        expect(parseArgs(args).env.host).toBe('192.168.1.10');
+      });
+
+      it('prefers --host over the HOST environment variable', () => {
+        process.env.HOST = '192.168.1.10';
+
+        const args = [
+          '--tools=all',
+          '--host=127.0.0.1',
+          '--clientId=test_client_id',
+          '--clientSecret=test_client_secret',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+
+        expect(parseArgs(args).env.host).toBe('127.0.0.1');
+      });
+    });
+
     describe('authType validation', () => {
       describe.each([
         {

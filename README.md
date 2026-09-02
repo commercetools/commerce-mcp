@@ -507,8 +507,22 @@ npx -y @commercetools/commerce-mcp \
   --apiUrl=API_URL \
   --remote=true \
   --stateless=true \
+  --host=127.0.0.1 \
   --port=8888
 ```
+
+`--host` controls the network interface the remote server binds to. It defaults to
+`127.0.0.1`, so a freshly started server is reachable from the local machine only.
+Pass `--host=0.0.0.0` (or a specific interface address) to accept connections from
+elsewhere — that is what container and Kubernetes deployments need in order for port
+mapping to work — and the server prints a warning at startup reminding you the port is
+now network-reachable, with a louder one for `0.0.0.0`/`::` since a wildcard bind also
+covers interfaces you may not have had in mind. `HOST` works as an environment variable
+equivalent.
+
+Prefer `127.0.0.1` over `localhost`: on many systems `localhost` resolves to the IPv6
+loopback (`::1`) first, so the server would bind IPv6 only and IPv4 clients could not
+connect.
 
 You can connect to the running remote server using Claude by specifying the below in the `claude_desktop_config.json` file.
 

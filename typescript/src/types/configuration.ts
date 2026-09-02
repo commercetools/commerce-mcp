@@ -71,7 +71,7 @@ export interface IApp {
     handler: (req: IRequest, res: IResponse) => void
   ) => void;
   get: (path: string, handler: (req: IRequest, res: IResponse) => void) => void;
-  listen: (port: number, cb?: () => void) => void;
+  listen: (port: number, host: string, cb?: () => void) => void;
 }
 
 type IWithServerInstance = {

@@ -2,6 +2,7 @@
 import {randomUUID} from 'node:crypto';
 import express, {Express, Request, Response} from 'express';
 import CommercetoolsCommerceAgentStreamable from '../streamable';
+import {DEFAULT_HOST} from '../../shared/constants';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
 import {CommercetoolsCommerceAgent} from '../../modelcontextprotocol';
@@ -676,29 +677,37 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
   });
 
   describe('listen method', () => {
-    test('should call app.listen with port and callback', () => {
-      const instance = new CommercetoolsCommerceAgentStreamable({
+    const build = () =>
+      new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
       } as any);
+
+    test('binds loopback by default, keeping the (port, callback) form', () => {
       const callback = jest.fn();
 
-      instance.listen(3000, callback);
+      build().listen(3000, callback);
 
-      expect(mockApp.listen).toHaveBeenCalledWith(3000, callback);
+      expect(mockApp.listen).toHaveBeenCalledWith(3000, '127.0.0.1', callback);
     });
 
     test('should call app.listen with port only', () => {
-      const instance = new CommercetoolsCommerceAgentStreamable({
-        authConfig: mockAuthConfig,
-        configuration: mockConfiguration,
-        server: mockServer,
-      } as any);
+      build().listen(8080);
 
-      instance.listen(8080);
+      expect(mockApp.listen).toHaveBeenCalledWith(8080, '127.0.0.1', undefined);
+    });
 
-      expect(mockApp.listen).toHaveBeenCalledWith(8080, undefined);
+    test('binds the host it is given', () => {
+      const callback = jest.fn();
+
+      build().listen(8080, '0.0.0.0', callback);
+
+      expect(mockApp.listen).toHaveBeenCalledWith(8080, '0.0.0.0', callback);
+    });
+
+    test('exposes the loopback default it applies', () => {
+      expect(DEFAULT_HOST).toBe('127.0.0.1');
     });
   });
 
