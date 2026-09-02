@@ -357,6 +357,66 @@ describe('parseArgs function', () => {
       });
     });
 
+    describe('host and origin allow-lists', () => {
+      const baseArgs = [
+        '--tools=all',
+        '--clientId=test_client_id',
+        '--clientSecret=test_client_secret',
+        '--authUrl=https://auth.commercetools.com',
+        '--projectKey=test_project',
+        '--apiUrl=https://api.commercetools.com',
+      ];
+
+      it('leaves both lists unset by default', () => {
+        const {env} = parseArgs(baseArgs);
+
+        expect(env.allowedHosts).toBeUndefined();
+        expect(env.allowedOrigins).toBeUndefined();
+      });
+
+      it('parses comma-separated --allowedHosts, trimming entries', () => {
+        const {env} = parseArgs([
+          ...baseArgs,
+          '--allowedHosts=mcp.example.com, mcp.internal ,',
+        ]);
+
+        expect(env.allowedHosts).toEqual(['mcp.example.com', 'mcp.internal']);
+      });
+
+      it('parses comma-separated --allowedOrigins', () => {
+        const {env} = parseArgs([
+          ...baseArgs,
+          '--allowedOrigins=https://app.example.com,https://admin.example.com',
+        ]);
+
+        expect(env.allowedOrigins).toEqual([
+          'https://app.example.com',
+          'https://admin.example.com',
+        ]);
+      });
+
+      it('falls back to the ALLOWED_HOSTS and ALLOWED_ORIGINS env vars', () => {
+        process.env.ALLOWED_HOSTS = 'env.example.com';
+        process.env.ALLOWED_ORIGINS = 'https://env.example.com';
+
+        const {env} = parseArgs(baseArgs);
+
+        expect(env.allowedHosts).toEqual(['env.example.com']);
+        expect(env.allowedOrigins).toEqual(['https://env.example.com']);
+      });
+
+      it('prefers the arguments over the env vars', () => {
+        process.env.ALLOWED_HOSTS = 'env.example.com';
+
+        const {env} = parseArgs([
+          ...baseArgs,
+          '--allowedHosts=arg.example.com',
+        ]);
+
+        expect(env.allowedHosts).toEqual(['arg.example.com']);
+      });
+    });
+
     describe('authType validation', () => {
       describe.each([
         {

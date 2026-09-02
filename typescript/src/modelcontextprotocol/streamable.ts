@@ -7,7 +7,7 @@ import {
 } from '../modelcontextprotocol';
 // Imported from the module that owns it, not via the barrel: the barrel
 // re-exports this file, and a value read through that cycle is undefined.
-import {DEFAULT_HOST} from '../shared/constants';
+import {DEFAULT_HOST, LOOPBACK_HOSTNAMES} from '../shared/constants';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
 import {IApp, IStreamServerOptions} from '../types/configuration';
@@ -21,6 +21,10 @@ export default class CommercetoolsCommerceAgentStreamable {
   private sessionTokens: {[sessionId: string]: string} = {};
   private stateless: boolean;
   private enforceAuthHeader: boolean;
+  /** Hostnames (no port) this server answers for; `*` disables the check. */
+  private allowedHosts: string[];
+  /** Browser origins allowed to call this server; `*` disables the check. */
+  private allowedOrigins: string[];
 
   private configuration: Configuration;
 
@@ -33,6 +37,8 @@ export default class CommercetoolsCommerceAgentStreamable {
     server,
     app,
     enforceAuthHeader = true,
+    allowedHosts = LOOPBACK_HOSTNAMES,
+    allowedOrigins = [],
   }: IStreamServerOptions) {
     this.server = server!;
     // Freeze a copy: our shared config cannot be mutated from here, and the
@@ -41,6 +47,8 @@ export default class CommercetoolsCommerceAgentStreamable {
     this.configuration = configuration!;
     this.stateless = stateless;
     this.enforceAuthHeader = enforceAuthHeader;
+    this.allowedHosts = allowedHosts;
+    this.allowedOrigins = allowedOrigins;
 
     // initialize express app
     this.app = app ?? express();
@@ -51,6 +59,22 @@ export default class CommercetoolsCommerceAgentStreamable {
      */
     this.app.post('/mcp', async (req, res) => {
       try {
+        /**
+         * Answer only for hostnames and origins we recognise. A DNS rebinding
+         * attack reaches a loopback server through an attacker-controlled
+         * hostname, which the browser still treats as same-origin — the
+         * `Host` header is what gives it away. Checked before authentication
+         * so a rebound request is turned away without touching credentials.
+         */
+        const untrusted = this.findUntrustedTarget(req.headers);
+        if (untrusted) {
+          return res.status(403).json({
+            jsonrpc: '2.0',
+            error: {code: -32004, message: untrusted},
+            id: null,
+          });
+        }
+
         const authHeader = req.headers.authorization as string | undefined;
         const token = this.extractBearerToken(authHeader);
 
@@ -196,6 +220,15 @@ export default class CommercetoolsCommerceAgentStreamable {
      * decide on how to handle SSE requests
      */
     this.app.get('/mcp', (req, res) => {
+      const untrusted = this.findUntrustedTarget(req.headers);
+      if (untrusted) {
+        return res.status(403).json({
+          jsonrpc: '2.0',
+          error: {code: -32004, message: untrusted},
+          id: null,
+        });
+      }
+
       const authHeader = req.headers.authorization as string | undefined;
       if (this.enforceAuthHeader && !this.extractBearerToken(authHeader)) {
         return res.status(401).json({
@@ -224,6 +257,56 @@ export default class CommercetoolsCommerceAgentStreamable {
     if (scheme?.toLowerCase() !== 'bearer') return undefined;
     const token = rest.join(' ').trim();
     return token.length > 0 ? token : undefined;
+  }
+
+  /**
+   * Returns why a request's `Host`/`Origin` is not trusted, or undefined when
+   * both are acceptable. `Host` is matched on hostname only, so the port the
+   * server happens to run on does not have to be configured.
+   */
+  private findUntrustedTarget(
+    headers: Record<string, string | string[] | undefined>
+  ): string | undefined {
+    return (
+      this.findUntrustedHost(headers.host) ??
+      this.findUntrustedOrigin(headers.origin)
+    );
+  }
+
+  private findUntrustedHost(host?: string | string[]): string | undefined {
+    if (this.allowedHosts.includes('*')) return undefined;
+
+    if (typeof host !== 'string' || host.trim().length === 0) {
+      return 'Forbidden: missing Host header';
+    }
+
+    let hostname: string;
+    try {
+      // The URL parser handles IPv4, bracketed IPv6 and plain hostnames.
+      hostname = new URL(`http://${host}`).hostname;
+    } catch {
+      return `Forbidden: malformed Host header`;
+    }
+
+    return this.isAllowed(hostname, this.allowedHosts)
+      ? undefined
+      : `Forbidden: Host "${hostname}" is not an allowed host for this server`;
+  }
+
+  private findUntrustedOrigin(origin?: string | string[]): string | undefined {
+    // Non-browser MCP clients send no Origin, and have nothing to spoof.
+    if (typeof origin !== 'string' || origin.trim().length === 0)
+      return undefined;
+    if (this.allowedOrigins.includes('*')) return undefined;
+
+    return this.isAllowed(origin, this.allowedOrigins)
+      ? undefined
+      : `Forbidden: Origin "${origin}" is not an allowed origin for this server`;
+  }
+
+  private isAllowed(value: string, allowList: string[]): boolean {
+    const candidate = value.trim().toLowerCase();
+    return allowList.some((entry) => entry.trim().toLowerCase() === candidate);
   }
 
   /**

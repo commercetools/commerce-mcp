@@ -9,6 +9,7 @@ import {
   CommercetoolsCommerceAgentStreamable,
   AuthConfig,
   DEFAULT_HOST,
+  LOOPBACK_HOSTNAMES,
   resolveToolsForConfiguration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 import {
@@ -45,6 +46,8 @@ type EnvVars = {
   stateless?: boolean;
   port?: number;
   host?: string;
+  allowedHosts?: string[];
+  allowedOrigins?: string[];
   logging?: boolean;
   accessToken?: string;
   authType?: 'client_credentials' | 'auth_token';
@@ -66,6 +69,8 @@ const PUBLIC_ARGS = [
   'logging',
   'host',
   'port',
+  'allowedHosts',
+  'allowedOrigins',
 ];
 
 const ACCEPTED_ARGS = [...PUBLIC_ARGS, ...HIDDEN_ARGS];
@@ -110,6 +115,10 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
         env.stateless = value == 'true';
       } else if (key == 'host') {
         env.host = value;
+      } else if (key == 'allowedHosts') {
+        env.allowedHosts = splitList(value);
+      } else if (key == 'allowedOrigins') {
+        env.allowedOrigins = splitList(value);
       } else if (key == 'port') {
         env.port = Number(value);
       } else if (key == 'customerId') {
@@ -181,6 +190,10 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
   env.logging = env.logging || process.env.LOGGING == 'true';
   env.stateless = env.stateless || process.env.STATELESS == 'true';
   env.host = env.host || process.env.HOST || DEFAULT_HOST;
+  env.allowedHosts =
+    env.allowedHosts || splitList(process.env.ALLOWED_HOSTS) || undefined;
+  env.allowedOrigins =
+    env.allowedOrigins || splitList(process.env.ALLOWED_ORIGINS) || undefined;
   env.port = env.port || Number(process.env.PORT);
 
   options.businessUnitKey =
@@ -364,6 +377,34 @@ function createAuthConfig(env: EnvVars): AuthConfig {
   }
 }
 
+function splitList(value?: string): string[] | undefined {
+  if (!value) return undefined;
+
+  const entries = value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  return entries.length > 0 ? entries : undefined;
+}
+
+/**
+ * Hostnames the server will answer for. Loopback always works; the interface
+ * it was told to bind is added so addressing the server by that address works
+ * without extra configuration, and `--allowedHosts` covers the rest (a domain
+ * in front of a proxy, a container hostname, ...).
+ */
+function resolveAllowedHosts(env: EnvVars): string[] {
+  const hosts = new Set([...LOOPBACK_HOSTNAMES, ...(env.allowedHosts ?? [])]);
+
+  const host = env.host;
+  if (host && !isWildcardHost(host)) {
+    hosts.add(host);
+  }
+
+  return [...hosts];
+}
+
 const LOOPBACK_HOSTS = ['127.0.0.1', 'localhost', '::1', '::ffff:127.0.0.1'];
 
 /** Hosts that mean "listen on every interface" rather than a single address. */
@@ -450,6 +491,8 @@ export async function main() {
       authConfig,
       configuration,
       stateless: env.stateless,
+      allowedHosts: resolveAllowedHosts(env),
+      allowedOrigins: env.allowedOrigins,
       streamableHttpOptions: {
         sessionIdGenerator: undefined,
       },

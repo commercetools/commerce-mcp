@@ -6,3 +6,10 @@ export const DYNAMIC_TOOL_LOADING_THRESHOLD = 30;
  * what someone starting a local MCP server intends.
  */
 export const DEFAULT_HOST = '127.0.0.1';
+
+/**
+ * Hostnames a loopback-bound server legitimately answers for. Anything else
+ * in the `Host` header means the request was addressed somewhere else and
+ * only reached us through DNS rebinding or a proxy we were not told about.
+ */
+export const LOOPBACK_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]'];

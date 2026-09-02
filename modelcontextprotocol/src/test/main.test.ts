@@ -2365,4 +2365,84 @@ describe('main function', () => {
       expect(quiet).toBe(true);
     });
   });
+
+  describe('remote host and origin allow-lists', () => {
+    let listenSpy: jest.SpyInstance;
+    let constructorSpy: jest.SpyInstance;
+
+    const remoteArgs = (extra: string[] = []) => [
+      'node',
+      'index.js',
+      '--tools=read_products',
+      '--clientId=test_client_id',
+      '--clientSecret=test_client_secret',
+      '--authUrl=https://auth.commercetools.com',
+      '--projectKey=test_project',
+      '--apiUrl=https://api.commercetools.com',
+      '--remote=true',
+      ...extra,
+    ];
+
+    beforeEach(() => {
+      listenSpy = jest
+        .spyOn(CommercetoolsCommerceAgentStreamable.prototype, 'listen')
+        .mockImplementation(() => undefined);
+      constructorSpy = jest
+        .spyOn(console, 'error')
+        .mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      listenSpy.mockRestore();
+      constructorSpy.mockRestore();
+    });
+
+    const optionsOf = (instance: any) => ({
+      allowedHosts: instance.allowedHosts,
+      allowedOrigins: instance.allowedOrigins,
+    });
+
+    it('allows loopback out of the box', async () => {
+      process.argv = remoteArgs();
+
+      await main();
+
+      expect(optionsOf(listenSpy.mock.instances[0])).toEqual({
+        allowedHosts: ['localhost', '127.0.0.1', '[::1]'],
+        allowedOrigins: [],
+      });
+    });
+
+    it('adds the bound interface so the server answers on its own address', async () => {
+      process.argv = remoteArgs(['--host=192.168.1.10']);
+
+      await main();
+
+      expect(listenSpy.mock.instances[0].allowedHosts).toEqual(
+        expect.arrayContaining(['127.0.0.1', '192.168.1.10'])
+      );
+    });
+
+    it('does not add a wildcard bind to the allow-list', async () => {
+      process.argv = remoteArgs(['--host=0.0.0.0']);
+
+      await main();
+
+      expect(listenSpy.mock.instances[0].allowedHosts).not.toContain('0.0.0.0');
+    });
+
+    it('passes --allowedHosts and --allowedOrigins through', async () => {
+      process.argv = remoteArgs([
+        '--allowedHosts=mcp.example.com',
+        '--allowedOrigins=https://app.example.com',
+      ]);
+
+      await main();
+
+      expect(optionsOf(listenSpy.mock.instances[0])).toEqual({
+        allowedHosts: expect.arrayContaining(['127.0.0.1', 'mcp.example.com']),
+        allowedOrigins: ['https://app.example.com'],
+      });
+    });
+  });
 });

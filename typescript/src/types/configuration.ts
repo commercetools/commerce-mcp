@@ -88,6 +88,21 @@ type IWithServerInstance = {
    * itself (e.g. via the injected `server` factory).
    */
   enforceAuthHeader?: boolean;
+  /**
+   * Hostnames (without port) this server answers for. Requests whose `Host`
+   * header resolves to anything else are rejected with 403, which is what
+   * stops a DNS rebinding attack from driving a loopback server through an
+   * attacker-controlled hostname. Defaults to localhost/127.0.0.1/[::1];
+   * pass `['*']` to accept any host.
+   */
+  allowedHosts?: string[];
+  /**
+   * Browser origins allowed to call this server. Requests without an `Origin`
+   * header (every non-browser MCP client) are unaffected; a request that
+   * carries one must match this list. Defaults to none; pass `['*']` to
+   * accept any origin.
+   */
+  allowedOrigins?: string[];
 };
 
 type IWithServerConfig = {
@@ -104,6 +119,21 @@ type IWithServerConfig = {
    * itself (e.g. via the injected `server` factory).
    */
   enforceAuthHeader?: boolean;
+  /**
+   * Hostnames (without port) this server answers for. Requests whose `Host`
+   * header resolves to anything else are rejected with 403, which is what
+   * stops a DNS rebinding attack from driving a loopback server through an
+   * attacker-controlled hostname. Defaults to localhost/127.0.0.1/[::1];
+   * pass `['*']` to accept any host.
+   */
+  allowedHosts?: string[];
+  /**
+   * Browser origins allowed to call this server. Requests without an `Origin`
+   * header (every non-browser MCP client) are unaffected; a request that
+   * carries one must match this list. Defaults to none; pass `['*']` to
+   * accept any origin.
+   */
+  allowedOrigins?: string[];
 };
 
 export type IStreamServerOptions = IWithServerInstance | IWithServerConfig;
