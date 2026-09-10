@@ -297,6 +297,126 @@ describe('parseArgs function', () => {
       delete process.env.API_URL;
     });
 
+    describe('host binding', () => {
+      it('defaults to loopback when no host is given', () => {
+        const args = [
+          '--tools=all',
+          '--clientId=test_client_id',
+          '--clientSecret=test_client_secret',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+
+        expect(parseArgs(args).env.host).toBe('127.0.0.1');
+      });
+
+      it('accepts an explicit --host', () => {
+        const args = [
+          '--tools=all',
+          '--host=0.0.0.0',
+          '--clientId=test_client_id',
+          '--clientSecret=test_client_secret',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+
+        expect(parseArgs(args).env.host).toBe('0.0.0.0');
+      });
+
+      it('falls back to the HOST environment variable', () => {
+        process.env.HOST = '192.168.1.10';
+
+        const args = [
+          '--tools=all',
+          '--clientId=test_client_id',
+          '--clientSecret=test_client_secret',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+
+        expect(parseArgs(args).env.host).toBe('192.168.1.10');
+      });
+
+      it('prefers --host over the HOST environment variable', () => {
+        process.env.HOST = '192.168.1.10';
+
+        const args = [
+          '--tools=all',
+          '--host=127.0.0.1',
+          '--clientId=test_client_id',
+          '--clientSecret=test_client_secret',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+
+        expect(parseArgs(args).env.host).toBe('127.0.0.1');
+      });
+    });
+
+    describe('host and origin allow-lists', () => {
+      const baseArgs = [
+        '--tools=all',
+        '--clientId=test_client_id',
+        '--clientSecret=test_client_secret',
+        '--authUrl=https://auth.commercetools.com',
+        '--projectKey=test_project',
+        '--apiUrl=https://api.commercetools.com',
+      ];
+
+      it('leaves both lists unset by default', () => {
+        const {env} = parseArgs(baseArgs);
+
+        expect(env.allowedHosts).toBeUndefined();
+        expect(env.allowedOrigins).toBeUndefined();
+      });
+
+      it('parses comma-separated --allowedHosts, trimming entries', () => {
+        const {env} = parseArgs([
+          ...baseArgs,
+          '--allowedHosts=mcp.example.com, mcp.internal ,',
+        ]);
+
+        expect(env.allowedHosts).toEqual(['mcp.example.com', 'mcp.internal']);
+      });
+
+      it('parses comma-separated --allowedOrigins', () => {
+        const {env} = parseArgs([
+          ...baseArgs,
+          '--allowedOrigins=https://app.example.com,https://admin.example.com',
+        ]);
+
+        expect(env.allowedOrigins).toEqual([
+          'https://app.example.com',
+          'https://admin.example.com',
+        ]);
+      });
+
+      it('falls back to the ALLOWED_HOSTS and ALLOWED_ORIGINS env vars', () => {
+        process.env.ALLOWED_HOSTS = 'env.example.com';
+        process.env.ALLOWED_ORIGINS = 'https://env.example.com';
+
+        const {env} = parseArgs(baseArgs);
+
+        expect(env.allowedHosts).toEqual(['env.example.com']);
+        expect(env.allowedOrigins).toEqual(['https://env.example.com']);
+      });
+
+      it('prefers the arguments over the env vars', () => {
+        process.env.ALLOWED_HOSTS = 'env.example.com';
+
+        const {env} = parseArgs([
+          ...baseArgs,
+          '--allowedHosts=arg.example.com',
+        ]);
+
+        expect(env.allowedHosts).toEqual(['arg.example.com']);
+      });
+    });
+
     describe('authType validation', () => {
       describe.each([
         {
@@ -343,6 +463,72 @@ describe('parseArgs function', () => {
           });
         }
       );
+
+      it.each([
+        {source: 'the --remote flag', args: ['--remote=true'], env: {}},
+        {source: 'the REMOTE env var', args: [], env: {REMOTE: 'true'}},
+      ])(
+        'should not require an access token when authType=auth_token and remote is enabled via $source',
+        ({args, env: envVars}) => {
+          Object.assign(process.env, envVars);
+
+          const testArgs = [
+            '--tools=all',
+            '--authType=auth_token',
+            ...args,
+            '--authUrl=https://auth.commercetools.com',
+            '--projectKey=test_project',
+            '--apiUrl=https://api.commercetools.com',
+          ];
+
+          const {env} = parseArgs(testArgs);
+          expect(env.authType).toBe('auth_token');
+          expect(env.remote).toBe(true);
+          expect(env.accessToken).toBeUndefined();
+        }
+      );
+
+      it('should still require an access token when authType=auth_token and remote is explicitly false', () => {
+        const args = [
+          '--tools=all',
+          '--authType=auth_token',
+          '--remote=false',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+        expect(() => parseArgs(args)).toThrow(
+          'Missing required access token when "authType" is "auth_token".'
+        );
+      });
+
+      it('should keep a provided access token when authType=auth_token and remote is enabled', () => {
+        const args = [
+          '--tools=all',
+          '--authType=auth_token',
+          '--remote=true',
+          '--accessToken=test_access_token',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+        const {env} = parseArgs(args);
+        expect(env.accessToken).toBe('test_access_token');
+      });
+
+      it('should still require client credentials when authType=client_credentials and remote is enabled', () => {
+        const args = [
+          '--tools=all',
+          '--authType=client_credentials',
+          '--remote=true',
+          '--authUrl=https://auth.commercetools.com',
+          '--projectKey=test_project',
+          '--apiUrl=https://api.commercetools.com',
+        ];
+        expect(() => parseArgs(args)).toThrow(
+          'Missing required client credentials when "authType" is "client_credentials".'
+        );
+      });
 
       it('should throw an error for unsupported authType value', () => {
         const args = [

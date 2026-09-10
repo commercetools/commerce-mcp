@@ -3,6 +3,12 @@ import CommercetoolsCommerceAgentStreamable from './streamable';
 export type {Configuration} from '../types/configuration';
 export type {AvailableNamespaces} from '../types/tools';
 export {CommercetoolsCommerceAgentStreamable};
+export {
+  ALL_INTERFACES_HOST,
+  DEFAULT_HOST,
+  LOOPBACK_HOSTNAMES,
+  normalizeBindHost,
+} from '../shared/constants';
 export type {AuthConfig} from '../types/auth';
 export {CommercetoolsCommerceAgent};
 export {
