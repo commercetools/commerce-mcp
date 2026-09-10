@@ -2,6 +2,7 @@
 import {randomUUID} from 'node:crypto';
 import express, {Express, Request, Response} from 'express';
 import CommercetoolsCommerceAgentStreamable from '../streamable';
+import {DEFAULT_HOST} from '../../shared/constants';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
 import {CommercetoolsCommerceAgent} from '../../modelcontextprotocol';
@@ -153,7 +154,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       postHandler = postCall[1];
 
       mockReq = {
-        headers: {authorization: 'Bearer test-token'},
+        headers: {host: '127.0.0.1:8888', authorization: 'Bearer test-token'},
         body: {method: 'test'},
       };
 
@@ -166,7 +167,10 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
     });
 
     test('should handle request with authorization token', async () => {
-      mockReq.headers = {authorization: 'Bearer new-auth-token'};
+      mockReq.headers = {
+        host: '127.0.0.1:8888',
+        authorization: 'Bearer new-auth-token',
+      };
 
       await postHandler(mockReq, mockRes);
 
@@ -186,7 +190,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
     });
 
     test('should reject request without authorization token with 401', async () => {
-      mockReq.headers = {};
+      mockReq.headers = {host: '127.0.0.1:8888'};
 
       await postHandler(mockReq, mockRes);
 
@@ -210,7 +214,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       await Promise.all(
         malformedHeaders.map((header) => {
           const req = {
-            headers: {authorization: header},
+            headers: {host: '127.0.0.1:8888', authorization: header},
             body: {method: 'test'},
           };
           const res = {
@@ -290,7 +294,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       postHandler = postCall[1];
 
       mockReq = {
-        headers: {authorization: 'Bearer test-token'},
+        headers: {host: '127.0.0.1:8888', authorization: 'Bearer test-token'},
         body: {method: 'initialize', params: {}},
       };
 
@@ -342,7 +346,10 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
 
     test('should return 400 for invalid session request', async () => {
       (isInitializeRequest as unknown as jest.Mock).mockReturnValue(false);
-      mockReq.headers = {authorization: 'Bearer test-token'}; // No session ID
+      mockReq.headers = {
+        host: '127.0.0.1:8888',
+        authorization: 'Bearer test-token',
+      }; // No session ID
 
       await postHandler(mockReq, mockRes);
 
@@ -367,6 +374,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
 
       jest.clearAllMocks();
       mockReq.headers = {
+        host: '127.0.0.1:8888',
         authorization: 'Bearer test-token',
         'mcp-session-id': 'existing-session-id',
       };
@@ -425,7 +433,13 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       const handler = postCalls[postCalls.length - 1][1];
 
       await handler(
-        {headers: {authorization: 'Bearer caller-token'}, body: {}},
+        {
+          headers: {
+            host: '127.0.0.1:8888',
+            authorization: 'Bearer caller-token',
+          },
+          body: {},
+        },
         {
           on: jest.fn(),
           status: jest.fn().mockReturnThis(),
@@ -472,7 +486,10 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       (isInitializeRequest as unknown as jest.Mock).mockReturnValue(true);
       await handler(
         {
-          headers: token ? {authorization: `Bearer ${token}`} : {},
+          headers: {
+            host: '127.0.0.1:8888',
+            ...(token && {authorization: `Bearer ${token}`}),
+          },
           body: {method: 'initialize', params: {}},
         },
         newRes()
@@ -496,6 +513,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       await handler(
         {
           headers: {
+            host: '127.0.0.1:8888',
             ...(token ? {authorization: `Bearer ${token}`} : {}),
             'mcp-session-id': sessionId,
           },
@@ -675,30 +693,224 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
     });
   });
 
+  describe('Host and Origin validation (COM-15-006)', () => {
+    const newRes = () =>
+      ({
+        on: jest.fn(),
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis(),
+        headersSent: false,
+      }) as any;
+
+    const handlerFor = (
+      options: Record<string, unknown> = {},
+      method: 'post' | 'get' = 'post'
+    ) => {
+      jest.clearAllMocks();
+      new CommercetoolsCommerceAgentStreamable({
+        authConfig: mockAuthConfig,
+        configuration: mockConfiguration,
+        server: mockServer,
+        streamableHttpOptions: mockStreamableHttpOptions,
+        ...options,
+      } as any);
+
+      const calls = mockApp[method].mock.calls.filter(
+        (call: any) => call[0] === '/mcp'
+      );
+      return calls[calls.length - 1][1];
+    };
+
+    const call = async (
+      handler: (req: any, res: any) => unknown,
+      headers: Record<string, string>
+    ) => {
+      const res = newRes();
+      await handler(
+        {headers: {authorization: 'Bearer test-token', ...headers}, body: {}},
+        res
+      );
+      return res;
+    };
+
+    const forbidden = (res: any, fragment: string) => {
+      expect(res.status).toHaveBeenCalledWith(403);
+      expect(res.json).toHaveBeenCalledWith({
+        jsonrpc: '2.0',
+        error: {code: -32004, message: expect.stringContaining(fragment)},
+        id: null,
+      });
+    };
+
+    describe('Host header', () => {
+      it.each(['127.0.0.1:8888', 'localhost:8888', '[::1]:8888', 'localhost'])(
+        'serves the loopback host %s by default',
+        async (host) => {
+          const res = await call(handlerFor(), {host});
+
+          expect(res.status).not.toHaveBeenCalledWith(403);
+        }
+      );
+
+      test('rejects a rebound attacker hostname', async () => {
+        const res = await call(handlerFor(), {host: 'xxx.attacker.com:8888'});
+
+        forbidden(res, 'Host "xxx.attacker.com" is not an allowed host');
+        expect(mockServer).not.toHaveBeenCalled();
+      });
+
+      test('rejects a missing Host header', async () => {
+        const res = await call(handlerFor(), {});
+
+        forbidden(res, 'missing Host header');
+      });
+
+      test('rejects a malformed Host header', async () => {
+        const res = await call(handlerFor(), {host: '[::1'});
+
+        forbidden(res, 'malformed Host header');
+      });
+
+      test('serves a configured hostname, whatever port it arrives on', async () => {
+        const handler = handlerFor({allowedHosts: ['mcp.example.com']});
+
+        const allowed = await call(handler, {host: 'MCP.example.com:9000'});
+        expect(allowed.status).not.toHaveBeenCalledWith(403);
+
+        const denied = await call(handler, {host: '127.0.0.1:9000'});
+        forbidden(denied, 'not an allowed host');
+      });
+
+      test('accepts any host when the list is a wildcard', async () => {
+        const res = await call(handlerFor({allowedHosts: ['*']}), {
+          host: 'anything.example.com',
+        });
+
+        expect(res.status).not.toHaveBeenCalledWith(403);
+      });
+
+      test('is checked before authentication', async () => {
+        const res = newRes();
+        await handlerFor()(
+          {headers: {host: 'xxx.attacker.com'}, body: {}},
+          res
+        );
+
+        // 403 for the wrong host, not 401 for the missing token.
+        expect(res.status).toHaveBeenCalledWith(403);
+        expect(res.status).not.toHaveBeenCalledWith(401);
+      });
+    });
+
+    describe('Origin header', () => {
+      test('serves requests that carry no Origin, as MCP clients do', async () => {
+        const res = await call(handlerFor(), {host: '127.0.0.1:8888'});
+
+        expect(res.status).not.toHaveBeenCalledWith(403);
+      });
+
+      test('rejects a browser origin by default', async () => {
+        const res = await call(handlerFor(), {
+          host: '127.0.0.1:8888',
+          origin: 'https://xxx.attacker.com:8080',
+        });
+
+        forbidden(
+          res,
+          'Origin "https://xxx.attacker.com:8080" is not an allowed origin'
+        );
+      });
+
+      test('serves a configured origin and refuses the rest', async () => {
+        const handler = handlerFor({
+          allowedOrigins: ['https://app.example.com'],
+        });
+
+        const allowed = await call(handler, {
+          host: '127.0.0.1:8888',
+          origin: 'https://app.example.com',
+        });
+        expect(allowed.status).not.toHaveBeenCalledWith(403);
+
+        const denied = await call(handler, {
+          host: '127.0.0.1:8888',
+          origin: 'https://evil.example.com',
+        });
+        forbidden(denied, 'not an allowed origin');
+      });
+
+      test('accepts any origin when the list is a wildcard', async () => {
+        const res = await call(handlerFor({allowedOrigins: ['*']}), {
+          host: '127.0.0.1:8888',
+          origin: 'https://anything.example.com',
+        });
+
+        expect(res.status).not.toHaveBeenCalledWith(403);
+      });
+    });
+
+    test('guards the GET endpoint too', () => {
+      const getHandler = handlerFor({}, 'get');
+      const res = newRes();
+
+      getHandler(
+        {headers: {host: 'xxx.attacker.com', authorization: 'Bearer t'}},
+        res
+      );
+
+      forbidden(res, 'not an allowed host');
+    });
+  });
+
   describe('listen method', () => {
-    test('should call app.listen with port and callback', () => {
-      const instance = new CommercetoolsCommerceAgentStreamable({
+    const build = () =>
+      new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
       } as any);
+
+    test('binds loopback by default, keeping the (port, callback) form', () => {
       const callback = jest.fn();
 
-      instance.listen(3000, callback);
+      build().listen(3000, callback);
 
-      expect(mockApp.listen).toHaveBeenCalledWith(3000, callback);
+      expect(mockApp.listen).toHaveBeenCalledWith(3000, '127.0.0.1', callback);
     });
 
     test('should call app.listen with port only', () => {
-      const instance = new CommercetoolsCommerceAgentStreamable({
-        authConfig: mockAuthConfig,
-        configuration: mockConfiguration,
-        server: mockServer,
-      } as any);
+      build().listen(8080);
 
-      instance.listen(8080);
+      expect(mockApp.listen).toHaveBeenCalledWith(8080, '127.0.0.1', undefined);
+    });
 
-      expect(mockApp.listen).toHaveBeenCalledWith(8080, undefined);
+    test('binds the host it is given', () => {
+      const callback = jest.fn();
+
+      build().listen(8080, '0.0.0.0', callback);
+
+      expect(mockApp.listen).toHaveBeenCalledWith(8080, '0.0.0.0', callback);
+    });
+
+    it.each(['*', ''])(
+      'binds every interface when given the %p shorthand',
+      (host) => {
+        // A literal `*` reaches dns.lookup() and never binds.
+        build().listen(8080, host);
+
+        expect(mockApp.listen).toHaveBeenCalledWith(8080, '0.0.0.0', undefined);
+      }
+    );
+
+    test('returns the server so callers can watch for bind failures', () => {
+      const server = {address: () => null};
+      mockApp.listen.mockReturnValue(server);
+
+      expect(build().listen(8080)).toBe(server);
+    });
+
+    test('exposes the loopback default it applies', () => {
+      expect(DEFAULT_HOST).toBe('127.0.0.1');
     });
   });
 
@@ -734,7 +946,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         json: jest.fn().mockReturnThis(),
       };
       const result = getHandler(
-        {headers: {authorization: 'Bearer test-token'}},
+        {headers: {host: '127.0.0.1:8888', authorization: 'Bearer test-token'}},
         mockRes
       );
       expect(result).toBeUndefined();
@@ -757,7 +969,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         status: jest.fn().mockReturnThis(),
         json: jest.fn().mockReturnThis(),
       };
-      await getHandler({headers: {}}, mockRes);
+      await getHandler({headers: {host: '127.0.0.1:8888'}}, mockRes);
       expect(mockRes.status).toHaveBeenCalledWith(401);
     });
   });
@@ -781,7 +993,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
 
     test('should accept request with authorization header token', async () => {
       const mockReq = {
-        headers: {authorization: 'Bearer header-token'},
+        headers: {host: '127.0.0.1:8888', authorization: 'Bearer header-token'},
         body: {},
       };
       const mockRes = {
@@ -798,7 +1010,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
 
     test('should NOT fall back to config token when no header (401)', async () => {
       const mockReq = {
-        headers: {},
+        headers: {host: '127.0.0.1:8888'},
         body: {},
       };
       const mockRes = {
@@ -835,7 +1047,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       const handler = postCall[1];
 
       const mockReq = {
-        headers: {authorization: 'Bearer caller-token'},
+        headers: {host: '127.0.0.1:8888', authorization: 'Bearer caller-token'},
         body: {},
       };
       const mockRes = {
@@ -873,7 +1085,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       const handler = postCall[1];
 
       const mockReq = {
-        headers: {},
+        headers: {host: '127.0.0.1:8888'},
         body: {},
       };
       const mockRes = {
