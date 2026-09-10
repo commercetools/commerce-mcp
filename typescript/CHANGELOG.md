@@ -1,5 +1,21 @@
 # @commercetools/commerce-agent
 
+## 4.1.0
+
+### Minor Changes
+
+- [#53](https://github.com/commercetools/commerce-mcp/pull/53) [`28f7d9e`](https://github.com/commercetools/commerce-mcp/commit/28f7d9e70e1e898149f3dae74b68037c4d15a331) Thanks [@ajimae](https://github.com/ajimae)! - Validate the `Host` and `Origin` headers on the remote (streamable HTTP) server (Cure53 COM-15-006). Requests addressed to an unrecognised hostname are rejected with `403`, which is what closes the DNS rebinding path: a malicious page can rebind its hostname to `127.0.0.1` and stays same-origin as far as the browser is concerned, but the `Host` header still names the attacker's domain. Requests that carry an `Origin` header must match an allow-list too; requests without one (every non-browser MCP client) are unaffected, and no permissive CORS header is ever sent.
+
+  Hostnames default to `localhost`, `127.0.0.1`, `[::1]` plus the resolved `--host`, so a server serving a real domain now needs `--allowedHosts=mcp.example.com` (or `ALLOWED_HOSTS`). Browser origins are opted in with `--allowedOrigins`/`ALLOWED_ORIGINS`. Both accept `*` to disable the check, and both are available as `allowedHosts`/`allowedOrigins` on `CommercetoolsCommerceAgentStreamable`.
+
+- [#53](https://github.com/commercetools/commerce-mcp/pull/53) [`28f7d9e`](https://github.com/commercetools/commerce-mcp/commit/28f7d9e70e1e898149f3dae74b68037c4d15a331) Thanks [@ajimae](https://github.com/ajimae)! - Bind the remote (streamable HTTP) server to `127.0.0.1` by default instead of every network interface (Cure53 COM-15-005). A new `--host` option (or `HOST` environment variable) opts into a wider binding, and the server warns at startup whenever it is bound beyond loopback.
+
+  This changes the default reachability of `--remote=true` servers: deployments that rely on the server accepting connections from other hosts — containers with published ports, Kubernetes pods, anything behind a reverse proxy on another machine — must now pass `--host=0.0.0.0` explicitly. `CommercetoolsCommerceAgentStreamable.listen()` takes an optional host as its second argument, still accepts the `(port, callback)` form, and now returns the underlying server so a bind failure can be observed. `--host=*` is normalised to `0.0.0.0` (Node cannot bind the literal `*`), and a failed bind is reported as `Unable to bind <host>:<port>` instead of exiting silently after logging a misleading "listening" line.
+
+### Patch Changes
+
+- [#53](https://github.com/commercetools/commerce-mcp/pull/53) [`28f7d9e`](https://github.com/commercetools/commerce-mcp/commit/28f7d9e70e1e898149f3dae74b68037c4d15a331) Thanks [@ajimae](https://github.com/ajimae)! - Harden the streamable HTTP server against cross-caller credential sharing (Cure53 COM-15-010). The shared startup `authConfig` is now a frozen copy that cannot be written to after construction, and in stateful mode a session records the bearer token it was opened with: continuing a session with a different token — or with the header dropped — is rejected with `403` instead of reusing the opener's credentials. Stateless mode and sessions opened without a token are unaffected.
+
 ## 4.0.0
 
 ### Major Changes
