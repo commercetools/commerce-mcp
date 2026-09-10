@@ -9,6 +9,8 @@ import {
   CommercetoolsCommerceAgentStreamable,
   AuthConfig,
   DEFAULT_HOST,
+  LOOPBACK_HOSTNAMES,
+  normalizeBindHost,
   resolveToolsForConfiguration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 import {
@@ -45,6 +47,8 @@ type EnvVars = {
   stateless?: boolean;
   port?: number;
   host?: string;
+  allowedHosts?: string[];
+  allowedOrigins?: string[];
   logging?: boolean;
   accessToken?: string;
   authType?: 'client_credentials' | 'auth_token';
@@ -66,6 +70,8 @@ const PUBLIC_ARGS = [
   'logging',
   'host',
   'port',
+  'allowedHosts',
+  'allowedOrigins',
 ];
 
 const ACCEPTED_ARGS = [...PUBLIC_ARGS, ...HIDDEN_ARGS];
@@ -110,6 +116,10 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
         env.stateless = value == 'true';
       } else if (key == 'host') {
         env.host = value;
+      } else if (key == 'allowedHosts') {
+        env.allowedHosts = splitList(value);
+      } else if (key == 'allowedOrigins') {
+        env.allowedOrigins = splitList(value);
       } else if (key == 'port') {
         env.port = Number(value);
       } else if (key == 'customerId') {
@@ -181,6 +191,10 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
   env.logging = env.logging || process.env.LOGGING == 'true';
   env.stateless = env.stateless || process.env.STATELESS == 'true';
   env.host = env.host || process.env.HOST || DEFAULT_HOST;
+  env.allowedHosts =
+    env.allowedHosts || splitList(process.env.ALLOWED_HOSTS) || undefined;
+  env.allowedOrigins =
+    env.allowedOrigins || splitList(process.env.ALLOWED_ORIGINS) || undefined;
   env.port = env.port || Number(process.env.PORT);
 
   options.businessUnitKey =
@@ -364,6 +378,34 @@ function createAuthConfig(env: EnvVars): AuthConfig {
   }
 }
 
+function splitList(value?: string): string[] | undefined {
+  if (!value) return undefined;
+
+  const entries = value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  return entries.length > 0 ? entries : undefined;
+}
+
+/**
+ * Hostnames the server will answer for. Loopback always works; the interface
+ * it was told to bind is added so addressing the server by that address works
+ * without extra configuration, and `--allowedHosts` covers the rest (a domain
+ * in front of a proxy, a container hostname, ...).
+ */
+function resolveAllowedHosts(env: EnvVars): string[] {
+  const hosts = new Set([...LOOPBACK_HOSTNAMES, ...(env.allowedHosts ?? [])]);
+
+  const host = env.host;
+  if (host && !isWildcardHost(host)) {
+    hosts.add(host);
+  }
+
+  return [...hosts];
+}
+
 const LOOPBACK_HOSTS = ['127.0.0.1', 'localhost', '::1', '::ffff:127.0.0.1'];
 
 /** Hosts that mean "listen on every interface" rather than a single address. */
@@ -399,6 +441,28 @@ function warnIfPubliclyBound(host: string) {
         `   is only exposed to networks you trust. Use --host=127.0.0.1 to keep it local.\n`
     )
   );
+}
+
+type MaybeServer = {
+  address?: () => unknown;
+  on?: (
+    event: string,
+    listener: (error: NodeJS.ErrnoException) => void
+  ) => void;
+};
+
+/** True once the server actually holds an address. */
+function isBound(server: unknown): boolean {
+  const address = (server as MaybeServer)?.address;
+  return typeof address === 'function' ? address.call(server) !== null : true;
+}
+
+function onServerError(
+  server: unknown,
+  listener: (error: NodeJS.ErrnoException) => void
+) {
+  const on = (server as MaybeServer)?.on;
+  if (typeof on === 'function') on.call(server, 'error', listener);
 }
 
 function handleError(error: any) {
@@ -450,18 +514,49 @@ export async function main() {
       authConfig,
       configuration,
       stateless: env.stateless,
+      allowedHosts: resolveAllowedHosts(env),
+      allowedOrigins: env.allowedOrigins,
       streamableHttpOptions: {
         sessionIdGenerator: undefined,
       },
     });
 
     const port = env.port || 8080;
-    const host = env.host!;
+    // `*` and an empty value mean "every interface"; the OS needs 0.0.0.0.
+    const host = normalizeBindHost(env.host);
 
     warnIfPubliclyBound(host);
 
-    streamServer.listen(port, host, function () {
+    /**
+     * Kept in a holder so the listen callback can read the server without a
+     * binding that is still in its temporal dead zone should an app
+     * implementation invoke the callback synchronously.
+     */
+    const bound: {server?: unknown} = {};
+
+    bound.server = streamServer.listen(port, host, function () {
+      /**
+       * Express runs this callback even when the bind failed (an unresolvable
+       * host leaves `address()` null), so confirm before claiming success —
+       * the error handler below reports the failure instead.
+       */
+      if (!isBound(bound.server)) return;
+
       console.error(`Stream server listening on ${host}:${port}`);
+    });
+
+    /**
+     * A bind failure — port already taken, address not available, a host that
+     * does not resolve — arrives as an 'error' event. Left unhandled it kills
+     * the process with no explanation of what went wrong.
+     */
+    onServerError(bound.server, (error) => {
+      handleError(
+        new Error(
+          `Unable to bind ${host}:${port}${error.code ? ` (${error.code})` : ''}. ${error.message}`
+        )
+      );
+      process.exitCode = 1;
     });
   } else {
     const server = await getServer();
