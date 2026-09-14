@@ -48,6 +48,8 @@ The MCP server supports two authentication methods:
 | `client_credentials` (default) | `--clientId`, `--clientSecret`                             | Uses API client credentials for authentication. `--authType=client_credentials` is optional since this is the default                |
 | `auth_token`                   | `--accessToken`, (optional `--clientId`, `--clientSecret`) | Uses a pre-existing access token for authentication. Requires `--authType=auth_token` and optional `--clientId` and `--clientSecret` |
 
+With `--authType=auth_token`, `--accessToken` (or `ACCESS_TOKEN`) is only required for the stdio transport, which has no way to receive a token later. A remote server (`--remote=true`) does not necessarily need it at startup: every request must carry its own `Authorization: Bearer <token>` header, and that token is used for the request. Passing `--accessToken` alongside `--remote=true` is still allowed, but per-request tokens always take precedence.
+
 ### Customer context
 
 Pass `--customerId=CUSTOMER_ID` to run the server in customer self-service mode. When set, tools for customer-owned resources are automatically scoped to that customer and limited to safe operations:
@@ -505,8 +507,61 @@ npx -y @commercetools/commerce-mcp \
   --apiUrl=API_URL \
   --remote=true \
   --stateless=true \
+  --host=127.0.0.1 \
   --port=8888
 ```
+
+`--host` controls the network interface the remote server binds to. It defaults to
+`127.0.0.1`, so a freshly started server is reachable from the local machine only.
+Pass `--host=0.0.0.0` (or a specific interface address) to accept connections from
+elsewhere — that is what container and Kubernetes deployments need in order for port
+mapping to work — and the server prints a warning at startup reminding you the port is
+now network-reachable, with a louder one for `0.0.0.0`/`::` since a wildcard bind also
+covers interfaces you may not have had in mind. `HOST` works as an environment variable
+equivalent.
+
+`--host` takes an interface address. `--host=*` is accepted as a shorthand and binds
+`0.0.0.0`; `--host=` (empty) falls back to the loopback default rather than opening the
+server up. Note that `*` means something different in `--allowedHosts` below, where it
+disables the check rather than selecting an interface.
+
+Prefer `127.0.0.1` over `localhost`: on many systems `localhost` resolves to the IPv6
+loopback (`::1`) first, so the server would bind IPv6 only and IPv4 clients could not
+connect. A host that cannot be resolved or an address already in use is reported as
+`Unable to bind <host>:<port>` and the process exits non-zero.
+
+#### Host and Origin allow-lists
+
+The remote server only answers for hostnames it recognises. By default that is
+`localhost`, `127.0.0.1` and `[::1]`, plus whatever `--host` was set to (unless it is a
+wildcard). A request whose `Host` header says anything else is rejected with
+`403 Forbidden`.
+
+This is what stops a **DNS rebinding** attack. A malicious page can flip its own
+hostname to resolve to `127.0.0.1`, at which point the browser keeps treating it as the
+same origin and lets the page's JavaScript talk to a local MCP server. Same-origin
+policy and the absence of CORS headers do not help, because after the rebind the
+request no longer looks cross-origin — but the `Host` header still carries the
+attacker's hostname, so checking it turns the request away.
+
+Serving the MCP server under a real hostname therefore needs that hostname declared:
+
+```bash
+npx -y @commercetools/commerce-mcp ... \
+  --remote=true \
+  --host=0.0.0.0 \
+  --allowedHosts=mcp.example.com,mcp.internal
+```
+
+`--allowedOrigins` does the same for browser callers: a request carrying an `Origin`
+header must match the list, which is empty by default. Requests without an `Origin` —
+every non-browser MCP client — are unaffected, and no permissive
+`Access-Control-Allow-Origin` header is ever sent.
+
+Both accept comma-separated values, both have environment variable equivalents
+(`ALLOWED_HOSTS`, `ALLOWED_ORIGINS`), and both accept `*` to disable the check. Use `*`
+only when something in front of the server already validates the `Host` header —
+it re-opens the rebinding hole described above.
 
 You can connect to the running remote server using Claude by specifying the below in the `claude_desktop_config.json` file.
 
@@ -540,6 +595,13 @@ You can connect to the running remote server using Claude by specifying the belo
 > Advanced embedders who perform their own authentication can opt out of this check by
 > passing `enforceAuthHeader: false` to `CommercetoolsCommerceAgentStreamable` (see the
 > SDK usage below). This is **not** recommended for network-exposed deployments.
+>
+> The startup credentials are frozen at construction and every request derives its own
+> copy, so one request can never influence the credentials used by the next. In stateful
+> mode (`--stateless=false`) a session additionally remembers the token it was opened
+> with — knowing a session ID is not enough to continue someone else's session, and a
+> mismatch is rejected with `403 Forbidden`. Callers that rotate their token mid-session
+> should open a new session.
 
 You can also use the Streamable HTTP server with the Commerce Agent like an SDK and develop on it.
 
