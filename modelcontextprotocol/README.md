@@ -76,7 +76,7 @@ Run the following command in your terminal:
 
 ```bash
 # Start MCP Inspector and server with all tools
-npx @modelcontextprotocol/inspector node dist/index.js --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx @modelcontextprotocol/inspector node dist/cli.js --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 ### Instructions
