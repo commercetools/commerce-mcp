@@ -193,7 +193,8 @@ class CommercetoolsCommerceAgent extends McpServer {
           result = fieldFilteringHandler.filterFields(result);
         }
         return this.createToolResponse(
-          this.formatToolResultText(result, `${tool.method} result`)
+          this.formatToolResultText(result, `${tool.method} result`),
+          {structuredContent: this.toStructuredContent(result)}
         );
       }
     );
@@ -260,13 +261,35 @@ class CommercetoolsCommerceAgent extends McpServer {
           }
 
           return this.createToolResponse(
-            this.formatToolResultText(result, `${args.toolMethod} result`)
+            this.formatToolResultText(result, `${args.toolMethod} result`),
+            {structuredContent: this.toStructuredContent(result)}
           );
         } catch (error) {
           return this.handleToolExecutionError(error, args.toolMethod);
         }
       }
     );
+  }
+
+  /**
+   * The payload as `structuredContent`, when it is shaped like one.
+   *
+   * The protocol models structured output as a JSON object, so array and
+   * scalar payloads are carried by the text block alone rather than being
+   * wrapped in an invented envelope.
+   */
+  private toStructuredContent(
+    result: unknown
+  ): Record<string, unknown> | undefined {
+    if (
+      typeof result !== 'object' ||
+      result === null ||
+      Array.isArray(result)
+    ) {
+      return undefined;
+    }
+
+    return result as Record<string, unknown>;
   }
 
   /**
@@ -287,8 +310,22 @@ class CommercetoolsCommerceAgent extends McpServer {
     });
   }
 
-  private createToolResponse(result: string): {
+  /**
+   * A tool result. The text content stays exactly as before so existing
+   * clients are unaffected; `structuredContent` is the same payload in
+   * machine-readable form, for clients that would otherwise have to parse our
+   * stringified JSON back out of a text block.
+   */
+  private createToolResponse(
+    result: string,
+    options: {
+      structuredContent?: Record<string, unknown>;
+      isError?: boolean;
+    } = {}
+  ): {
     content: Array<{type: 'text'; text: string}>;
+    structuredContent?: Record<string, unknown>;
+    isError?: boolean;
   } {
     return {
       content: [
@@ -297,6 +334,10 @@ class CommercetoolsCommerceAgent extends McpServer {
           text: result,
         },
       ],
+      ...(options.structuredContent && {
+        structuredContent: options.structuredContent,
+      }),
+      ...(options.isError && {isError: true}),
     };
   }
 
@@ -327,7 +368,10 @@ class CommercetoolsCommerceAgent extends McpServer {
     });
 
     return this.createToolResponse(
-      `Error executing tool '${toolMethod}': ${errorMessage} - ${errorBody}`
+      `Error executing tool '${toolMethod}': ${errorMessage} - ${errorBody}`,
+      // Without this a failed `execute_tool` call is indistinguishable from a
+      // successful one. Tools that throw are already flagged by the SDK.
+      {isError: true}
     );
   }
 }

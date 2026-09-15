@@ -241,8 +241,46 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
           text: JSON.stringify(apiResult),
         },
       ],
+      // Same payload, machine-readable, for clients that would otherwise
+      // parse our JSON back out of the text block.
+      structuredContent: apiResult,
     });
   });
+
+  it.each([
+    {label: 'an array', payload: [{id: 'a'}]},
+    {label: 'a string', payload: 'plain text'},
+    {label: 'null', payload: null},
+  ])(
+    'omits structuredContent when the payload is $label',
+    async ({payload}) => {
+      CommercetoolsCommerceAgent.create({
+        authConfig: {
+          clientId: 'id',
+          clientSecret: 'secret',
+          authUrl: 'url',
+          projectKey: 'key',
+          apiUrl: 'apiUrl',
+        } as any,
+        configuration: {
+          actions: {products: {read: true}},
+          context: {},
+        } as Configuration,
+      });
+
+      await new Promise(setImmediate);
+      const handler =
+        mockToolMethod.mock.calls[mockToolMethod.mock.calls.length - 1][3];
+      mockCommercetoolsAPIInstance.run.mockResolvedValue(payload as any);
+
+      const result = await handler({}, {});
+
+      // Structured output is modelled as a JSON object; anything else travels
+      // in the text block rather than in an invented envelope.
+      expect(result).not.toHaveProperty('structuredContent');
+      expect(result.content[0].type).toBe('text');
+    }
+  );
 
   it('uses titled tabular output when toolOutputFormat is tabular', async () => {
     CommercetoolsCommerceAgent.create({
@@ -1027,6 +1065,67 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
         // Should register all tools directly (using default threshold)
         expect(mockToolMethod).toHaveBeenCalledTimes(2);
       });
+    });
+  });
+
+  describe('execute_tool results', () => {
+    /** Registers the resource-based tool system and returns execute_tool's handler. */
+    const executeToolHandler = async () => {
+      mockToolMethod.mockClear();
+      // Allow every tool so the count exceeds the threshold below and the
+      // resource-based system (which owns execute_tool) is registered.
+      (isToolAllowed as jest.Mock).mockReturnValue(true);
+      await CommercetoolsCommerceAgent.create({
+        authConfig: {
+          clientId: 'id',
+          clientSecret: 'secret',
+          authUrl: 'auth',
+          projectKey: 'key',
+          apiUrl: 'api',
+          type: 'client_credentials',
+        },
+        configuration: {
+          actions: {products: {read: true}, carts: {read: true}},
+          context: {dynamicToolLoadingThreshold: 1},
+        } as Configuration,
+      });
+
+      await new Promise(setImmediate);
+      const call = mockToolMethod.mock.calls.find(
+        (args: unknown[]) => args[0] === 'execute_tool'
+      );
+      return call![3] as (args: unknown, extra: unknown) => Promise<any>;
+    };
+
+    it('returns structuredContent for an object payload', async () => {
+      const handler = await executeToolHandler();
+      mockCommercetoolsAPIInstance.run.mockResolvedValue({total: 2} as any);
+
+      const result = await handler(
+        {toolMethod: 'read_products', arguments: {}},
+        {}
+      );
+
+      expect(result.structuredContent).toEqual({total: 2});
+      expect(result.isError).toBeUndefined();
+    });
+
+    it('flags a failed call with isError', async () => {
+      const handler = await executeToolHandler();
+      mockCommercetoolsAPIInstance.run.mockRejectedValue(
+        new Error('upstream exploded')
+      );
+
+      const result = await handler(
+        {toolMethod: 'read_products', arguments: {}},
+        {}
+      );
+
+      // Without isError a failure is indistinguishable from a success whose
+      // text happens to mention an error.
+      expect(result.isError).toBe(true);
+      expect(result.content[0].text).toContain('upstream exploded');
+      expect(result).not.toHaveProperty('structuredContent');
     });
   });
 });
