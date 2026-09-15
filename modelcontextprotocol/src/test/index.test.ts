@@ -3,7 +3,7 @@ import {
   applyResolvedToolsToConfiguration,
   parseArgs,
   resolveToolsForConfiguration,
-} from '../index';
+} from '../index.js';
 import {
   CommercetoolsCommerceAgent,
   Configuration,

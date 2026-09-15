@@ -1,11 +1,13 @@
 {
   "name": "@commercetools/commerce-mcp",
   "version": "4.1.0",
+  "type": "module",
   "mcpName": "io.github.commercetools/commerce-mcp",
   "homepage": "https://github.com/commercetools/commerce-mcp",
   "description": "A command line tool for setting up commercetools MCP server",
-  "bin": "dist/index.js",
+  "bin": "dist/cli.js",
   "files": [
+    "dist/cli.js",
     "dist/index.js",
     "LICENSE",
     "README.md",
@@ -17,8 +19,8 @@
     "prebuild": "pnpm --filter @commercetools/processors run build && pnpm --filter @commercetools/commerce-agent run build",
     "dev": "concurrently -n BUILD,SERVER -c magenta,cyan \"pnpm dev:build\" \"pnpm dev:run\"",
     "dev:build": "tsup --env.NODE_ENV dev",
-    "dev:run": "nodemon  dist/index.js --watch",
-    "build": "tsc && node -e \"require('fs').chmodSync('dist/index.js', '755')\"",
+    "dev:run": "nodemon  dist/cli.js --watch",
+    "build": "tsc && node --input-type=module -e \"import {chmodSync} from 'node:fs'; chmodSync('dist/cli.js', '755')\"",
     "clean": "rm -rf dist",
     "lint": "eslint \"./**/*.ts*\"",
     "prettier": "prettier './**/*.{js,ts,md,html,css}' --write",
@@ -28,7 +30,7 @@
   },
   "packageManager": "pnpm@9.11.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "publishConfig": {
     "access": "public"
