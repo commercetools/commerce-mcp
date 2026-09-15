@@ -12,8 +12,10 @@
     "@changesets/cli": "^2.29.4",
     "@commercetools/commerce-agent": "workspace:*",
     "@commercetools/processors": "workspace:*",
-    "@commercetools/platform-sdk": "^8.13.0",
-    "@commercetools/ts-client": "^4.2.0",
+    "@commercetools/platform-sdk": "^9.4.0",
+    "@commercetools/checkout-sdk": "^1.0.0",
+    "@commercetools/tools-core": "^0.3.0",
+    "@commercetools/ts-client": "^5.0.2",
     "@types/pluralize": "^0.0.33"
   },
   "packageManager": "pnpm@9.11.0"

@@ -1,10 +1,17 @@
-import {randomUUID} from 'node:crypto';
+import {createHash, randomUUID} from 'node:crypto';
 import express from 'express';
 import {
   AuthConfig,
   CommercetoolsCommerceAgent,
   Configuration,
 } from '../modelcontextprotocol';
+// Imported from the module that owns it, not via the barrel: the barrel
+// re-exports this file, and a value read through that cycle is undefined.
+import {
+  DEFAULT_HOST,
+  LOOPBACK_HOSTNAMES,
+  normalizeBindHost,
+} from '../shared/constants';
 import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
 import {IApp, IStreamServerOptions} from '../types/configuration';
@@ -12,11 +19,16 @@ import {ExistingTokenAuth as E} from '../types/auth';
 
 export default class CommercetoolsCommerceAgentStreamable {
   private app: IApp;
-  private authConfig: AuthConfig;
+  private readonly authConfig: AuthConfig;
   private server: (sessionId?: string) => Promise<CommercetoolsCommerceAgent>;
   private transports: {[sessionId: string]: StreamableHTTPServerTransport} = {};
+  private sessionTokens: {[sessionId: string]: string} = {};
   private stateless: boolean;
   private enforceAuthHeader: boolean;
+  /** Hostnames (no port) this server answers for; `*` disables the check. */
+  private allowedHosts: string[];
+  /** Browser origins allowed to call this server; `*` disables the check. */
+  private allowedOrigins: string[];
 
   private configuration: Configuration;
 
@@ -29,12 +41,18 @@ export default class CommercetoolsCommerceAgentStreamable {
     server,
     app,
     enforceAuthHeader = true,
+    allowedHosts = LOOPBACK_HOSTNAMES,
+    allowedOrigins = [],
   }: IStreamServerOptions) {
     this.server = server!;
-    this.authConfig = authConfig!;
+    // Freeze a copy: our shared config cannot be mutated from here, and the
+    // caller's object is left alone.
+    this.authConfig = authConfig ? Object.freeze({...authConfig}) : authConfig!;
     this.configuration = configuration!;
     this.stateless = stateless;
     this.enforceAuthHeader = enforceAuthHeader;
+    this.allowedHosts = allowedHosts;
+    this.allowedOrigins = allowedOrigins;
 
     // initialize express app
     this.app = app ?? express();
@@ -45,6 +63,22 @@ export default class CommercetoolsCommerceAgentStreamable {
      */
     this.app.post('/mcp', async (req, res) => {
       try {
+        /**
+         * Answer only for hostnames and origins we recognise. A DNS rebinding
+         * attack reaches a loopback server through an attacker-controlled
+         * hostname, which the browser still treats as same-origin — the
+         * `Host` header is what gives it away. Checked before authentication
+         * so a rebound request is turned away without touching credentials.
+         */
+        const untrusted = this.findUntrustedTarget(req.headers);
+        if (untrusted) {
+          return res.status(403).json({
+            jsonrpc: '2.0',
+            error: {code: -32004, message: untrusted},
+            id: null,
+          });
+        }
+
         const authHeader = req.headers.authorization as string | undefined;
         const token = this.extractBearerToken(authHeader);
 
@@ -79,6 +113,22 @@ export default class CommercetoolsCommerceAgentStreamable {
               accessToken: token,
             } as E)
           : this.authConfig;
+
+        /**
+         * A stateful session holds an agent already bound to the credentials
+         * of the caller that opened it, so knowing a session id must not be
+         * enough to borrow those credentials: the token has to match too.
+         */
+        if (!this.isSessionOpener(req.headers['mcp-session-id'], token)) {
+          return res.status(403).json({
+            jsonrpc: '2.0',
+            error: {
+              code: -32003,
+              message: 'Forbidden: this session belongs to another caller',
+            },
+            id: null,
+          });
+        }
 
         let transport: StreamableHTTPServerTransport;
         let serverInstance = await this.getServer(undefined, requestAuthConfig);
@@ -115,6 +165,12 @@ export default class CommercetoolsCommerceAgentStreamable {
                 // Store the transport by session ID
                 this.transports[sessionId] = transport;
 
+                // Remember who may keep using this session
+                const fingerprint = this.fingerprintToken(token);
+                if (fingerprint) {
+                  this.sessionTokens[sessionId] = fingerprint;
+                }
+
                 // connect server to the transport
                 serverInstance = await this.getServer(
                   sessionId,
@@ -128,6 +184,7 @@ export default class CommercetoolsCommerceAgentStreamable {
             transport.onclose = () => {
               if (transport.sessionId) {
                 delete this.transports[transport.sessionId];
+                delete this.sessionTokens[transport.sessionId];
               }
             };
           } else {
@@ -167,6 +224,15 @@ export default class CommercetoolsCommerceAgentStreamable {
      * decide on how to handle SSE requests
      */
     this.app.get('/mcp', (req, res) => {
+      const untrusted = this.findUntrustedTarget(req.headers);
+      if (untrusted) {
+        return res.status(403).json({
+          jsonrpc: '2.0',
+          error: {code: -32004, message: untrusted},
+          id: null,
+        });
+      }
+
       const authHeader = req.headers.authorization as string | undefined;
       if (this.enforceAuthHeader && !this.extractBearerToken(authHeader)) {
         return res.status(401).json({
@@ -197,6 +263,79 @@ export default class CommercetoolsCommerceAgentStreamable {
     return token.length > 0 ? token : undefined;
   }
 
+  /**
+   * Returns why a request's `Host`/`Origin` is not trusted, or undefined when
+   * both are acceptable. `Host` is matched on hostname only, so the port the
+   * server happens to run on does not have to be configured.
+   */
+  private findUntrustedTarget(
+    headers: Record<string, string | string[] | undefined>
+  ): string | undefined {
+    return (
+      this.findUntrustedHost(headers.host) ??
+      this.findUntrustedOrigin(headers.origin)
+    );
+  }
+
+  private findUntrustedHost(host?: string | string[]): string | undefined {
+    if (this.allowedHosts.includes('*')) return undefined;
+
+    if (typeof host !== 'string' || host.trim().length === 0) {
+      return 'Forbidden: missing Host header';
+    }
+
+    let hostname: string;
+    try {
+      // The URL parser handles IPv4, bracketed IPv6 and plain hostnames.
+      hostname = new URL(`http://${host}`).hostname;
+    } catch {
+      return `Forbidden: malformed Host header`;
+    }
+
+    return this.isAllowed(hostname, this.allowedHosts)
+      ? undefined
+      : `Forbidden: Host "${hostname}" is not an allowed host for this server`;
+  }
+
+  private findUntrustedOrigin(origin?: string | string[]): string | undefined {
+    // Non-browser MCP clients send no Origin, and have nothing to spoof.
+    if (typeof origin !== 'string' || origin.trim().length === 0)
+      return undefined;
+    if (this.allowedOrigins.includes('*')) return undefined;
+
+    return this.isAllowed(origin, this.allowedOrigins)
+      ? undefined
+      : `Forbidden: Origin "${origin}" is not an allowed origin for this server`;
+  }
+
+  private isAllowed(value: string, allowList: string[]): boolean {
+    const candidate = value.trim().toLowerCase();
+    return allowList.some((entry) => entry.trim().toLowerCase() === candidate);
+  }
+
+  /**
+   * Whether `token` may use the given session. Sessions opened without a
+   * bearer token (only possible when `enforceAuthHeader` is off) are left
+   * unrestricted; every other session requires the token it was opened with.
+   */
+  private isSessionOpener(
+    sessionId: string | string[] | undefined,
+    token?: string
+  ): boolean {
+    if (typeof sessionId !== 'string') return true;
+
+    const opener = this.sessionTokens[sessionId];
+    if (!opener) return true;
+
+    return opener === this.fingerprintToken(token);
+  }
+
+  /** Truncated SHA-256 of a token, so raw tokens are never held in memory here. */
+  private fingerprintToken(token?: string): string | undefined {
+    if (!token) return undefined;
+    return createHash('sha256').update(token).digest('hex').slice(0, 32);
+  }
+
   // eslint-disable-next-line require-await
   private async getServer(
     id?: string,
@@ -216,7 +355,24 @@ export default class CommercetoolsCommerceAgentStreamable {
     });
   }
 
-  listen(port: number, cb?: () => void) {
-    this.app.listen(port, cb);
+  /**
+   * Binds the HTTP server. Without an explicit `host` the server listens on
+   * loopback only; widening it to other interfaces has to be asked for.
+   * The `(port, callback)` form is still accepted.
+   */
+  listen(port: number, cb?: () => void): unknown;
+  listen(port: number, host?: string, cb?: () => void): unknown;
+  listen(
+    port: number,
+    hostOrCb?: string | (() => void),
+    maybeCb?: () => void
+  ): unknown {
+    const host =
+      typeof hostOrCb === 'string' ? normalizeBindHost(hostOrCb) : DEFAULT_HOST;
+    const cb = typeof hostOrCb === 'function' ? hostOrCb : maybeCb;
+
+    // Returned so callers can watch for a bind failure, which arrives as an
+    // 'error' event rather than as a thrown error.
+    return this.app.listen(port, host, cb);
   }
 }

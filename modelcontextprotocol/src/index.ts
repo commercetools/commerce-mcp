@@ -8,6 +8,9 @@ import {
   CommercetoolsCommerceAgent,
   CommercetoolsCommerceAgentStreamable,
   AuthConfig,
+  DEFAULT_HOST,
+  LOOPBACK_HOSTNAMES,
+  normalizeBindHost,
   resolveToolsForConfiguration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
 import {
@@ -16,7 +19,10 @@ import {
   FieldFilteringHandler,
 } from '@commercetools/processors';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
-import {red, yellow} from 'colors';
+import colors from 'colors';
+
+const red = colors.red;
+const yellow = colors.yellow;
 
 type Options = {
   tools?: string[];
@@ -40,6 +46,9 @@ type EnvVars = {
   remote?: boolean;
   stateless?: boolean;
   port?: number;
+  host?: string;
+  allowedHosts?: string[];
+  allowedOrigins?: string[];
   logging?: boolean;
   accessToken?: string;
   authType?: 'client_credentials' | 'auth_token';
@@ -59,6 +68,10 @@ const PUBLIC_ARGS = [
   'dynamicToolLoadingThreshold',
   'toolOutputFormat',
   'logging',
+  'host',
+  'port',
+  'allowedHosts',
+  'allowedOrigins',
 ];
 
 const ACCEPTED_ARGS = [...PUBLIC_ARGS, ...HIDDEN_ARGS];
@@ -101,6 +114,12 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
         env.remote = value == 'true';
       } else if (key == 'stateless') {
         env.stateless = value == 'true';
+      } else if (key == 'host') {
+        env.host = value;
+      } else if (key == 'allowedHosts') {
+        env.allowedHosts = splitList(value);
+      } else if (key == 'allowedOrigins') {
+        env.allowedOrigins = splitList(value);
       } else if (key == 'port') {
         env.port = Number(value);
       } else if (key == 'customerId') {
@@ -171,6 +190,11 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
   env.remote = env.remote || process.env.REMOTE == 'true';
   env.logging = env.logging || process.env.LOGGING == 'true';
   env.stateless = env.stateless || process.env.STATELESS == 'true';
+  env.host = env.host || process.env.HOST || DEFAULT_HOST;
+  env.allowedHosts =
+    env.allowedHosts || splitList(process.env.ALLOWED_HOSTS) || undefined;
+  env.allowedOrigins =
+    env.allowedOrigins || splitList(process.env.ALLOWED_ORIGINS) || undefined;
   env.port = env.port || Number(process.env.PORT);
 
   options.businessUnitKey =
@@ -212,7 +236,7 @@ export function parseArgs(args: string[]): {options: Options; env: EnvVars} {
       }
       break;
     case 'auth_token':
-      if (!env.accessToken) {
+      if (!env.remote && !env.accessToken) {
         throw new Error(
           'Missing required access token when "authType" is "auth_token". Please make sure to provide the value for "accessToken" or via environment variable (ACCESS_TOKEN).'
         );
@@ -354,15 +378,100 @@ function createAuthConfig(env: EnvVars): AuthConfig {
   }
 }
 
+function splitList(value?: string): string[] | undefined {
+  if (!value) return undefined;
+
+  const entries = value
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+
+  return entries.length > 0 ? entries : undefined;
+}
+
+/**
+ * Hostnames the server will answer for. Loopback always works; the interface
+ * it was told to bind is added so addressing the server by that address works
+ * without extra configuration, and `--allowedHosts` covers the rest (a domain
+ * in front of a proxy, a container hostname, ...).
+ */
+function resolveAllowedHosts(env: EnvVars): string[] {
+  const hosts = new Set([...LOOPBACK_HOSTNAMES, ...(env.allowedHosts ?? [])]);
+
+  const host = env.host;
+  if (host && !isWildcardHost(host)) {
+    hosts.add(host);
+  }
+
+  return [...hosts];
+}
+
+const LOOPBACK_HOSTS = ['127.0.0.1', 'localhost', '::1', '::ffff:127.0.0.1'];
+
+/** Hosts that mean "listen on every interface" rather than a single address. */
+const WILDCARD_HOSTS = ['0.0.0.0', '::', '::0', '*', ''];
+
+function isLoopbackHost(host: string): boolean {
+  return LOOPBACK_HOSTS.includes(host) || host.startsWith('127.');
+}
+
+function isWildcardHost(host: string): boolean {
+  return WILDCARD_HOSTS.includes(host.trim());
+}
+
+/**
+ * Binding beyond loopback puts the server on the network, where anything that
+ * can reach the port can talk to it. That is a legitimate choice behind a
+ * gateway, but it should never happen without the operator noticing — and a
+ * wildcard bind deserves a louder warning than a single chosen interface,
+ * since it also covers interfaces the operator may not have had in mind.
+ */
+function warnIfPubliclyBound(host: string) {
+  if (isLoopbackHost(host)) return;
+
+  const exposure = isWildcardHost(host)
+    ? `bound to ${host || '0.0.0.0'} — every network interface on this machine, including\n` +
+      `   any that is publicly routable`
+    : `bound to ${host}, so it is reachable from outside this machine`;
+
+  console.error(
+    yellow(
+      `\n\u26a0\ufe0f  The MCP server is ${exposure}.\n` +
+        `   Callers still need a valid "Authorization: Bearer <token>" header, but make sure the port\n` +
+        `   is only exposed to networks you trust. Use --host=127.0.0.1 to keep it local.\n`
+    )
+  );
+}
+
+type MaybeServer = {
+  address?: () => unknown;
+  on?: (
+    event: string,
+    listener: (error: NodeJS.ErrnoException) => void
+  ) => void;
+};
+
+/** True once the server actually holds an address. */
+function isBound(server: unknown): boolean {
+  const address = (server as MaybeServer)?.address;
+  return typeof address === 'function' ? address.call(server) !== null : true;
+}
+
+function onServerError(
+  server: unknown,
+  listener: (error: NodeJS.ErrnoException) => void
+) {
+  const on = (server as MaybeServer)?.on;
+  if (typeof on === 'function') on.call(server, 'error', listener);
+}
+
 function handleError(error: any) {
   console.error(red('\n🚨  Error initializing commercetools MCP server:\n'));
   console.error(yellow(`   ${error.message}\n`));
 }
 
 export async function main() {
-  require('dotenv').config({
-    quiet: true,
-  });
+  require('dotenv').config({quiet: true});
   const {options, env} = parseArgs(process.argv.slice(2));
 
   // Create the CommercetoolsCommerceAgent instance
@@ -405,14 +514,49 @@ export async function main() {
       authConfig,
       configuration,
       stateless: env.stateless,
+      allowedHosts: resolveAllowedHosts(env),
+      allowedOrigins: env.allowedOrigins,
       streamableHttpOptions: {
         sessionIdGenerator: undefined,
       },
     });
 
     const port = env.port || 8080;
-    streamServer.listen(port, function () {
-      console.error(`Stream server listening on`, port);
+    // `*` and an empty value mean "every interface"; the OS needs 0.0.0.0.
+    const host = normalizeBindHost(env.host);
+
+    warnIfPubliclyBound(host);
+
+    /**
+     * Kept in a holder so the listen callback can read the server without a
+     * binding that is still in its temporal dead zone should an app
+     * implementation invoke the callback synchronously.
+     */
+    const bound: {server?: unknown} = {};
+
+    bound.server = streamServer.listen(port, host, function () {
+      /**
+       * Express runs this callback even when the bind failed (an unresolvable
+       * host leaves `address()` null), so confirm before claiming success —
+       * the error handler below reports the failure instead.
+       */
+      if (!isBound(bound.server)) return;
+
+      console.error(`Stream server listening on ${host}:${port}`);
+    });
+
+    /**
+     * A bind failure — port already taken, address not available, a host that
+     * does not resolve — arrives as an 'error' event. Left unhandled it kills
+     * the process with no explanation of what went wrong.
+     */
+    onServerError(bound.server, (error) => {
+      handleError(
+        new Error(
+          `Unable to bind ${host}:${port}${error.code ? ` (${error.code})` : ''}. ${error.message}`
+        )
+      );
+      process.exitCode = 1;
     });
   } else {
     const server = await getServer();
