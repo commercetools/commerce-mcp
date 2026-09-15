@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "dotenv": "17.2.1",
-    "qs": "6.15.2"
+    "qs": "6.16.0"
   },
   "keywords": [
     "mcp",
