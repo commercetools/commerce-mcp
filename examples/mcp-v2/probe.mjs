@@ -28,7 +28,7 @@ async function rpc(body, {token = TOKEN, method = body.method} = {}) {
   });
   if (token) headers.set('authorization', `Bearer ${token}`);
   // SEP-2243: modern POSTs must name their method in the headers too.
-  if (method !== undefined) headers.set('mcp-method', method);
+  if (method) headers.set('mcp-method', method);
   if (body.params?.name) headers.set('mcp-name', body.params.name);
 
   const response = await handler.fetch(
