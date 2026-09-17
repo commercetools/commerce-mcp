@@ -1,4 +1,4 @@
-import {main} from '..';
+import {main} from '../index.js';
 import {
   AuthConfig,
   CommercetoolsCommerceAgent,
