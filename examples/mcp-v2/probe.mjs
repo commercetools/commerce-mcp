@@ -133,7 +133,7 @@ const init = await rpc({
 });
 check(
   'legacy: initialize still negotiates',
-  Boolean(init.payload?.result?.protocolVersion),
+  init.payload?.result?.protocolVersion === LEGACY,
   init.payload?.result?.protocolVersion
 );
 
