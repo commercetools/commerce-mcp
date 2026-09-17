@@ -11,6 +11,30 @@ export type JsonSchemaObject = {
 };
 
 /**
+ * Keywords whose values are arbitrary data rather than subschemas. Recursing
+ * into them could strip an `additionalProperties` that belongs to a literal
+ * value instead of being a constraint.
+ */
+const OPAQUE_KEYWORDS = new Set(['enum', 'const', 'default', 'examples']);
+
+/**
+ * Drops `additionalProperties: false` wherever it appears. `$refStrategy:
+ * 'none'` inlines nested objects, so they arrive carrying their own copy and
+ * the root alone is not enough.
+ */
+function allowUnknownKeys(node: unknown): unknown {
+  if (Array.isArray(node)) return node.map(allowUnknownKeys);
+  if (node === null || typeof node !== 'object') return node;
+
+  const result: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    if (key === 'additionalProperties' && value === false) continue;
+    result[key] = OPAQUE_KEYWORDS.has(key) ? value : allowUnknownKeys(value);
+  }
+  return result;
+}
+
+/**
  * Converts a zod schema to JSON Schema for MCP tool registration.
  *
  * Our tool parameters come from `@commercetools/tools-core`, which is on
@@ -24,10 +48,12 @@ export type JsonSchemaObject = {
  * - `$schema` is dropped. MCP declares JSON Schema 2020-12 as the default
  *   dialect, so declaring an older one on every tool would be wrong; omitting
  *   it lets the dialect be inherited.
- * - `additionalProperties` is dropped. zod object schemas *strip* unknown keys,
- *   but the generator renders that as `additionalProperties: false`, which
- *   turns a stray argument from something ignored into a validation failure.
- *   Models pass stray arguments; keep today's lenient behaviour.
+ * - `additionalProperties: false` is dropped, at every level. zod object schemas
+ *   *strip* unknown keys, but the generator renders that as
+ *   `additionalProperties: false`, which turns a stray argument from something
+ *   ignored into a validation failure. Models pass stray arguments; keep
+ *   today's lenient behaviour. A schema-valued `additionalProperties` is kept:
+ *   on a `z.record` it describes the value type rather than forbidding keys.
  */
 export function toJsonSchema(schema: ZodTypeAny): Record<string, unknown> {
   const converted = zodToJsonSchema(schema, {
@@ -39,13 +65,9 @@ export function toJsonSchema(schema: ZodTypeAny): Record<string, unknown> {
     $refStrategy: 'none',
   }) as Record<string, unknown>;
 
-  const {
-    $schema: _schema,
-    additionalProperties: _additional,
-    ...rest
-  } = converted;
+  const {$schema: _schema, ...rest} = converted;
 
-  return rest;
+  return allowUnknownKeys(rest) as Record<string, unknown>;
 }
 
 /**

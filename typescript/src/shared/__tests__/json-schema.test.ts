@@ -43,6 +43,34 @@ describe('toJsonSchema', () => {
     );
   });
 
+  it('drops additionalProperties on nested schemas too', () => {
+    // Nested objects are inlined, so each arrives with its own copy; stripping
+    // only the root would still reject a stray key inside an argument.
+    const schema = toJsonSchema(
+      z.object({
+        outer: z.object({inner: z.object({id: z.string()})}),
+        items: z.array(z.object({sku: z.string()})),
+        choice: z.union([z.object({a: z.string()}), z.object({b: z.number()})]),
+      })
+    );
+
+    expect(JSON.stringify(schema)).not.toContain(
+      '"additionalProperties":false'
+    );
+  });
+
+  it('keeps a schema-valued additionalProperties', () => {
+    // On a record this describes the value type rather than forbidding keys,
+    // so it must survive the strip.
+    expect(toJsonSchema(z.object({attrs: z.record(z.string())}))).toEqual({
+      type: 'object',
+      properties: {
+        attrs: {type: 'object', additionalProperties: {type: 'string'}},
+      },
+      required: ['attrs'],
+    });
+  });
+
   it('inlines nested schemas rather than emitting $ref', () => {
     const inner = z.object({id: z.string()});
     const schema = toJsonSchema(z.object({a: inner, b: inner}));
@@ -79,6 +107,9 @@ describe('toolInputJsonSchema', () => {
         expect(schema.type).toBe('object');
         expect(schema).not.toHaveProperty('$schema');
         expect(JSON.stringify(schema)).not.toContain('$ref');
+        expect(JSON.stringify(schema)).not.toContain(
+          '"additionalProperties":false'
+        );
         for (const key of schema.required ?? []) {
           expect(Object.keys(schema.properties ?? {})).toContain(key);
         }
