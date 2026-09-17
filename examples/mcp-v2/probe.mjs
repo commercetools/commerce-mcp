@@ -9,6 +9,8 @@
 import {buildHandler} from './server.mjs';
 
 const MODERN = '2026-07-28';
+/** The legacy version the server settles on, whatever the client asks for. */
+const LEGACY = '2025-11-25';
 const TOKEN = 'example-token';
 const ENDPOINT = new URL('/mcp', 'http://mcp.localhost');
 
@@ -132,7 +134,7 @@ const init = await rpc({
   },
 });
 check(
-  'legacy: initialize still negotiates',
+  `legacy: initialize negotiates ${LEGACY}`,
   init.payload?.result?.protocolVersion === LEGACY,
   init.payload?.result?.protocolVersion
 );

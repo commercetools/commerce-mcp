@@ -7,6 +7,8 @@
  * Tools are registered from JSON Schema via `fromJsonSchema`, which is how we
  * intend to feed our zod-3 schemas (DEVX-883) without a zod 4 upgrade.
  */
+import {pathToFileURL} from 'node:url';
+
 import {createMcpExpressApp} from '@modelcontextprotocol/express';
 import {toNodeHandler} from '@modelcontextprotocol/node';
 import {createMcpHandler, McpServer, fromJsonSchema} from '@modelcontextprotocol/server';
@@ -165,7 +167,7 @@ export function buildApp({host = '127.0.0.1', allowedHosts} = {}) {
   return app;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const port = Number(process.env.PORT ?? 8899);
   const host = process.env.HOST ?? '127.0.0.1';
   buildApp({host}).listen(port, host, () => console.error(`example listening on ${host}:${port}`));
