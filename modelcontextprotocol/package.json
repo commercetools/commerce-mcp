@@ -19,7 +19,7 @@
     "prebuild": "pnpm --filter @commercetools/processors run build && pnpm --filter @commercetools/commerce-agent run build",
     "dev": "concurrently -n BUILD,SERVER -c magenta,cyan \"pnpm dev:build\" \"pnpm dev:run\"",
     "dev:build": "tsup --env.NODE_ENV dev",
-    "dev:run": "nodemon  dist/cli.js --watch",
+    "dev:run": "nodemon --watch dist dist/cli.js",
     "build": "tsc && node --input-type=module -e \"import {chmodSync} from 'node:fs'; chmodSync('dist/cli.js', '755')\"",
     "clean": "rm -rf dist",
     "lint": "eslint \"./**/*.ts*\"",
