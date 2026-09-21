@@ -144,7 +144,7 @@ export function buildApp({host = '127.0.0.1', allowedHosts} = {}) {
     onerror: (error) => console.error('[mcp:adapter]', error.message),
   });
 
-app.all('/mcp', (req, res) => {
+  app.all('/mcp', (req, res) => {
     const token = bearer(req);
 
     // `req.auth` is the adapter's documented hand-off to the handler's
