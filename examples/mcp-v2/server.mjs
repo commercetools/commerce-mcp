@@ -144,8 +144,16 @@ export function buildApp({host = '127.0.0.1', allowedHosts} = {}) {
     onerror: (error) => console.error('[mcp:adapter]', error.message),
   });
 
-  app.all('/mcp', (req, res) => {
+app.all('/mcp', (req, res) => {
     const token = bearer(req);
+
+    // `req.auth` is the adapter's documented hand-off to the handler's
+    // pass-through `authInfo`; it never inspects headers or verifies tokens.
+    if (token) req.auth = {token, clientId: 'example', scopes: []};
+
+    // Let the SDK handle non-POST so we return the spec-mandated 405s.
+    if (req.method !== 'POST') return mcp(req, res, req.body);
+
     if (!token) {
       return res.status(401).json({
         jsonrpc: '2.0',
@@ -156,10 +164,6 @@ export function buildApp({host = '127.0.0.1', allowedHosts} = {}) {
         id: null,
       });
     }
-
-    // `req.auth` is the adapter's documented hand-off to the handler's
-    // pass-through `authInfo`; it never inspects headers or verifies tokens.
-    req.auth = {token, clientId: 'example', scopes: []};
 
     return mcp(req, res, req.body);
   });
