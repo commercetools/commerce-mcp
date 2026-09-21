@@ -1,7 +1,7 @@
 ---
-'@commercetools/commerce-mcp': minor
-'@commercetools/commerce-agent': minor
-'@commercetools/processors': minor
+'@commercetools/commerce-mcp': major
+'@commercetools/commerce-agent': major
+'@commercetools/processors': major
 ---
 
 Require Node.js 20 or newer, and publish the MCP CLI as an ES module. Groundwork for the MCP SDK v2 migration (DEVX-882): the v2 packages are ESM-only and declare `engines.node >= 20`.
