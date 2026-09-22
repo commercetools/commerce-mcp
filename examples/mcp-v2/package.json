@@ -1,0 +1,21 @@
+{
+  "name": "@commercetools/commerce-mcp-v2-example",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "description": "Runnable example: commerce-mcp on MCP SDK v2, serving both protocol eras. Not part of the pnpm workspace.",
+  "scripts": {
+    "serve": "node server.mjs",
+    "probe": "node probe.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/express": "^2.0.0",
+    "@modelcontextprotocol/node": "^2.0.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "express": "^5.1.0",
+    "hono": "^4.13.8"
+  }
+}
