@@ -12,11 +12,14 @@ pnpm run build
 # link the local package
 pnpm add link:../typescript
 
+# build this package: the executable is dist/cli.js
+pnpm run build
+
 # run the server in terminal
-npx ts-node src/index.ts --tools=read_products --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --authUrl=AUTH_URL --projectKey=PROJECT_KEY --apiUrl=API_URL
+node dist/cli.js --tools=read_products --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --authUrl=AUTH_URL --projectKey=PROJECT_KEY --apiUrl=API_URL
 
 # test using mcptools : Install mcptools from https://github.com/f/mcptools
-mcp call read_products --params '{"limit": 2}' npx ts-node /<absolute-path>/commerce-agent/modelcontextprotocol/src/index.ts --tools=all \
+mcp call read_products --params '{"limit": 2}' node /<absolute-path>/commerce-agent/modelcontextprotocol/dist/cli.js --tools=all \
 --projectKey="PROJECT_KEY" \
 --clientSecret="CLIENT_SECRET" \
 --clientId="CLIENT_ID" \
@@ -24,11 +27,14 @@ mcp call read_products --params '{"limit": 2}' npx ts-node /<absolute-path>/comm
 --apiUrl="API_URL"
 ```
 
+`src/index.ts` exports `main()` but does not call it, so running that file
+directly starts nothing. `dist/cli.js` is the entry point that does.
+
 **_Do not commit the linked package in package.json to the repo_**
 
 ## Testing Using Claude Desktop
 
-NOTE: This will not work with Claude Desktop unless you uninstall node v16 from your machine!
+NOTE: This package requires Node.js 20 or newer. Make sure the `node` on Claude Desktop's PATH is a v20+ install.
 
 ```bash
 #  navigate to ../typescript
@@ -38,6 +44,9 @@ pnpm run build
 
 # link the local package
 pnpm add link:../typescript
+
+# build this package: the executable is dist/cli.js
+pnpm run build
 ```
 
 Configure MCP servers in Claude Desktop
@@ -46,10 +55,9 @@ Configure MCP servers in Claude Desktop
 {
   "mcpServers": {
     "commercetools": {
-      "command": "npx",
+      "command": "node",
       "args": [
-        "ts-node",
-        "/<absolute-path>/commerce-agent/modelcontextprotocol/src/index.ts",
+        "/<absolute-path>/commerce-agent/modelcontextprotocol/dist/cli.js",
         "--tools=all",
         "--projectKey=PROJECT_KEY",
         "--clientSecret=CLIENT_SECRET",
@@ -76,7 +84,7 @@ Run the following command in your terminal:
 
 ```bash
 # Start MCP Inspector and server with all tools
-npx @modelcontextprotocol/inspector node dist/index.js --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
+npx @modelcontextprotocol/inspector node dist/cli.js --tools=all --clientId=CLIENT_ID --clientSecret=CLIENT_SECRET --projectKey=PROJECT_KEY --authUrl=AUTH_URL --apiUrl=API_URL
 ```
 
 ### Instructions

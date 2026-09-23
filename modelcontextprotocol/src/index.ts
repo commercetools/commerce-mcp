@@ -19,6 +19,7 @@ import {
   FieldFilteringHandler,
 } from '@commercetools/processors';
 import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import dotenv from 'dotenv';
 import colors from 'colors';
 
 const red = colors.red;
@@ -465,13 +466,13 @@ function onServerError(
   if (typeof on === 'function') on.call(server, 'error', listener);
 }
 
-function handleError(error: any) {
+export function handleError(error: any) {
   console.error(red('\n🚨  Error initializing commercetools MCP server:\n'));
   console.error(yellow(`   ${error.message}\n`));
 }
 
 export async function main() {
-  require('dotenv').config({quiet: true});
+  dotenv.config({quiet: true});
   const {options, env} = parseArgs(process.argv.slice(2));
 
   // Create the CommercetoolsCommerceAgent instance
@@ -564,10 +565,4 @@ export async function main() {
     await server.connect(transport);
     console.error('MCP server is running...');
   }
-}
-
-if (require.main === module) {
-  main().catch((error) => {
-    handleError(error);
-  });
 }

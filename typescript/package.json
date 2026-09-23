@@ -43,7 +43,7 @@
   },
   "packageManager": "pnpm@9.11.0",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "author": "commercetools GmbH <info@commercetools.com> (https://commercetools.com)",
   "repository": {
