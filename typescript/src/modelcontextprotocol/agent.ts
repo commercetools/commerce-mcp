@@ -10,6 +10,12 @@ import {
   processConfigurationDefaults,
 } from '../shared/configuration';
 import {contextToTools} from '../shared/tools';
+import {
+  deriveToolAnnotationsOrConservative,
+  deriveToolTitle,
+  titleAndAnnotations,
+  toolVerb,
+} from '@commercetools/tools-core';
 import type {Configuration, Context} from '../types/configuration';
 import {scopesToActions} from '../utils/scopes';
 import {AuthConfig} from '../types/auth';
@@ -229,27 +235,33 @@ class CommercetoolsCommerceAgent extends McpServer {
     return fromJsonSchema<T>(toolInputJsonSchema(tool) as JsonSchemaType);
   }
 
-  private toolAnnotations(tool: Tool): {
-    title: string;
-    readOnlyHint: boolean;
-    destructiveHint: boolean;
-    idempotentHint: boolean;
-    openWorldHint: boolean;
-  } {
-    const verbs = new Set(
-      Object.values(tool.actions ?? {}).flatMap((action) =>
-        Object.keys(action ?? {})
-      )
-    );
-    const readOnly = verbs.size > 0 && [...verbs].every((v) => v === 'read');
+  /**
+   * A tool's `title` and MCP `annotations`, derived upstream.
+   *
+   * `@commercetools/tools-core` owns the tool catalogue, and since 0.4 it also
+   * owns this mapping — with a drift test asserting every catalogue tool
+   * resolves. Deriving it here too meant two definitions of what `update_*`
+   * implies, so this defers to the package.
+   *
+   * The catalogue does not cover everything we register: the dynamic-loading
+   * meta-tools (`list_available_tools`, `execute_tool`) and any custom tool an
+   * embedder supplies have no catalogue verb, and `titleAndAnnotations` throws
+   * on those. They take the conservative fallback, which claims the tool both
+   * writes and destroys — the reading that makes a client ask first.
+   */
+  private titleAndAnnotationsFor(tool: Tool) {
+    if (toolVerb(tool.method) !== undefined) {
+      return titleAndAnnotations(tool.method);
+    }
 
-    return {
-      title: tool.name,
-      readOnlyHint: readOnly,
-      destructiveHint: verbs.has('update'),
-      idempotentHint: readOnly,
-      openWorldHint: true,
-    };
+    const title = tool.name || deriveToolTitle(tool.method);
+    const annotations = deriveToolAnnotationsOrConservative(tool.method, () => {
+      console.error(
+        `[mcp] no known verb for "${tool.method}"; assuming it writes and destroys`
+      );
+    });
+
+    return {title, annotations: {...annotations, title}};
   }
 
   private registerSingleTool(tool: Tool): void {
@@ -257,10 +269,9 @@ class CommercetoolsCommerceAgent extends McpServer {
     this.registerTool(
       tool.method,
       {
-        title: tool.name,
+        ...this.titleAndAnnotationsFor(tool),
         description: tool.description,
         inputSchema: this.toolSchema<Record<string, unknown>>(tool),
-        annotations: this.toolAnnotations(tool),
       },
       async (args: Record<string, unknown>) => {
         let result = await this.commercetoolsAPI.run(method, args, execute);
@@ -295,10 +306,9 @@ class CommercetoolsCommerceAgent extends McpServer {
     this.registerTool(
       injectTools.method,
       {
-        title: injectTools.name,
+        ...this.titleAndAnnotationsFor(injectTools),
         description: injectTools.description,
         inputSchema: this.toolSchema<ToolShape>(injectTools),
-        annotations: this.toolAnnotations(injectTools),
       },
       async (arg: ToolShape) => {
         const toolsToInject = filteredTools.filter((tool) =>
@@ -325,10 +335,9 @@ class CommercetoolsCommerceAgent extends McpServer {
     this.registerTool(
       executeTool.method,
       {
-        title: executeTool.name,
+        ...this.titleAndAnnotationsFor(executeTool),
         description: executeTool.description,
         inputSchema: this.toolSchema<ToolShape>(executeTool),
-        annotations: this.toolAnnotations(executeTool),
       },
       async (args: ToolShape) => {
         try {

@@ -61,26 +61,19 @@ describe('tool annotations (DEVX-885)', () => {
   });
 
   it.each([
-    [
-      'read_carts',
-      {readOnlyHint: true, destructiveHint: false, idempotentHint: true},
-    ],
-    [
-      'create_carts',
-      {readOnlyHint: false, destructiveHint: false, idempotentHint: false},
-    ],
+    ['read_carts', {readOnlyHint: true, destructiveHint: false}],
+    ['create_carts', {readOnlyHint: false, destructiveHint: false}],
     // `update` overwrites existing resource state, so it is the destructive verb.
-    [
-      'update_carts',
-      {readOnlyHint: false, destructiveHint: true, idempotentHint: false},
-    ],
-  ])('derives %s annotations from its actions', async (name, expected) => {
+    ['update_carts', {readOnlyHint: false, destructiveHint: true}],
+  ])('derives %s annotations from its verb', async (name, expected) => {
     const tools = registered(await build());
     expect(tools[name].annotations).toMatchObject(expected);
   });
 
-  it('marks tools as open-world, since they call a remote project', async () => {
+  it('titles a tool the way the catalogue does', async () => {
     const tools = registered(await build());
-    expect(tools.read_carts.annotations).toMatchObject({openWorldHint: true});
+    expect(tools.read_carts.title).toBe('Read Carts');
+    // MCP carries the title twice; both come from the same value.
+    expect(tools.read_carts.annotations).toMatchObject({title: 'Read Carts'});
   });
 });
