@@ -603,6 +603,16 @@ You can connect to the running remote server using Claude by specifying the belo
 > mismatch is rejected with `403 Forbidden`. Callers that rotate their token mid-session
 > should open a new session.
 
+> [!WARNING]
+> **Stateful session mode is deprecated.** The 2026-07-28 MCP specification removes
+> protocol sessions and the `Mcp-Session-Id` header, so this mode has no equivalent in
+> the new protocol and will be removed in a future major release.
+>
+> The remote server still defaults to stateful today, and that default will flip. Nothing
+> is kept between calls beyond the session's own auth binding, which per-request
+> credentials already provide, so switching is a configuration change rather than a
+> behavioural one. Pass `--stateless=true` to adopt the future default now.
+
 You can also use the Streamable HTTP server with the Commerce Agent like an SDK and develop on it.
 
 ```typescript

@@ -444,6 +444,31 @@ function warnIfPubliclyBound(host: string) {
   );
 }
 
+/**
+ * Stateful mode is on its way out (DEVX-888). The 2026-07-28 spec removes
+ * protocol sessions and `Mcp-Session-Id` entirely, and the v2 handler answers
+ * the session operations (GET/DELETE) with 405.
+ *
+ * An audit found nothing kept across calls but the transport instance and the
+ * token fingerprint that binds a session to its opener, so per-request auth
+ * already covers what sessions were carrying. Nothing changes yet — this only
+ * warns, because remote currently defaults to stateful and silently flipping
+ * that would break clients mid-release.
+ */
+function warnIfStateful(stateless: boolean) {
+  if (stateless) return;
+
+  console.error(
+    yellow(
+      `\n\u26a0\ufe0f  Stateful session mode is deprecated and will be removed.\n` +
+        `   The 2026-07-28 MCP spec has no protocol sessions, so this mode cannot carry\n` +
+        `   forward. Nothing is stored across calls today beyond the session's own auth\n` +
+        `   binding, which per-request credentials already provide.\n` +
+        `   Pass --stateless=true to adopt the future default now.\n`
+    )
+  );
+}
+
 type MaybeServer = {
   address?: () => unknown;
   on?: (
@@ -511,6 +536,8 @@ export async function main() {
   }
 
   if (env.remote) {
+    warnIfStateful(Boolean(env.stateless));
+
     const streamServer = new CommercetoolsCommerceAgentStreamable({
       authConfig,
       configuration,
