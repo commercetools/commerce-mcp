@@ -13,6 +13,7 @@ import {contextToToolsResourceBasedToolSystem} from '../shared/resource-based-to
 import {Tool} from '../types/tools';
 import {contextToBulkTools} from '../shared/bulk/tools';
 import {DYNAMIC_TOOL_LOADING_THRESHOLD} from '../shared/constants';
+import {SERVER_VERSION} from '../shared/version';
 import {transformToolOutput} from '@commercetools/processors';
 import {
   FieldFilteringHandler,
@@ -32,10 +33,23 @@ class CommercetoolsCommerceAgent extends McpServer {
     authConfig: AuthConfig;
     configuration: Configuration;
   }) {
-    super({
-      name: 'Commercetools',
-      version: '0.4.0',
-    });
+    super(
+      {
+        name: 'Commercetools',
+        title: 'commercetools',
+        version: SERVER_VERSION,
+        description:
+          'Query and manage a commercetools project through the commercetools APIs.',
+        websiteUrl: 'https://commercetools.com',
+      },
+      {
+        instructions:
+          'Tools are grouped by commercetools resource (carts, orders, products, ...) ' +
+          'and by verb: read_* queries, create_* adds, update_* modifies. Read tools ' +
+          'accept `where` predicates and `limit`/`offset` paging. Prefer a resource ' +
+          'key over its id where a tool accepts both.',
+      }
+    );
 
     this.authConfig = authConfig;
     const configurationWithDefaults =
@@ -170,12 +184,50 @@ class CommercetoolsCommerceAgent extends McpServer {
     return Array.from(new Set(actionResources));
   }
 
+  /**
+   * MCP tool annotations derived from the tool's declared actions.
+   *
+   * Every tool carries exactly one verb across `create` / `read` / `update`
+   * (no tool deletes), so the mapping is direct. `update` is marked
+   * destructive because it overwrites existing resource state; `create` is
+   * additive and `read` changes nothing.
+   *
+   * `openWorldHint` is true throughout: these call a remote commercetools
+   * project, not a closed local domain.
+   */
+  private toolAnnotations(tool: Tool): {
+    title: string;
+    readOnlyHint: boolean;
+    destructiveHint: boolean;
+    idempotentHint: boolean;
+    openWorldHint: boolean;
+  } {
+    const verbs = new Set(
+      Object.values(tool.actions ?? {}).flatMap((action) =>
+        Object.keys(action ?? {})
+      )
+    );
+    const readOnly = verbs.size > 0 && [...verbs].every((v) => v === 'read');
+
+    return {
+      title: tool.name,
+      readOnlyHint: readOnly,
+      destructiveHint: verbs.has('update'),
+      idempotentHint: readOnly,
+      openWorldHint: true,
+    };
+  }
+
   private registerSingleTool(tool: Tool): void {
     const {method, execute} = tool;
-    this.tool(
+    this.registerTool(
       tool.method,
-      tool.description,
-      tool.parameters.shape,
+      {
+        title: tool.name,
+        description: tool.description,
+        inputSchema: tool.parameters.shape,
+        annotations: this.toolAnnotations(tool),
+      },
       async (args: Record<string, unknown>) => {
         let result = await this.commercetoolsAPI.run(method, args, execute);
 
@@ -206,10 +258,14 @@ class CommercetoolsCommerceAgent extends McpServer {
   ): void {
     type ToolShape = z.infer<typeof injectTools.parameters.shape>;
 
-    this.tool(
+    this.registerTool(
       injectTools.method,
-      injectTools.description,
-      injectTools.parameters.shape,
+      {
+        title: injectTools.name,
+        description: injectTools.description,
+        inputSchema: injectTools.parameters.shape,
+        annotations: this.toolAnnotations(injectTools),
+      },
       async (arg: ToolShape) => {
         const toolsToInject = filteredTools.filter((tool) =>
           arg.toolMethods.includes(tool.method)
@@ -232,10 +288,14 @@ class CommercetoolsCommerceAgent extends McpServer {
   private registerExecuteTool(executeTool: Tool): void {
     type ToolShape = z.infer<typeof executeTool.parameters.shape>;
 
-    this.tool(
+    this.registerTool(
       executeTool.method,
-      executeTool.description,
-      executeTool.parameters.shape,
+      {
+        title: executeTool.name,
+        description: executeTool.description,
+        inputSchema: executeTool.parameters.shape,
+        annotations: this.toolAnnotations(executeTool),
+      },
       async (args: ToolShape) => {
         try {
           let result = await this.commercetoolsAPI.run(

@@ -5,6 +5,7 @@ import {isToolAllowed} from '../../shared/configuration';
 import {Configuration, Context} from '../../types/configuration';
 import {scopesToActions} from '../../utils/scopes';
 import {transformToolOutput} from '@commercetools/processors';
+import {SERVER_VERSION} from '../../shared/version';
 
 // Mock dependencies
 jest.mock('@modelcontextprotocol/sdk/server/mcp.js');
@@ -93,7 +94,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
 
     // Set up McpServer mock to handle the fact that CommercetoolsCommerceAgent extends it
     (McpServer as jest.Mock).mockImplementation(function (this: any) {
-      this.tool = mockToolMethod;
+      this.registerTool = mockToolMethod;
     });
 
     mockCommercetoolsAPIInstance = new CommercetoolsAPI(
@@ -141,10 +142,15 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
       },
       configuration: mockConfiguration,
     });
-    expect(McpServer).toHaveBeenCalledWith({
-      name: 'Commercetools',
-      version: '0.4.0',
-    });
+    expect(McpServer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Commercetools',
+        // Was hardcoded to 0.4.0 while the package sat at 4.x (DEVX-885).
+        version: SERVER_VERSION,
+        description: expect.any(String),
+      }),
+      expect.objectContaining({instructions: expect.any(String)})
+    );
   });
 
   it('should initialize CommercetoolsAPI', () => {
@@ -190,16 +196,25 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
     expect(mockToolMethod).toHaveBeenCalledTimes(2); // mcpTool1 and mcpTool2
 
     // Check if registerTool was called with the correct parameters
+    // registerTool takes a config object, not positional description/shape.
     expect(mockToolMethod).toHaveBeenCalledWith(
       mockSharedToolsData[0].method,
-      mockSharedToolsData[0].description,
-      expect.any(Object),
+      expect.objectContaining({
+        title: mockSharedToolsData[0].name,
+        description: mockSharedToolsData[0].description,
+        inputSchema: expect.any(Object),
+        annotations: expect.objectContaining({readOnlyHint: true}),
+      }),
       expect.any(Function) // Handler function
     );
     expect(mockToolMethod).toHaveBeenCalledWith(
       mockSharedToolsData[1].method,
-      mockSharedToolsData[1].description,
-      expect.any(Object),
+      expect.objectContaining({
+        title: mockSharedToolsData[1].name,
+        description: mockSharedToolsData[1].description,
+        inputSchema: expect.any(Object),
+        annotations: expect.objectContaining({readOnlyHint: true}),
+      }),
       expect.any(Function) // Handler function
     );
   });
@@ -220,7 +235,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
     // Get the handler from the mock call
     await new Promise(setImmediate);
     const toolCallArgs = mockToolMethod.mock.calls[0];
-    const handler = toolCallArgs[3]; // The async handler function
+    const handler = toolCallArgs[2]; // The async handler function
     const toolMethod = toolCallArgs[0];
 
     const handlerArg = {paramA: 'testValue'};
@@ -270,7 +285,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
 
       await new Promise(setImmediate);
       const handler =
-        mockToolMethod.mock.calls[mockToolMethod.mock.calls.length - 1][3];
+        mockToolMethod.mock.calls[mockToolMethod.mock.calls.length - 1][2];
       mockCommercetoolsAPIInstance.run.mockResolvedValue(payload as any);
 
       const result = await handler({}, {});
@@ -303,7 +318,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
 
     await new Promise(setImmediate);
     const toolCallArgs = mockToolMethod.mock.calls[0];
-    const handler = toolCallArgs[3];
+    const handler = toolCallArgs[2];
     const toolMethod = toolCallArgs[0];
     const apiResult = {data: 'api success'};
     mockCommercetoolsAPIInstance.run.mockResolvedValue(apiResult as any);
@@ -509,7 +524,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
 
       // Set up McpServer mock to handle the fact that CommercetoolsCommerceAgent extends it
       (McpServer as jest.Mock).mockImplementation(function (this: any) {
-        this.tool = _mockToolMethod;
+        this.registerTool = _mockToolMethod;
       });
 
       _mockCommercetoolsAPIInstance = new CommercetoolsAPI(
@@ -614,8 +629,12 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
 
         expect(_mockToolMethod).toHaveBeenCalledWith(
           'mcpTool1',
-          expect.any(String),
-          expect.any(Object),
+          expect.objectContaining({
+            title: expect.any(String),
+            description: expect.any(String),
+            inputSchema: expect.any(Object),
+            annotations: expect.any(Object),
+          }),
           expect.any(Function)
         );
       });
@@ -649,8 +668,12 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
         expect(_mockToolMethod).toHaveBeenCalledTimes(2);
         expect(_mockToolMethod).toHaveBeenCalledWith(
           'custom-test-tool',
-          expect.any(String),
-          expect.any(Object),
+          expect.objectContaining({
+            title: expect.any(String),
+            description: expect.any(String),
+            inputSchema: expect.any(Object),
+            annotations: expect.any(Object),
+          }),
           expect.any(Function)
         );
       });
@@ -764,7 +787,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
 
       // Set up McpServer mock to handle the fact that CommercetoolsCommerceAgent extends it
       (McpServer as jest.Mock).mockImplementation(function (this: any) {
-        this.tool = mockToolMethod;
+        this.registerTool = mockToolMethod;
       });
 
       mockCommercetoolsAPIInstance = new CommercetoolsAPI(
@@ -831,14 +854,22 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
         expect(mockToolMethod).toHaveBeenCalledTimes(2);
         expect(mockToolMethod).toHaveBeenCalledWith(
           'mcpTool1',
-          expect.any(String),
-          expect.any(Object),
+          expect.objectContaining({
+            title: expect.any(String),
+            description: expect.any(String),
+            inputSchema: expect.any(Object),
+            annotations: expect.any(Object),
+          }),
           expect.any(Function)
         );
         expect(mockToolMethod).toHaveBeenCalledWith(
           'mcpTool2',
-          expect.any(String),
-          expect.any(Object),
+          expect.objectContaining({
+            title: expect.any(String),
+            description: expect.any(String),
+            inputSchema: expect.any(Object),
+            annotations: expect.any(Object),
+          }),
           expect.any(Function)
         );
       });
@@ -934,20 +965,32 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
         expect(mockToolMethod).toHaveBeenCalledTimes(5);
         expect(mockToolMethod).toHaveBeenCalledWith(
           'list_available_tools',
-          expect.any(String),
-          expect.any(Object),
+          expect.objectContaining({
+            title: expect.any(String),
+            description: expect.any(String),
+            inputSchema: expect.any(Object),
+            annotations: expect.any(Object),
+          }),
           expect.any(Function)
         );
         expect(mockToolMethod).toHaveBeenCalledWith(
           'inject_tools',
-          expect.any(String),
-          expect.any(Object),
+          expect.objectContaining({
+            title: expect.any(String),
+            description: expect.any(String),
+            inputSchema: expect.any(Object),
+            annotations: expect.any(Object),
+          }),
           expect.any(Function)
         );
         expect(mockToolMethod).toHaveBeenCalledWith(
           'execute_tool',
-          expect.any(String),
-          expect.any(Object),
+          expect.objectContaining({
+            title: expect.any(String),
+            description: expect.any(String),
+            inputSchema: expect.any(Object),
+            annotations: expect.any(Object),
+          }),
           expect.any(Function)
         );
 
@@ -1094,7 +1137,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
       const call = mockToolMethod.mock.calls.find(
         (args: unknown[]) => args[0] === 'execute_tool'
       );
-      return call![3] as (args: unknown, extra: unknown) => Promise<any>;
+      return call![2] as (args: unknown, extra: unknown) => Promise<any>;
     };
 
     it('returns structuredContent for an object payload', async () => {
