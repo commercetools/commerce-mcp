@@ -78,6 +78,9 @@
     "@commercetools/platform-sdk": "^9.4.0",
     "@commercetools/tools-core": "^0.3.0",
     "@commercetools/ts-client": "^5.0.2",
+    "@modelcontextprotocol/express": "^2",
+    "@modelcontextprotocol/node": "^2",
+    "@modelcontextprotocol/server": "^2",
     "express": "^5.1.0",
     "pluralize": "^8.0.0",
     "qs": "^6.14.2",
@@ -87,7 +90,6 @@
   "peerDependencies": {
     "@langchain/core": "^0.3.6",
     "@mastra/core": "^0.8.0",
-    "@modelcontextprotocol/sdk": "^1.10.2",
     "ai": "^4.1.54",
     "openai": "^4.86.1"
   },

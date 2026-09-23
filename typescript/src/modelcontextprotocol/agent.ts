@@ -1,5 +1,9 @@
 import z from 'zod';
-import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {
+  McpServer,
+  fromJsonSchema,
+  type JsonSchemaType,
+} from '@modelcontextprotocol/server';
 import CommercetoolsAPI from '../shared/api';
 import {
   isToolAllowed,
@@ -14,6 +18,12 @@ import {Tool} from '../types/tools';
 import {contextToBulkTools} from '../shared/bulk/tools';
 import {DYNAMIC_TOOL_LOADING_THRESHOLD} from '../shared/constants';
 import {SERVER_VERSION} from '../shared/version';
+import {toolInputJsonSchema} from '../shared/json-schema';
+import {
+  LEGACY_PROTOCOL_VERSION,
+  MODERN_PROTOCOL_VERSION,
+  TOOLS_LIST_CACHE_HINT,
+} from '../shared/constants';
 import {transformToolOutput} from '@commercetools/processors';
 import {
   FieldFilteringHandler,
@@ -43,6 +53,16 @@ class CommercetoolsCommerceAgent extends McpServer {
         websiteUrl: 'https://commercetools.com',
       },
       {
+        // Opt in to the 2026 era. Without this the SDK serves 2025 only and
+        // never registers `server/discover`; the legacy handshake still falls
+        // back to the 2025 entry, so existing clients are unaffected.
+        supportedProtocolVersions: [
+          MODERN_PROTOCOL_VERSION,
+          LEGACY_PROTOCOL_VERSION,
+        ],
+        // The tool list only changes when configuration does, so it is worth
+        // caching for modern clients. 2025-era responses are unaffected.
+        cacheHints: {'tools/list': TOOLS_LIST_CACHE_HINT},
         instructions:
           'Tools are grouped by commercetools resource (carts, orders, products, ...) ' +
           'and by verb: read_* queries, create_* adds, update_* modifies. Read tools ' +
@@ -195,6 +215,20 @@ class CommercetoolsCommerceAgent extends McpServer {
    * `openWorldHint` is true throughout: these call a remote commercetools
    * project, not a closed local domain.
    */
+  /**
+   * A tool's parameters as the Standard Schema v2 `registerTool` expects.
+   *
+   * Our schemas come from `@commercetools/tools-core` on zod 3, which the v2
+   * API cannot consume directly, so they go through the JSON Schema bridge
+   * (DEVX-883). The cast is safe and confined here: `toolInputJsonSchema`
+   * already guarantees an object schema whose `required` keys all exist, and
+   * `JsonSchemaObject` differs from the SDK's `JsonSchemaType` only in
+   * modelling property values as `unknown` rather than nested schemas.
+   */
+  private toolSchema<T>(tool: Tool) {
+    return fromJsonSchema<T>(toolInputJsonSchema(tool) as JsonSchemaType);
+  }
+
   private toolAnnotations(tool: Tool): {
     title: string;
     readOnlyHint: boolean;
@@ -225,7 +259,7 @@ class CommercetoolsCommerceAgent extends McpServer {
       {
         title: tool.name,
         description: tool.description,
-        inputSchema: tool.parameters.shape,
+        inputSchema: this.toolSchema<Record<string, unknown>>(tool),
         annotations: this.toolAnnotations(tool),
       },
       async (args: Record<string, unknown>) => {
@@ -263,7 +297,7 @@ class CommercetoolsCommerceAgent extends McpServer {
       {
         title: injectTools.name,
         description: injectTools.description,
-        inputSchema: injectTools.parameters.shape,
+        inputSchema: this.toolSchema<ToolShape>(injectTools),
         annotations: this.toolAnnotations(injectTools),
       },
       async (arg: ToolShape) => {
@@ -293,7 +327,7 @@ class CommercetoolsCommerceAgent extends McpServer {
       {
         title: executeTool.name,
         description: executeTool.description,
-        inputSchema: executeTool.parameters.shape,
+        inputSchema: this.toolSchema<ToolShape>(executeTool),
         annotations: this.toolAnnotations(executeTool),
       },
       async (args: ToolShape) => {

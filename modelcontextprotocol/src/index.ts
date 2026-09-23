@@ -18,7 +18,7 @@ import {
   FieldFilteringRule,
   FieldFilteringHandler,
 } from '@commercetools/processors';
-import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {StdioServerTransport} from '@modelcontextprotocol/server/stdio';
 import dotenv from 'dotenv';
 import colors from 'colors';
 

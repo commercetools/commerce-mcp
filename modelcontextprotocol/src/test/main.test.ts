@@ -5,14 +5,14 @@ import {
   CommercetoolsCommerceAgentStreamable,
   Configuration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
-import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
-import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {StdioServerTransport} from '@modelcontextprotocol/server/stdio';
+import {McpServer} from '@modelcontextprotocol/server';
 
 jest.mock('@commercetools/commerce-agent/modelcontextprotocol', () => ({
   ...jest.requireActual('@commercetools/commerce-agent/modelcontextprotocol'),
 }));
-jest.mock('@modelcontextprotocol/sdk/server/stdio.js');
-jest.mock('@modelcontextprotocol/sdk/server/mcp.js');
+jest.mock('@modelcontextprotocol/server/stdio');
+jest.mock('@modelcontextprotocol/server');
 
 describe('main function', () => {
   beforeEach(() => {

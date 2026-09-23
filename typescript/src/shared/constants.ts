@@ -28,3 +28,22 @@ export function normalizeBindHost(host?: string): string {
   if (trimmed === '' || trimmed === '*') return ALL_INTERFACES_HOST;
   return trimmed;
 }
+
+/** The 2026-07-28 spec revision — the modern protocol era. */
+export const MODERN_PROTOCOL_VERSION = '2026-07-28';
+
+/**
+ * The newest 2025-era revision. The legacy `initialize` handshake counter-offers
+ * this to clients that ask for any older 2025 revision.
+ */
+export const LEGACY_PROTOCOL_VERSION = '2025-11-25';
+
+/**
+ * `tools/list` changes only when configuration does, so modern clients may
+ * cache it briefly. `public` is safe: the list is derived from configuration
+ * and scopes, never from the caller's data.
+ */
+export const TOOLS_LIST_CACHE_HINT = {
+  ttlMs: 60_000,
+  cacheScope: 'public',
+} as const;

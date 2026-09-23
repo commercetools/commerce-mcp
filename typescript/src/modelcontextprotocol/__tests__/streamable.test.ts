@@ -1,10 +1,9 @@
 /* eslint-disable no-new */
 import {randomUUID} from 'node:crypto';
 import express, {Express, Request, Response} from 'express';
+import {createMcpHandler} from '@modelcontextprotocol/server';
 import CommercetoolsCommerceAgentStreamable from '../streamable';
 import {DEFAULT_HOST} from '../../shared/constants';
-import {StreamableHTTPServerTransport} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import {isInitializeRequest} from '@modelcontextprotocol/sdk/types.js';
 import {CommercetoolsCommerceAgent} from '../../modelcontextprotocol';
 
 jest.mock('node:crypto', () => ({
@@ -17,6 +16,7 @@ jest.mock('express', () => {
     use: jest.fn(),
     post: jest.fn(),
     get: jest.fn(),
+    all: jest.fn(),
     listen: jest.fn(),
   };
 
@@ -25,12 +25,17 @@ jest.mock('express', () => {
   return expressFunction;
 });
 
-jest.mock('@modelcontextprotocol/sdk/server/streamableHttp.js', () => ({
-  StreamableHTTPServerTransport: jest.fn(),
+// These tests cover our routing and guards, not the SDK's Node adapter. The
+// real adapter needs a live socket (`res.on`), so it is stubbed and asserted
+// on as the delegation target.
+const mockNodeHandler = jest.fn();
+jest.mock('@modelcontextprotocol/node', () => ({
+  toNodeHandler: jest.fn(() => mockNodeHandler),
 }));
 
-jest.mock('@modelcontextprotocol/sdk/types.js', () => ({
-  isInitializeRequest: jest.fn(),
+jest.mock('@modelcontextprotocol/server', () => ({
+  ...jest.requireActual('@modelcontextprotocol/server'),
+  createMcpHandler: jest.fn(() => ({fetch: jest.fn()})),
 }));
 
 jest.mock('../../modelcontextprotocol', () => ({
@@ -43,7 +48,6 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
   let mockApp: any;
   let mockServer: jest.MockedFunction<() => Promise<any>>;
   let mockCommercetoolsServer: any;
-  let mockTransport: any;
 
   const mockAuthConfig = {
     accessToken: 'test-token',
@@ -67,6 +71,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       use: jest.fn(),
       post: jest.fn(),
       get: jest.fn(),
+      all: jest.fn(),
       listen: jest.fn(),
     };
     (express as jest.MockedFunction<typeof express>).mockReturnValue(mockApp);
@@ -77,15 +82,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
     };
     mockServer = jest.fn().mockResolvedValue(mockCommercetoolsServer);
 
-    mockTransport = {
-      handleRequest: jest.fn().mockResolvedValue(undefined),
-      close: jest.fn().mockResolvedValue(undefined),
-      sessionId: 'test-session-id',
-      onclose: undefined,
-    };
-    (StreamableHTTPServerTransport as jest.Mock).mockImplementation(
-      () => mockTransport
-    );
+    mockNodeHandler.mockReset();
 
     (CommercetoolsCommerceAgent.create as jest.Mock).mockResolvedValue(
       mockCommercetoolsServer
@@ -104,8 +101,9 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
 
       expect(express).toHaveBeenCalled();
       expect(mockApp.use).toHaveBeenCalledWith(expect.any(Function));
-      expect(mockApp.post).toHaveBeenCalledWith('/mcp', expect.any(Function));
-      expect(mockApp.get).toHaveBeenCalledWith('/mcp', expect.any(Function));
+      // One handler for every method: the SDK answers GET/DELETE with 405,
+      // which routing only POST would turn into a 404.
+      expect(mockApp.all).toHaveBeenCalledWith('/mcp', expect.any(Function));
     });
 
     test('should use provided express app', () => {
@@ -129,8 +127,9 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       } as any);
 
       expect(mockApp.use).toHaveBeenCalled();
-      expect(mockApp.post).toHaveBeenCalledWith('/mcp', expect.any(Function));
-      expect(mockApp.get).toHaveBeenCalledWith('/mcp', expect.any(Function));
+      // One handler for every method: the SDK answers GET/DELETE with 405,
+      // which routing only POST would turn into a 404.
+      expect(mockApp.all).toHaveBeenCalledWith('/mcp', expect.any(Function));
     });
   });
 
@@ -148,7 +147,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         streamableHttpOptions: mockStreamableHttpOptions,
       });
 
-      const postCall = mockApp.post.mock.calls.find(
+      const postCall = mockApp.all.mock.calls.find(
         (call: any) => call[0] === '/mcp'
       );
       postHandler = postCall[1];
@@ -156,6 +155,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       mockReq = {
         headers: {host: '127.0.0.1:8888', authorization: 'Bearer test-token'},
         body: {method: 'test'},
+        method: 'POST',
       };
 
       mockRes = {
@@ -166,7 +166,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       };
     });
 
-    test('should handle request with authorization token', async () => {
+    test('delegates an authorized request to the SDK handler', async () => {
       mockReq.headers = {
         host: '127.0.0.1:8888',
         authorization: 'Bearer new-auth-token',
@@ -174,19 +174,27 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
 
       await postHandler(mockReq, mockRes);
 
-      expect(StreamableHTTPServerTransport).toHaveBeenCalledWith({
-        ...mockStreamableHttpOptions,
-        sessionIdGenerator: undefined,
-      });
-      expect(mockServer).toHaveBeenCalled();
-      expect(mockCommercetoolsServer.connect).toHaveBeenCalledWith(
-        mockTransport
-      );
-      expect(mockTransport.handleRequest).toHaveBeenCalledWith(
+      // The SDK adapter owns the response write, including SSE backpressure.
+      expect(mockNodeHandler).toHaveBeenCalledWith(
         mockReq,
         mockRes,
         mockReq.body
       );
+    });
+
+    test("hands the caller's token to the handler as authInfo", async () => {
+      mockReq.headers = {
+        host: '127.0.0.1:8888',
+        authorization: 'Bearer new-auth-token',
+      };
+
+      await postHandler(mockReq, mockRes);
+
+      // `req.auth` is the adapter's documented hand-off to `ctx.authInfo`,
+      // which is what builds the per-request auth config.
+      expect((mockReq as {auth?: unknown}).auth).toMatchObject({
+        token: 'new-auth-token',
+      });
     });
 
     test('should reject request without authorization token with 401', async () => {
@@ -204,8 +212,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         },
         id: null,
       });
-      expect(mockServer).not.toHaveBeenCalled();
-      expect(mockTransport.handleRequest).not.toHaveBeenCalled();
+      expect(mockNodeHandler).not.toHaveBeenCalled();
     });
 
     test('should reject request with a malformed authorization header with 401', async () => {
@@ -216,6 +223,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
           const req = {
             headers: {host: '127.0.0.1:8888', authorization: header},
             body: {method: 'test'},
+            method: 'POST',
           };
           const res = {
             on: jest.fn(),
@@ -228,177 +236,27 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
           });
         })
       );
-      expect(mockServer).not.toHaveBeenCalled();
-      expect(mockTransport.handleRequest).not.toHaveBeenCalled();
+      expect(mockNodeHandler).not.toHaveBeenCalled();
     });
 
-    test('should setup cleanup on response close', async () => {
-      await postHandler(mockReq, mockRes);
+    test('lets non-POST through so the SDK can answer 405', async () => {
+      // The 2026-07-28 spec removed the GET endpoint; the handler returns 405.
+      // Blocking it on auth first would return 401 instead, and those methods
+      // carry no credentials to protect.
+      for (const method of ['GET', 'DELETE']) {
+        mockNodeHandler.mockClear();
+        const req = {headers: {host: '127.0.0.1:8888'}, method};
+        const res = {
+          on: jest.fn(),
+          status: jest.fn().mockReturnThis(),
+          json: jest.fn().mockReturnThis(),
+        };
 
-      expect(mockRes.on).toHaveBeenCalledWith('close', expect.any(Function));
+        await postHandler(req, res);
 
-      const closeHandler = (mockRes.on as jest.Mock).mock.calls[0][1];
-      await closeHandler();
-
-      expect(mockTransport.close).toHaveBeenCalled();
-      expect(mockCommercetoolsServer.close).toHaveBeenCalled();
-    });
-
-    test('should handle transport errors gracefully', async () => {
-      const error = new Error('Transport error');
-      mockTransport.handleRequest.mockRejectedValue(error);
-
-      await postHandler(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(500);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        jsonrpc: '2.0',
-        error: {
-          code: -32603,
-          message: 'Internal server error',
-        },
-        id: null,
-      });
-    });
-
-    test('should not send error response if headers already sent', async () => {
-      mockRes.headersSent = true;
-      mockTransport.handleRequest.mockRejectedValue(new Error('Test error'));
-
-      await postHandler(mockReq, mockRes);
-
-      expect(console.error).toHaveBeenCalled();
-      expect(mockRes.status).not.toHaveBeenCalled();
-      expect(mockRes.json).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('POST /mcp endpoint - Stateful mode', () => {
-    let instance: CommercetoolsCommerceAgentStreamable;
-    let postHandler: (req: any, res: any) => void;
-    let mockReq: Partial<Request>;
-    let mockRes: Partial<Response>;
-
-    beforeEach(() => {
-      instance = new CommercetoolsCommerceAgentStreamable({
-        authConfig: mockAuthConfig,
-        configuration: mockConfiguration,
-        server: mockServer,
-        stateless: false,
-        streamableHttpOptions: mockStreamableHttpOptions,
-      });
-
-      const postCall = mockApp.post.mock.calls.find(
-        (call: any) => call[0] === '/mcp'
-      );
-      postHandler = postCall[1];
-
-      mockReq = {
-        headers: {host: '127.0.0.1:8888', authorization: 'Bearer test-token'},
-        body: {method: 'initialize', params: {}},
-      };
-
-      mockRes = {
-        on: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-        headersSent: false,
-      };
-    });
-
-    test('should create new transport for initialize request', async () => {
-      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(true);
-
-      await postHandler(mockReq, mockRes);
-      const transportCall = (StreamableHTTPServerTransport as jest.Mock).mock
-        .calls[0][0];
-
-      transportCall.onsessioninitialized('existing-session-id');
-      await new Promise(setImmediate);
-
-      expect(StreamableHTTPServerTransport).toHaveBeenCalledWith({
-        sessionIdGenerator: mockStreamableHttpOptions.sessionIdGenerator,
-        onsessioninitialized: expect.any(Function),
-      });
-      expect(mockCommercetoolsServer.connect).toHaveBeenCalledWith(
-        mockTransport
-      );
-    });
-
-    test('should use randomUUID when sessionIdGenerator not provided', async () => {
-      instance = new CommercetoolsCommerceAgentStreamable({
-        authConfig: mockAuthConfig,
-        configuration: mockConfiguration,
-        server: mockServer,
-        stateless: false,
-        streamableHttpOptions: {
-          sessionIdGenerator: undefined,
-        },
-      });
-      const postCall = mockApp.post.mock.calls.find(
-        (call: any) => call[0] === '/mcp'
-      );
-      postHandler = postCall[1];
-      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(true);
-      await postHandler(mockReq, mockRes);
-      expect(StreamableHTTPServerTransport).toHaveBeenCalled();
-    });
-
-    test('should return 400 for invalid session request', async () => {
-      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(false);
-      mockReq.headers = {
-        host: '127.0.0.1:8888',
-        authorization: 'Bearer test-token',
-      }; // No session ID
-
-      await postHandler(mockReq, mockRes);
-
-      expect(mockRes.status).toHaveBeenCalledWith(400);
-      expect(mockRes.json).toHaveBeenCalledWith({
-        jsonrpc: '2.0',
-        error: {
-          code: -32000,
-          message: 'Bad Request: No valid session ID provided',
-        },
-        id: null,
-      });
-    });
-
-    test('should handle existing session ID', async () => {
-      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(true);
-      await postHandler(mockReq, mockRes);
-
-      const transportCall = (StreamableHTTPServerTransport as jest.Mock).mock
-        .calls[0][0];
-      transportCall.onsessioninitialized('existing-session-id');
-
-      jest.clearAllMocks();
-      mockReq.headers = {
-        host: '127.0.0.1:8888',
-        authorization: 'Bearer test-token',
-        'mcp-session-id': 'existing-session-id',
-      };
-
-      await postHandler(mockReq, mockRes);
-
-      expect(StreamableHTTPServerTransport).not.toHaveBeenCalled();
-      expect(mockTransport.handleRequest).toHaveBeenCalledWith(
-        mockReq,
-        mockRes,
-        mockReq.body
-      );
-    });
-
-    test('should setup transport cleanup on close', async () => {
-      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(true);
-
-      await postHandler(mockReq, mockRes);
-
-      expect(typeof mockTransport.onclose).toBe('function');
-
-      // Simulate transport close
-      mockTransport.onclose();
-      expect(mockTransport.onclose).toBeDefined();
+        expect(res.status).not.toHaveBeenCalledWith(401);
+        expect(mockNodeHandler).toHaveBeenCalled();
+      }
     });
   });
 
@@ -427,7 +285,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         configuration: mockConfiguration,
         server: mockServer,
       } as any);
-      const postCalls = mockApp.post.mock.calls.filter(
+      const postCalls = mockApp.all.mock.calls.filter(
         (call: any) => call[0] === '/mcp'
       );
       const handler = postCalls[postCalls.length - 1][1];
@@ -449,156 +307,6 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       );
 
       expect((instance as any).authConfig.accessToken).toBe('startup-token');
-    });
-  });
-
-  describe('POST /mcp endpoint - session binding (stateful)', () => {
-    const newRes = () =>
-      ({
-        on: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-        headersSent: false,
-      }) as any;
-
-    const buildInstance = (options: Record<string, unknown> = {}) => {
-      jest.clearAllMocks();
-      const instance = new CommercetoolsCommerceAgentStreamable({
-        authConfig: mockAuthConfig,
-        configuration: mockConfiguration,
-        server: mockServer,
-        stateless: false,
-        streamableHttpOptions: mockStreamableHttpOptions,
-        ...options,
-      } as any);
-
-      const postCalls = mockApp.post.mock.calls.filter(
-        (call: any) => call[0] === '/mcp'
-      );
-      return {instance, handler: postCalls[postCalls.length - 1][1]};
-    };
-
-    const openSession = async (
-      handler: (req: any, res: any) => Promise<void>,
-      token: string | undefined,
-      sessionId: string
-    ) => {
-      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(true);
-      await handler(
-        {
-          headers: {
-            host: '127.0.0.1:8888',
-            ...(token && {authorization: `Bearer ${token}`}),
-          },
-          body: {method: 'initialize', params: {}},
-        },
-        newRes()
-      );
-
-      const transportOptions = (
-        StreamableHTTPServerTransport as jest.Mock
-      ).mock.calls.slice(-1)[0][0];
-      await transportOptions.onsessioninitialized(sessionId);
-      await new Promise(setImmediate);
-    };
-
-    const continueSession = async (
-      handler: (req: any, res: any) => Promise<void>,
-      token: string | undefined,
-      sessionId: string
-    ) => {
-      (isInitializeRequest as unknown as jest.Mock).mockReturnValue(false);
-      const res = newRes();
-      mockTransport.handleRequest.mockClear();
-      await handler(
-        {
-          headers: {
-            host: '127.0.0.1:8888',
-            ...(token ? {authorization: `Bearer ${token}`} : {}),
-            'mcp-session-id': sessionId,
-          },
-          body: {method: 'tools/list', params: {}},
-        },
-        res
-      );
-      return res;
-    };
-
-    test('rejects another caller reusing a session id with 403', async () => {
-      const {handler} = buildInstance();
-      await openSession(handler, 'victim-token', 'session-1');
-
-      const res = await continueSession(handler, 'attacker-token', 'session-1');
-
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(res.json).toHaveBeenCalledWith({
-        jsonrpc: '2.0',
-        error: {
-          code: -32003,
-          message: 'Forbidden: this session belongs to another caller',
-        },
-        id: null,
-      });
-      expect(mockTransport.handleRequest).not.toHaveBeenCalled();
-    });
-
-    test('rejects a session-id-only request when the header is dropped', async () => {
-      const {handler} = buildInstance({enforceAuthHeader: false});
-      await openSession(handler, 'victim-token', 'session-1');
-
-      const res = await continueSession(handler, undefined, 'session-1');
-
-      expect(res.status).toHaveBeenCalledWith(403);
-      expect(mockTransport.handleRequest).not.toHaveBeenCalled();
-    });
-
-    test('lets the opener keep using its own session', async () => {
-      const {handler} = buildInstance();
-      await openSession(handler, 'victim-token', 'session-1');
-
-      const res = await continueSession(handler, 'victim-token', 'session-1');
-
-      expect(res.status).not.toHaveBeenCalledWith(403);
-      expect(mockTransport.handleRequest).toHaveBeenCalled();
-    });
-
-    test('does not restrict sessions opened without a token', async () => {
-      const {handler} = buildInstance({enforceAuthHeader: false});
-      await openSession(handler, undefined, 'session-1');
-
-      const res = await continueSession(handler, 'any-token', 'session-1');
-
-      expect(res.status).not.toHaveBeenCalledWith(403);
-    });
-
-    test('forgets the session token when the transport closes', async () => {
-      const {instance, handler} = buildInstance();
-      await openSession(handler, 'victim-token', 'session-1');
-
-      expect((instance as any).sessionTokens['session-1']).toBeDefined();
-
-      mockTransport.sessionId = 'session-1';
-      mockTransport.onclose();
-
-      expect((instance as any).sessionTokens['session-1']).toBeUndefined();
-      expect((instance as any).transports['session-1']).toBeUndefined();
-    });
-
-    test('never keeps the raw token in the session map', async () => {
-      const {instance, handler} = buildInstance();
-      await openSession(handler, 'victim-token', 'session-1');
-
-      expect(Object.values((instance as any).sessionTokens)).not.toContain(
-        'victim-token'
-      );
-    });
-
-    test('ignores an unknown session id, leaving the 400 path intact', async () => {
-      const {handler} = buildInstance();
-
-      const res = await continueSession(handler, 'some-token', 'never-opened');
-
-      expect(res.status).toHaveBeenCalledWith(400);
     });
   });
 
@@ -702,10 +410,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         headersSent: false,
       }) as any;
 
-    const handlerFor = (
-      options: Record<string, unknown> = {},
-      method: 'post' | 'get' = 'post'
-    ) => {
+    const handlerFor = (options: Record<string, unknown> = {}) => {
       jest.clearAllMocks();
       new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
@@ -715,7 +420,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         ...options,
       } as any);
 
-      const calls = mockApp[method].mock.calls.filter(
+      const calls = mockApp.all.mock.calls.filter(
         (call: any) => call[0] === '/mcp'
       );
       return calls[calls.length - 1][1];
@@ -727,7 +432,11 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
     ) => {
       const res = newRes();
       await handler(
-        {headers: {authorization: 'Bearer test-token', ...headers}, body: {}},
+        {
+          headers: {authorization: 'Bearer test-token', ...headers},
+          body: {},
+          method: 'POST',
+        },
         res
       );
       return res;
@@ -850,7 +559,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
     });
 
     test('guards the GET endpoint too', () => {
-      const getHandler = handlerFor({}, 'get');
+      const getHandler = handlerFor();
       const res = newRes();
 
       getHandler(
@@ -922,7 +631,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         server: mockServer,
       } as any);
 
-      const getCall = mockApp.get.mock.calls.find(
+      const getCall = mockApp.all.mock.calls.find(
         (call: any) => call[0] === '/mcp'
       );
       expect(getCall).toBeDefined();
@@ -936,7 +645,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         server: mockServer,
       } as any);
 
-      const getCall = mockApp.get.mock.calls.find(
+      const getCall = mockApp.all.mock.calls.find(
         (call: any) => call[0] === '/mcp'
       );
 
@@ -945,91 +654,106 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         status: jest.fn().mockReturnThis(),
         json: jest.fn().mockReturnThis(),
       };
-      const result = getHandler(
-        {headers: {host: '127.0.0.1:8888', authorization: 'Bearer test-token'}},
+      getHandler(
+        {
+          headers: {host: '127.0.0.1:8888', authorization: 'Bearer test-token'},
+          method: 'GET',
+        },
         mockRes
       );
-      expect(result).toBeUndefined();
       expect(mockRes.status).not.toHaveBeenCalledWith(401);
+      expect(mockNodeHandler).toHaveBeenCalled();
     });
 
-    test('should reject unauthorized GET requests with 401', async () => {
+    test('hands an unauthorized GET to the SDK, which answers 405', async () => {
+      // Changed in the 2026-07-28 model: GET is no longer an MCP endpoint, so
+      // the SDK returns 405. Rejecting it with 401 first would hide that, and
+      // a GET carries no credentials worth protecting.
       new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
       } as any);
 
-      const getCall = mockApp.get.mock.calls.find(
+      const getHandler = mockApp.all.mock.calls.find(
         (call: any) => call[0] === '/mcp'
-      );
-
-      const getHandler = getCall[1];
+      )[1];
       const mockRes = {
         status: jest.fn().mockReturnThis(),
         json: jest.fn().mockReturnThis(),
       };
-      await getHandler({headers: {host: '127.0.0.1:8888'}}, mockRes);
-      expect(mockRes.status).toHaveBeenCalledWith(401);
+
+      await getHandler(
+        {headers: {host: '127.0.0.1:8888'}, method: 'GET'},
+        mockRes
+      );
+
+      expect(mockRes.status).not.toHaveBeenCalledWith(401);
+      expect(mockNodeHandler).toHaveBeenCalled();
     });
   });
 
   describe('Authorization token handling', () => {
-    let instance: CommercetoolsCommerceAgentStreamable;
     let postHandler: (req: any, res: any) => void;
 
+    /** The per-request factory the route handed to `createMcpHandler`. */
+    const serverFactory = () =>
+      (createMcpHandler as jest.Mock).mock.calls.at(-1)![0] as (
+        ctx: unknown
+      ) => Promise<unknown>;
+
+    const newRes = () => ({
+      on: jest.fn(),
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn().mockReturnThis(),
+      headersSent: false,
+    });
+
     beforeEach(() => {
-      instance = new CommercetoolsCommerceAgentStreamable({
+      jest.clearAllMocks();
+      new CommercetoolsCommerceAgentStreamable({
         authConfig: {...mockAuthConfig, accessToken: 'original-token'},
         configuration: mockConfiguration,
         server: mockServer,
       } as any);
 
-      const postCall = mockApp.post.mock.calls.find(
+      postHandler = mockApp.all.mock.calls.find(
         (call: any) => call[0] === '/mcp'
-      );
-      postHandler = postCall[1];
+      )[1];
     });
 
-    test('should accept request with authorization header token', async () => {
-      const mockReq = {
-        headers: {host: '127.0.0.1:8888', authorization: 'Bearer header-token'},
-        body: {},
-      };
-      const mockRes = {
-        on: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-        headersSent: false,
-      };
+    test('accepts a request carrying an Authorization header', async () => {
+      const res = newRes();
+      await postHandler(
+        {
+          headers: {
+            host: '127.0.0.1:8888',
+            authorization: 'Bearer header-token',
+          },
+          body: {},
+          method: 'POST',
+        },
+        res
+      );
 
-      await postHandler(mockReq, mockRes);
-      expect(mockServer).toHaveBeenCalled();
-      expect(mockRes.status).not.toHaveBeenCalledWith(401);
+      expect(res.status).not.toHaveBeenCalledWith(401);
+      expect(mockNodeHandler).toHaveBeenCalled();
     });
 
     test('should NOT fall back to config token when no header (401)', async () => {
-      const mockReq = {
-        headers: {host: '127.0.0.1:8888'},
-        body: {},
-      };
-      const mockRes = {
-        on: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-        headersSent: false,
-      };
+      const res = newRes();
+      await postHandler(
+        {headers: {host: '127.0.0.1:8888'}, body: {}, method: 'POST'},
+        res
+      );
 
-      await postHandler(mockReq, mockRes);
-      expect(mockRes.status).toHaveBeenCalledWith(401);
-      expect(mockServer).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(401);
+      expect(mockNodeHandler).not.toHaveBeenCalled();
     });
 
-    test('should forward the header token (type auth_token) to the bootstrapped server', async () => {
-      // Reset so the post handler we look up belongs to the instance below,
-      // not the one constructed in beforeEach (shared mockApp accumulates).
+    test('builds the per-request server from the caller token, as auth_token', async () => {
       jest.clearAllMocks();
-      // No injected `server` factory, so the bootstrapped path is used and
+      // No injected `server` factory, so the bootstrapped path runs and
       // CommercetoolsCommerceAgent.create receives the per-request authConfig.
       new CommercetoolsCommerceAgentStreamable({
         authConfig: {
@@ -1041,23 +765,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         configuration: mockConfiguration,
       } as any);
 
-      const postCall = mockApp.post.mock.calls.find(
-        (call: any) => call[0] === '/mcp'
-      );
-      const handler = postCall[1];
-
-      const mockReq = {
-        headers: {host: '127.0.0.1:8888', authorization: 'Bearer caller-token'},
-        body: {},
-      };
-      const mockRes = {
-        on: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-        headersSent: false,
-      };
-
-      await handler(mockReq, mockRes);
+      await serverFactory()({authInfo: {token: 'caller-token'}});
 
       expect(CommercetoolsCommerceAgent.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -1069,35 +777,48 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       );
     });
 
-    test('should allow header-less requests when enforceAuthHeader is false', async () => {
-      // Reset so the post handler we look up belongs to the instance below.
+    test('falls back to the startup config when no caller token is present', async () => {
       jest.clearAllMocks();
       new CommercetoolsCommerceAgentStreamable({
-        authConfig: {...mockAuthConfig, accessToken: 'original-token'},
+        authConfig: {
+          ...mockAuthConfig,
+          type: 'client_credentials',
+          clientId: 'startup-client',
+        },
+        configuration: mockConfiguration,
+        enforceAuthHeader: false,
+      } as any);
+
+      await serverFactory()({});
+
+      expect(CommercetoolsCommerceAgent.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          authConfig: expect.objectContaining({type: 'client_credentials'}),
+        })
+      );
+    });
+
+    test('should allow header-less requests when enforceAuthHeader is false', async () => {
+      jest.clearAllMocks();
+      new CommercetoolsCommerceAgentStreamable({
+        authConfig: mockAuthConfig,
         configuration: mockConfiguration,
         server: mockServer,
         enforceAuthHeader: false,
       } as any);
 
-      const postCall = mockApp.post.mock.calls.find(
+      const handler = mockApp.all.mock.calls.find(
         (call: any) => call[0] === '/mcp'
+      )[1];
+      const res = newRes();
+
+      await handler(
+        {headers: {host: '127.0.0.1:8888'}, body: {}, method: 'POST'},
+        res
       );
-      const handler = postCall[1];
 
-      const mockReq = {
-        headers: {host: '127.0.0.1:8888'},
-        body: {},
-      };
-      const mockRes = {
-        on: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-        json: jest.fn().mockReturnThis(),
-        headersSent: false,
-      };
-
-      await handler(mockReq, mockRes);
-      expect(mockServer).toHaveBeenCalled();
-      expect(mockRes.status).not.toHaveBeenCalledWith(401);
+      expect(res.status).not.toHaveBeenCalledWith(401);
+      expect(mockNodeHandler).toHaveBeenCalled();
     });
   });
 });
