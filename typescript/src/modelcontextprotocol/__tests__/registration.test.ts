@@ -1,5 +1,6 @@
 import CommercetoolsCommerceAgent from '../agent';
 import {SERVER_VERSION} from '../../shared/version';
+import {SUPPORTED_PROTOCOL_VERSIONS} from '@modelcontextprotocol/server';
 
 jest.mock('../../shared/api');
 
@@ -49,6 +50,25 @@ describe('server identity (DEVX-885)', () => {
   });
 });
 
+describe('protocol versions', () => {
+  it('keeps every 2025-era revision the SDK supports, plus the 2026 one', async () => {
+    // Advertising only the newest legacy revision looks equivalent but is
+    // not: the handshake then counter-offers `2025-11-25` to a client that
+    // asked for an older one, and a client that does not recognise that
+    // version disconnects rather than downgrading. `mcp-remote` did exactly
+    // that — "Server's protocol version is not supported: 2025-11-25".
+    const agent = await build();
+    const advertised = (
+      agent as {server: {_supportedProtocolVersions: string[]}}
+    ).server._supportedProtocolVersions;
+
+    expect(advertised).toContain('2026-07-28');
+    for (const legacy of SUPPORTED_PROTOCOL_VERSIONS) {
+      expect(advertised).toContain(legacy);
+    }
+  });
+});
+
 describe('tool annotations (DEVX-885)', () => {
   it('gives every tool a title', async () => {
     const tools = registered(await build());
@@ -61,26 +81,25 @@ describe('tool annotations (DEVX-885)', () => {
   });
 
   it.each([
-    [
-      'read_carts',
-      {readOnlyHint: true, destructiveHint: false, idempotentHint: true},
-    ],
-    [
-      'create_carts',
-      {readOnlyHint: false, destructiveHint: false, idempotentHint: false},
-    ],
+    ['read_carts', {readOnlyHint: true, destructiveHint: false}],
+    ['create_carts', {readOnlyHint: false, destructiveHint: false}],
     // `update` overwrites existing resource state, so it is the destructive verb.
-    [
-      'update_carts',
-      {readOnlyHint: false, destructiveHint: true, idempotentHint: false},
-    ],
-  ])('derives %s annotations from its actions', async (name, expected) => {
+    ['update_carts', {readOnlyHint: false, destructiveHint: true}],
+  ])('derives %s annotations from its verb', async (name, expected) => {
     const tools = registered(await build());
     expect(tools[name].annotations).toMatchObject(expected);
   });
 
-  it('marks tools as open-world, since they call a remote project', async () => {
+  it('marks tools open-world, since they reach a live remote project', async () => {
+    // The catalogue reports false; we override it deliberately.
     const tools = registered(await build());
     expect(tools.read_carts.annotations).toMatchObject({openWorldHint: true});
+  });
+
+  it('titles a tool the way the catalogue does', async () => {
+    const tools = registered(await build());
+    expect(tools.read_carts.title).toBe('Read Carts');
+    // MCP carries the title twice; both come from the same value.
+    expect(tools.read_carts.annotations).toMatchObject({title: 'Read Carts'});
   });
 });

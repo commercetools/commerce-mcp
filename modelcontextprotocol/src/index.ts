@@ -18,7 +18,7 @@ import {
   FieldFilteringRule,
   FieldFilteringHandler,
 } from '@commercetools/processors';
-import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {StdioServerTransport} from '@modelcontextprotocol/server/stdio';
 import dotenv from 'dotenv';
 import colors from 'colors';
 
@@ -544,9 +544,6 @@ export async function main() {
       stateless: env.stateless,
       allowedHosts: resolveAllowedHosts(env),
       allowedOrigins: env.allowedOrigins,
-      streamableHttpOptions: {
-        sessionIdGenerator: undefined,
-      },
     });
 
     const port = env.port || 8080;

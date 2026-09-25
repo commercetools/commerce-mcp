@@ -1,5 +1,6 @@
+import {z} from 'zod';
 import CommercetoolsCommerceAgent from '../agent';
-import {McpServer} from '@modelcontextprotocol/sdk/server/mcp.js';
+import {McpServer} from '@modelcontextprotocol/server';
 import CommercetoolsAPI from '../../shared/api';
 import {isToolAllowed} from '../../shared/configuration';
 import {Configuration, Context} from '../../types/configuration';
@@ -8,7 +9,13 @@ import {transformToolOutput} from '@commercetools/processors';
 import {SERVER_VERSION} from '../../shared/version';
 
 // Mock dependencies
-jest.mock('@modelcontextprotocol/sdk/server/mcp.js');
+jest.mock('@modelcontextprotocol/server', () => {
+  const actual = jest.requireActual('@modelcontextprotocol/server');
+  return {
+    ...actual,
+    McpServer: jest.fn(),
+  };
+});
 jest.mock('../../shared/api');
 jest.mock('../../shared/configuration', () => ({
   isToolAllowed: jest.fn(),
@@ -203,7 +210,13 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
         title: mockSharedToolsData[0].name,
         description: mockSharedToolsData[0].description,
         inputSchema: expect.any(Object),
-        annotations: expect.objectContaining({readOnlyHint: true}),
+        // These fixtures are not catalogue tool names, so the upstream
+        // derivation cannot resolve a verb and falls back conservatively:
+        // assume the tool writes and destroys, so clients ask first.
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: true,
+        }),
       }),
       expect.any(Function) // Handler function
     );
@@ -213,7 +226,13 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
         title: mockSharedToolsData[1].name,
         description: mockSharedToolsData[1].description,
         inputSchema: expect.any(Object),
-        annotations: expect.objectContaining({readOnlyHint: true}),
+        // These fixtures are not catalogue tool names, so the upstream
+        // derivation cannot resolve a verb and falls back conservatively:
+        // assume the tool writes and destroys, so clients ask first.
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: true,
+        }),
       }),
       expect.any(Function) // Handler function
     );
@@ -645,7 +664,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
             name: 'custom-tool',
             method: 'custom-test-tool',
             description: 'custom tool description',
-            parameters: {shape: {key: 'unique-key'}},
+            parameters: z.object({key: z.string().describe('unique-key')}),
             execute: jest.fn(),
           },
         ];
@@ -708,7 +727,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
             name: 'custom-tool-no-exec-fn',
             method: 'custom-test-tool-exec-fn',
             description: 'custom tool description',
-            parameters: {shape: {key: 'unique-key'}},
+            parameters: z.object({key: z.string().describe('unique-key')}),
           },
         ];
 
@@ -741,7 +760,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
             name: 'custom-tool-no-exec-fn',
             method: 'custom-test-tool-exec-fn',
             description: 'custom tool description',
-            parameters: {shape: {key: 'unique-key'}},
+            parameters: z.object({key: z.string().describe('unique-key')}),
             execute: 'not-a-function',
           },
         ];

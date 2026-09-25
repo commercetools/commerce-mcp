@@ -1,4 +1,3 @@
-import {StreamableHTTPServerTransportOptions} from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import {AuthConfig, CommercetoolsCommerceAgent} from '../modelcontextprotocol';
 import {AvailableNamespaces, Tool} from './tools';
 import {IncomingMessage, ServerResponse} from 'node:http';
@@ -64,6 +63,16 @@ type IResponse = {
   json: (data: unknown) => void;
   on: (event: string, listener: (...args: unknown[]) => void) => void;
 } & ServerResponse<IncomingMessage>;
+/**
+ * Options that were forwarded to the v1 `StreamableHTTPServerTransport`.
+ *
+ * @deprecated Inert since the move to `createMcpHandler` (DEVX-886). The
+ * 2026-07-28 spec has no protocol sessions, so `sessionIdGenerator` and the
+ * other session knobs have nothing to configure. Kept so existing callers
+ * still typecheck; it will be removed in the next major.
+ */
+export type StreamableHttpOptions = Record<string, unknown>;
+
 export interface IApp {
   use: (middleware: any) => void;
   post: (
@@ -71,6 +80,11 @@ export interface IApp {
     handler: (req: IRequest, res: IResponse) => void
   ) => void;
   get: (path: string, handler: (req: IRequest, res: IResponse) => void) => void;
+  /**
+   * Every method on one path. The 2026-07-28 handler answers GET and DELETE
+   * with 405 itself, so routing only POST would return 404 instead.
+   */
+  all: (path: string, handler: (req: IRequest, res: IResponse) => void) => void;
   listen: (port: number, host: string, cb?: () => void) => unknown;
 }
 
@@ -79,7 +93,8 @@ type IWithServerInstance = {
   configuration?: Configuration;
   server: (sessionId?: string) => Promise<CommercetoolsCommerceAgent>;
   stateless?: boolean;
-  streamableHttpOptions: StreamableHTTPServerTransportOptions;
+  /** @deprecated See {@link StreamableHttpOptions}. */
+  streamableHttpOptions?: StreamableHttpOptions;
   app?: IApp;
   /**
    * When true (default), every HTTP request must carry a valid
@@ -110,7 +125,8 @@ type IWithServerConfig = {
   configuration: Configuration;
   server?: undefined;
   stateless?: boolean;
-  streamableHttpOptions: StreamableHTTPServerTransportOptions;
+  /** @deprecated See {@link StreamableHttpOptions}. */
+  streamableHttpOptions?: StreamableHttpOptions;
   app?: IApp;
   /**
    * When true (default), every HTTP request must carry a valid
