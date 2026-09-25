@@ -1,6 +1,6 @@
 {
   "name": "@commercetools/commerce-mcp",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "type": "module",
   "mcpName": "io.github.commercetools/commerce-mcp",
   "homepage": "https://github.com/commercetools/commerce-mcp",
