@@ -670,16 +670,12 @@ const getAgentServer = async () => {
 };
 
 const serverStreamable = new CommercetoolsCommerceAgentStreamable({
-  stateless: false, // make the MCP server stateless/stateful
   server: getAgentServer,
   app: expressApp, // optional express app instance
   // By default every request must send an `Authorization: Bearer <token>`
   // header (otherwise it is rejected with 401). If your `getAgentServer`
   // factory already handles authentication, set this to false to opt out.
   // enforceAuthHeader: false,
-  streamableHttpOptions: {
-    sessionIdGenerator: undefined,
-  },
 });
 
 serverStreamable.listen(8888, function () {
@@ -713,11 +709,7 @@ const server = new CommercetoolsCommerceAgentStreamable({
     },
   },
 
-  stateless: false,
   app: expressApp,
-  streamableHttpOptions: {
-    sessionIdGenerator: undefined,
-  },
 });
 
 server.listen(8888, function () {

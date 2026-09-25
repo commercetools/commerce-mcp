@@ -18,9 +18,11 @@ export type JsonSchemaObject = {
 const OPAQUE_KEYWORDS = new Set(['enum', 'const', 'default', 'examples']);
 
 /**
- * Drops `additionalProperties: false` wherever it appears. `$refStrategy:
- * 'none'` inlines nested objects, so they arrive carrying their own copy and
- * the root alone is not enough.
+ * Drops `additionalProperties: false` wherever it appears.
+ *
+ * Every nested object carries its own copy, so stripping the root alone is
+ * not enough. Referenced subschemas are covered too: a `$ref` points at a
+ * node that lives elsewhere in this same tree, which the walk still reaches.
  */
 function allowUnknownKeys(node: unknown): unknown {
   if (Array.isArray(node)) return node.map(allowUnknownKeys);
@@ -57,12 +59,27 @@ function allowUnknownKeys(node: unknown): unknown {
  */
 export function toJsonSchema(schema: ZodTypeAny): Record<string, unknown> {
   const converted = zodToJsonSchema(schema, {
-    // 2020-12 is MCP's default dialect and the closest target the generator
-    // offers; with `$schema` stripped the difference is not observable for
-    // the shapes our tools use.
-    target: 'jsonSchema2019-09',
-    // Inline everything: no `$defs`, so clients never have to resolve `$ref`.
-    $refStrategy: 'none',
+    // MCP's default dialect is 2020-12. The generator has no 2020-12 target,
+    // and its `jsonSchema2019-09` one is the wrong choice despite the closer
+    // name: for `.positive()` / `.gt()` it emits the draft-4 spelling
+    // `{minimum: n, exclusiveMinimum: true}`, which every draft-6-or-later
+    // validator rejects with `exclusiveMinimum value must be ["number"]`.
+    // `jsonSchema7` emits the numeric `{exclusiveMinimum: n}` that 2020-12
+    // also expects, and matches 2020-12 on every other keyword our tools use.
+    target: 'jsonSchema7',
+    // Point repeated and recursive subschemas at their first occurrence.
+    //
+    // `'none'` inlines everything, which reads better for a model consuming
+    // `inputSchema` directly — but a recursive schema cannot be inlined, and
+    // the generator resolves that by emitting an empty schema and logging
+    // "Recursive reference detected ... Defaulting to any". That silently
+    // dropped the whole compound-query DSL of `read_product_search`, and the
+    // nested `elementType` of `update_product_types` / `update_types`.
+    //
+    // For those, the choice is not "inlined or referenced" but "referenced or
+    // absent". `'root'` also deduplicates repeated subschemas, which cuts the
+    // combined size of the 122 tool schemas by about a quarter.
+    $refStrategy: 'root',
   }) as Record<string, unknown>;
 
   const {$schema: _schema, ...rest} = converted;
