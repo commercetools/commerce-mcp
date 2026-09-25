@@ -1,3 +1,4 @@
+import {z} from 'zod';
 import CommercetoolsCommerceAgent from '../agent';
 import {SERVER_VERSION} from '../../shared/version';
 import {SUPPORTED_PROTOCOL_VERSIONS} from '@modelcontextprotocol/server';
@@ -66,6 +67,87 @@ describe('protocol versions', () => {
     for (const legacy of SUPPORTED_PROTOCOL_VERSIONS) {
       expect(advertised).toContain(legacy);
     }
+  });
+});
+
+describe('unknown-verb fallback', () => {
+  const buildWithThreshold = () =>
+    (
+      CommercetoolsCommerceAgent as unknown as {
+        create: (o: unknown) => Promise<unknown>;
+      }
+    ).create({
+      authConfig: {
+        type: 'auth_token',
+        accessToken: 't',
+        projectKey: 'p',
+        authUrl: 'https://auth.example',
+        apiUrl: 'https://api.example',
+      },
+      // Force the resource-based system on, so the meta-tools register.
+      configuration: {
+        actions: {cart: {read: true, create: true, update: true}},
+        context: {dynamicToolLoadingThreshold: 1},
+      },
+    });
+
+  it('stays quiet about the meta-tools it registers itself', async () => {
+    // They are never in the catalogue, so the conservative fallback is
+    // expected for them; saying so on every start is noise.
+    const {error} = console;
+    const lines: string[] = [];
+    console.error = ((...a: unknown[]) => {
+      lines.push(String(a[0]));
+    }) as typeof console.error;
+    try {
+      await buildWithThreshold();
+    } finally {
+      console.error = error;
+    }
+
+    expect(lines.filter((l) => l.includes('no known verb'))).toEqual([]);
+  });
+
+  it('still warns for a tool it did not register', async () => {
+    const {error} = console;
+    const lines: string[] = [];
+    console.error = ((...a: unknown[]) => {
+      lines.push(String(a[0]));
+    }) as typeof console.error;
+    try {
+      await (
+        CommercetoolsCommerceAgent as unknown as {
+          create: (o: unknown) => Promise<unknown>;
+        }
+      ).create({
+        authConfig: {
+          type: 'auth_token',
+          accessToken: 't',
+          projectKey: 'p',
+          authUrl: 'https://auth.example',
+          apiUrl: 'https://api.example',
+        },
+        configuration: {
+          actions: {cart: {read: true}},
+          context: {},
+          customTools: [
+            {
+              name: 'Custom Thing',
+              method: 'custom_thing',
+              description: 'a tool we did not ship',
+              parameters: z.object({k: z.string()}),
+              execute: jest.fn(),
+            },
+          ],
+        },
+      });
+    } finally {
+      console.error = error;
+    }
+
+    expect(
+      lines.filter((l) => l.includes('no known verb for "custom_thing"'))
+    ).toHaveLength(1);
   });
 });
 
