@@ -1,6 +1,6 @@
 {
   "name": "@commercetools/processors",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "homepage": "https://github.com/commercetools/commerce-mcp",
   "description": "A collection of output processors for commercetools MCP server",
   "types": "dist/index.d.ts",

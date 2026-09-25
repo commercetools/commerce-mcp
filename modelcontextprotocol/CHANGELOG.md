@@ -1,5 +1,60 @@
 # @commercetools/commerce-mcp
 
+## 4.2.0
+
+### Minor Changes
+
+- [#59](https://github.com/commercetools/commerce-mcp/pull/59) [`49a315f`](https://github.com/commercetools/commerce-mcp/commit/49a315fcfd5ccd3b9cdcdcbfbeaec007f6f7bc64) Thanks [@ajimae](https://github.com/ajimae)! - Require Node.js 20 or newer, and publish the MCP CLI as an ES module. Groundwork for the MCP SDK v2 migration (DEVX-882): the v2 packages are ESM-only and declare `engines.node >= 20`.
+
+  The executable moves from `dist/index.js` to `dist/cli.js` — a thin bin shim, so `index.js` stays importable without starting a server as a side effect. Anyone invoking the package through `npx @commercetools/commerce-mcp` or the `bin` entry is unaffected; only a direct `node .../dist/index.js` invocation needs updating.
+
+  Three changes here can break an existing setup, so check them before upgrading:
+
+  - **Node 18 is no longer supported.** Install fails on `engines.node` unless you are on Node 20 or newer.
+  - **CommonJS consumers cannot `require()` these packages.** The published output is ESM only; use a dynamic `import()` or move the consuming code to ESM.
+  - **`node .../dist/index.js` no longer starts a server.** It now only exports `main()`. Call `dist/cli.js` instead.
+
+- [#65](https://github.com/commercetools/commerce-mcp/pull/65) [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416) Thanks [@ajimae](https://github.com/ajimae)! - Serve both protocol eras from the v2 SDK handler (DEVX-886).
+
+  `StreamableHTTPServerTransport` and its session map are replaced by `createMcpHandler` plus the SDK's Node adapter, and the CLI's stdio transport moves to `@modelcontextprotocol/server/stdio`. The handler builds a server per request from that request's credentials, which is what the previous `getServer` already did, so per-caller auth is unchanged.
+
+  `legacy: 'stateless'` keeps existing clients working: a 2025-era `initialize` still negotiates (against `2025-11-25`), while `server/discover` answers `2026-07-28` on the modern path. Tool registration now goes through the zod → JSON Schema bridge added in DEVX-883, so `tools/list` emits real JSON Schema alongside the titles and annotations from DEVX-885, and is marked cacheable for modern clients.
+
+  Two behaviour changes to know about:
+
+  - **`GET /mcp` now returns 405 instead of 401.** The 2026-07-28 spec removed the GET endpoint, and a GET carries no credentials to protect. `Host`/`Origin` validation still runs first, so DNS-rebinding protection is unaffected.
+  - **Protocol sessions are gone**, as flagged in DEVX-888. `Mcp-Session-Id` is no longer issued or accepted, and the session-to-opener binding it required is removed with it. Per-request credentials already provided that guarantee.
+
+  `streamableHttpOptions` is now inert and deprecated; it is still accepted so existing callers typecheck. The stale `@modelcontextprotocol/sdk` v1 peer dependency is dropped — the v2 packages ship as regular dependencies, so consumers no longer need to install the SDK themselves.
+
+### Patch Changes
+
+- [#65](https://github.com/commercetools/commerce-mcp/pull/65) [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416) Thanks [@ajimae](https://github.com/ajimae)! - Refresh the `server.json` manifest and document protocol compatibility (DEVX-889).
+
+  The manifest declared `version: "1.0.0"` while the package was at 4.x, and advertised only the stdio transport — the streamable HTTP server was not listed at all. Both are fixed, and the manifest validates against the published registry schema.
+
+  The README gains a compatibility matrix: which spec revisions are served (`2026-07-28` and `2025-11-25`), the available transports, the Node 20 floor, and the two behavioural consequences of the 2026 revision — no protocol sessions, and stricter headers on modern requests. The section describing session-to-opener binding is corrected, since sessions no longer exist.
+
+  Note the `$schema` date is unchanged: `2025-10-17` is still the only published registry schema, and it is independent of the MCP protocol revision.
+
+- [#65](https://github.com/commercetools/commerce-mcp/pull/65) [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416) Thanks [@ajimae](https://github.com/ajimae)! - Fix inconsistencies left by the SDK v2 migration.
+
+  - `context.mode` reported `'stateful'` whenever `--stateless=false` was set, but the 2026-07-28 handler has no sessions and always serves statelessly. Tools and the request log were being told a mode the server never serves. It now reports what actually happens.
+  - `server.json` advertised the streamable HTTP endpoint as `http://{HOST}:{PORT}/mcp` without declaring either variable, so a registry had nothing to substitute. Both are real environment variables the CLI reads, and are now declared.
+  - The CLI still passed `streamableHttpOptions`, which became inert when the transport moved to `createMcpHandler`, and the README's SDK examples still showed it alongside `stateless: false`. Both removed, so the documented setup matches what the options now do.
+
+  Also restores a regression test lost in the transport rewrite: the route used to catch errors and answer 500 itself, and that responsibility moved to the SDK adapter. A test now asserts a failed per-request server build still surfaces as an error rather than leaving the request unanswered.
+
+- [#65](https://github.com/commercetools/commerce-mcp/pull/65) [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416) Thanks [@ajimae](https://github.com/ajimae)! - Deprecate stateful session mode (DEVX-888). The 2026-07-28 MCP specification removes protocol sessions and the `Mcp-Session-Id` header, so `--stateless=false` has no equivalent in the new protocol.
+
+  An audit of the current implementation found nothing carried between calls except the transport instance and the fingerprint that binds a session to the token it was opened with. Per-request credentials already cover that, so no functionality is lost by moving to stateless.
+
+  Behaviour is unchanged: the remote server still defaults to stateful, and the flag still works. Starting it in stateful mode now prints a deprecation notice. Pass `--stateless=true` to adopt the future default, which is what the v2 handler will serve.
+
+- Updated dependencies [[`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416), [`70f5b6e`](https://github.com/commercetools/commerce-mcp/commit/70f5b6e0e2d8c670365b8b7e8becaecb9dc2d1f7), [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416), [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416), [`49a315f`](https://github.com/commercetools/commerce-mcp/commit/49a315fcfd5ccd3b9cdcdcbfbeaec007f6f7bc64), [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416), [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416), [`43e6264`](https://github.com/commercetools/commerce-mcp/commit/43e62641daf0f114845977af13859c494c5ed140), [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416), [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416), [`317c98d`](https://github.com/commercetools/commerce-mcp/commit/317c98d8ebdc5782d3979277cf05c446d7d69416)]:
+  - @commercetools/commerce-agent@4.2.0
+  - @commercetools/processors@0.1.0
+
 ## 4.1.0
 
 ### Minor Changes
