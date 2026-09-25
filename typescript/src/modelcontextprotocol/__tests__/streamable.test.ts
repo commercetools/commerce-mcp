@@ -239,6 +239,33 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       expect(mockNodeHandler).not.toHaveBeenCalled();
     });
 
+    test('surfaces a failed server build as an error, not a hang', async () => {
+      // The route used to wrap everything in try/catch and answer 500 itself.
+      // That went away with the SDK adapter, which owns the response now — so
+      // assert the factory's rejection still reaches the handler rather than
+      // leaving the request unanswered.
+      jest.clearAllMocks();
+      const boom = new Error(
+        'Unable to initialze `CommercetoolsCommerceAgent`'
+      );
+      const failing = jest.fn().mockRejectedValue(boom);
+
+      new CommercetoolsCommerceAgentStreamable({
+        authConfig: mockAuthConfig,
+        configuration: mockConfiguration,
+        server: failing,
+      } as any);
+
+      const factory = (createMcpHandler as jest.Mock).mock.calls.at(-1)![0] as (
+        ctx: unknown
+      ) => Promise<unknown>;
+
+      await expect(factory({authInfo: {token: 't'}})).rejects.toThrow(
+        'Unable to initialze'
+      );
+      expect(failing).toHaveBeenCalled();
+    });
+
     test('lets non-POST through so the SDK can answer 405', async () => {
       // The 2026-07-28 spec removed the GET endpoint; the handler returns 405.
       // Blocking it on auth first would return 401 instead, and those methods
@@ -354,7 +381,10 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       expect(result).toBe(mockCommercetoolsServer);
     });
 
-    test('should create server when not provided', async () => {
+    test('reports stateless even when the inert flag asks for stateful', async () => {
+      // `stateless: false` no longer changes how the server serves — the
+      // 2026-07-28 handler has no sessions. Reporting 'stateful' here would
+      // put a mode the server never serves into tool context and its logs.
       const instance = new CommercetoolsCommerceAgentStreamable({
         authConfig: mockAuthConfig,
         configuration: mockConfiguration,
@@ -369,7 +399,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
           ...mockConfiguration,
           context: {
             ...mockConfiguration.context,
-            mode: 'stateful',
+            mode: 'stateless',
             sessionId: 'session-123',
           },
         },
