@@ -1,6 +1,7 @@
 import z from 'zod';
 import {
   McpServer,
+  SUPPORTED_PROTOCOL_VERSIONS,
   fromJsonSchema,
   type JsonSchemaType,
 } from '@modelcontextprotocol/server';
@@ -36,7 +37,6 @@ import {toolInputJsonSchema} from '../shared/json-schema';
  */
 const OPEN_WORLD_HINT = true;
 import {
-  LEGACY_PROTOCOL_VERSION,
   MODERN_PROTOCOL_VERSION,
   TOOLS_LIST_CACHE_HINT,
 } from '../shared/constants';
@@ -69,12 +69,19 @@ class CommercetoolsCommerceAgent extends McpServer {
         websiteUrl: 'https://commercetools.com',
       },
       {
-        // Opt in to the 2026 era. Without this the SDK serves 2025 only and
-        // never registers `server/discover`; the legacy handshake still falls
-        // back to the 2025 entry, so existing clients are unaffected.
+        // Opt in to the 2026 era — without this the SDK serves 2025 only and
+        // never registers `server/discover` — while keeping every 2025-era
+        // revision the SDK knows.
+        //
+        // Listing just the newest legacy revision looks equivalent but is
+        // not: the handshake then counter-offers `2025-11-25` to a client
+        // that asked for an older one, and a client that does not recognise
+        // that version disconnects rather than downgrading. `mcp-remote`
+        // does exactly this. Spreading the SDK's own list keeps the range
+        // wide and current.
         supportedProtocolVersions: [
           MODERN_PROTOCOL_VERSION,
-          LEGACY_PROTOCOL_VERSION,
+          ...SUPPORTED_PROTOCOL_VERSIONS,
         ],
         // The tool list only changes when configuration does, so it is worth
         // caching for modern clients. 2025-era responses are unaffected.
