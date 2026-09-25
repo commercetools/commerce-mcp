@@ -24,11 +24,11 @@ export default class CommercetoolsCommerceAgentStreamable {
   private readonly authConfig: AuthConfig;
   private server: (sessionId?: string) => Promise<CommercetoolsCommerceAgent>;
   /**
-   * Retained for API compatibility only. The 2026-07-28 spec has no protocol
-   * sessions, so the handler always serves statelessly (DEVX-888); the value
-   * is still reported to tools through `context.mode`.
+   * Accepted for API compatibility and otherwise unused. The 2026-07-28 spec
+   * has no protocol sessions, so the handler always serves statelessly
+   * (DEVX-888) whatever this says.
    */
-  private stateless: boolean;
+  private readonly stateless: boolean;
   private enforceAuthHeader: boolean;
   /** Hostnames (no port) this server answers for; `*` disables the check. */
   private allowedHosts: string[];
@@ -250,7 +250,10 @@ export default class CommercetoolsCommerceAgentStreamable {
         ...this.configuration,
         context: {
           ...this.configuration.context,
-          mode: this.stateless ? 'stateless' : 'stateful',
+          // Always stateless: the 2026-07-28 handler has no sessions, so
+          // reporting 'stateful' because the inert flag says so would put a
+          // mode the server never serves into tool context and its logs.
+          mode: 'stateless',
           sessionId: id,
         },
       },
