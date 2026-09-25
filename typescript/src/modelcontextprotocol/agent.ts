@@ -20,7 +20,10 @@ import {
 import type {Configuration, Context} from '../types/configuration';
 import {scopesToActions} from '../utils/scopes';
 import {AuthConfig} from '../types/auth';
-import {contextToToolsResourceBasedToolSystem} from '../shared/resource-based-tools-system/tools';
+import {
+  RESOURCE_SYSTEM_TOOL_METHODS,
+  contextToToolsResourceBasedToolSystem,
+} from '../shared/resource-based-tools-system/tools';
 import {Tool} from '../types/tools';
 import {contextToBulkTools} from '../shared/bulk/tools';
 import {DYNAMIC_TOOL_LOADING_THRESHOLD} from '../shared/constants';
@@ -287,11 +290,20 @@ class CommercetoolsCommerceAgent extends McpServer {
    */
   private conservativeTitleAndAnnotations(tool: Tool) {
     const title = tool.name || deriveToolTitle(tool.method);
-    const annotations = deriveToolAnnotationsOrConservative(tool.method, () => {
-      console.error(
-        `[mcp] no known verb for "${tool.method}"; assuming it writes and destroys`
-      );
-    });
+
+    // Our own dynamic-loading tools are never in the catalogue, so the
+    // fallback is expected for them and saying so on every start is noise.
+    // A tool we did not register reaching this path is worth knowing about.
+    const ours = RESOURCE_SYSTEM_TOOL_METHODS.has(tool.method);
+    const annotations = deriveToolAnnotationsOrConservative(
+      tool.method,
+      ours
+        ? undefined
+        : () =>
+            console.error(
+              `[mcp] no known verb for "${tool.method}"; assuming it writes and destroys`
+            )
+    );
 
     return {title, annotations: {...annotations, title}};
   }
