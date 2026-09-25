@@ -1,5 +1,6 @@
 import CommercetoolsCommerceAgent from '../agent';
 import {SERVER_VERSION} from '../../shared/version';
+import {SUPPORTED_PROTOCOL_VERSIONS} from '@modelcontextprotocol/server';
 
 jest.mock('../../shared/api');
 
@@ -46,6 +47,25 @@ describe('server identity (DEVX-885)', () => {
     expect(
       (agent as {server: {_instructions?: string}}).server._instructions
     ).toBeTruthy();
+  });
+});
+
+describe('protocol versions', () => {
+  it('keeps every 2025-era revision the SDK supports, plus the 2026 one', async () => {
+    // Advertising only the newest legacy revision looks equivalent but is
+    // not: the handshake then counter-offers `2025-11-25` to a client that
+    // asked for an older one, and a client that does not recognise that
+    // version disconnects rather than downgrading. `mcp-remote` did exactly
+    // that — "Server's protocol version is not supported: 2025-11-25".
+    const agent = await build();
+    const advertised = (
+      agent as {server: {_supportedProtocolVersions: string[]}}
+    ).server._supportedProtocolVersions;
+
+    expect(advertised).toContain('2026-07-28');
+    for (const legacy of SUPPORTED_PROTOCOL_VERSIONS) {
+      expect(advertised).toContain(legacy);
+    }
   });
 });
 
