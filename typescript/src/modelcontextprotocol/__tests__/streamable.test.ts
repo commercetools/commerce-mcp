@@ -266,12 +266,14 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
       expect(failing).toHaveBeenCalled();
     });
 
-    test('lets non-POST through so the SDK can answer 405', async () => {
-      // The 2026-07-28 spec removed the GET endpoint; the handler returns 405.
-      // Blocking it on auth first would return 401 instead, and those methods
-      // carry no credentials to protect.
-      for (const method of ['GET', 'DELETE']) {
-        mockNodeHandler.mockClear();
+    // One case per method rather than a loop: each needs its own fresh
+    // handler mock, which `beforeEach` already provides.
+    test.each(['GET', 'DELETE'])(
+      'lets %s through so the SDK can answer 405',
+      async (method) => {
+        // The 2026-07-28 spec removed the GET endpoint; the handler returns
+        // 405. Blocking on auth first would return 401 instead, and these
+        // methods carry no credentials to protect.
         const req = {headers: {host: '127.0.0.1:8888'}, method};
         const res = {
           on: jest.fn(),
@@ -284,7 +286,7 @@ describe('CommercetoolsCommerceAgentStreamable', () => {
         expect(res.status).not.toHaveBeenCalledWith(401);
         expect(mockNodeHandler).toHaveBeenCalled();
       }
-    });
+    );
   });
 
   describe('shared auth config hardening (COM-15-010)', () => {
