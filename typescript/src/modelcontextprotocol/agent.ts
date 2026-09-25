@@ -24,7 +24,7 @@ import {contextToToolsResourceBasedToolSystem} from '../shared/resource-based-to
 import {Tool} from '../types/tools';
 import {contextToBulkTools} from '../shared/bulk/tools';
 import {DYNAMIC_TOOL_LOADING_THRESHOLD} from '../shared/constants';
-import {SERVER_VERSION} from '../shared/version';
+import pkg from '../../package.json';
 import {toolInputJsonSchema} from '../shared/json-schema';
 
 /**
@@ -63,7 +63,7 @@ class CommercetoolsCommerceAgent extends McpServer {
       {
         name: 'Commercetools',
         title: 'commercetools',
-        version: SERVER_VERSION,
+        version: pkg.version,
         description:
           'Query and manage a commercetools project through the commercetools APIs.',
         websiteUrl: 'https://commercetools.com',

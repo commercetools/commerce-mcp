@@ -16,7 +16,24 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [...compat.extends("plugin:prettier/recommended"), {
+export default [
+// Generated build output and coverage reports. They are gitignored, so a
+// clean checkout never has them and CI never lints them — but locally,
+// once you have run `pnpm build`, eslint would otherwise pick up the
+// emitted `.d.ts` files and report hundreds of formatting errors that do
+// not exist in the source. Mirrors .gitignore.
+{
+    ignores: [
+        "ai-sdk/**",
+        "langchain/**",
+        "mastra/**",
+        "modelcontextprotocol/**",
+        "openai/**",
+        "dist/**",
+        "coverage/**",
+    ],
+},
+...compat.extends("plugin:prettier/recommended"), {
     plugins: {
         prettier,
         import: fixupPluginRules(_import),

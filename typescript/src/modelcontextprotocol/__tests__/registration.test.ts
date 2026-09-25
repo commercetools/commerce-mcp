@@ -1,5 +1,5 @@
 import CommercetoolsCommerceAgent from '../agent';
-import {SERVER_VERSION} from '../../shared/version';
+import pkg from '../../../package.json';
 import {SUPPORTED_PROTOCOL_VERSIONS} from '@modelcontextprotocol/server';
 
 jest.mock('../../shared/api');
@@ -37,7 +37,10 @@ describe('server identity (DEVX-885)', () => {
     const info = (agent as {server: {_serverInfo: Record<string, unknown>}})
       .server._serverInfo;
 
-    expect(info.version).toBe(SERVER_VERSION);
+    // Read straight from package.json, so a release bump cannot leave the
+    // reported identity behind the way a hand-kept constant did.
+    expect(info.version).toBe(pkg.version);
+    expect(info.version).toMatch(/^\d+\.\d+\.\d+/);
     expect(info.version).not.toBe('0.4.0');
     expect(info.description).toBeTruthy();
   });
