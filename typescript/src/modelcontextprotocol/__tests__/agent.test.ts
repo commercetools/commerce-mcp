@@ -210,7 +210,13 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
         title: mockSharedToolsData[0].name,
         description: mockSharedToolsData[0].description,
         inputSchema: expect.any(Object),
-        annotations: expect.objectContaining({readOnlyHint: true}),
+        // These fixtures are not catalogue tool names, so the upstream
+        // derivation cannot resolve a verb and falls back conservatively:
+        // assume the tool writes and destroys, so clients ask first.
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: true,
+        }),
       }),
       expect.any(Function) // Handler function
     );
@@ -220,7 +226,13 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
         title: mockSharedToolsData[1].name,
         description: mockSharedToolsData[1].description,
         inputSchema: expect.any(Object),
-        annotations: expect.objectContaining({readOnlyHint: true}),
+        // These fixtures are not catalogue tool names, so the upstream
+        // derivation cannot resolve a verb and falls back conservatively:
+        // assume the tool writes and destroys, so clients ask first.
+        annotations: expect.objectContaining({
+          readOnlyHint: false,
+          destructiveHint: true,
+        }),
       }),
       expect.any(Function) // Handler function
     );

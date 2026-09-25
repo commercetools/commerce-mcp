@@ -182,8 +182,8 @@ importers:
         specifier: ^9.4.0
         version: 9.5.0
       '@commercetools/tools-core':
-        specifier: ^0.3.0
-        version: 0.3.1
+        specifier: ^0.4.1
+        version: 0.4.1
       '@commercetools/ts-client':
         specifier: ^5.0.2
         version: 5.0.3
@@ -659,6 +659,10 @@ packages:
 
   '@commercetools/tools-core@0.3.1':
     resolution: {integrity: sha512-+PwxZ5VOueSozI1HvfPP/bH63su8C9Wh0GgzZTSSEmVswyUtTF2ui+evuV/BUUB/jh0oXOmXB5Qp5Lyxsk5y+w==}
+    engines: {node: '>=22'}
+
+  '@commercetools/tools-core@0.4.1':
+    resolution: {integrity: sha512-RazQOqHEj3kcD6QR8pslBNlqOiQ1LbP0HJ4v8Mz9ZzeelmsLIs0Z6CcZCcAPWK47u5/DvGM9FSYEBi969dqK2g==}
     engines: {node: '>=22'}
 
   '@commercetools/ts-client@4.10.0':
@@ -5517,6 +5521,13 @@ snapshots:
       '@commercetools/ts-client': 5.0.3
 
   '@commercetools/tools-core@0.3.1':
+    dependencies:
+      '@commercetools/checkout-sdk': 2.0.1
+      '@commercetools/platform-sdk': 9.5.0
+      '@commercetools/ts-client': 5.0.3
+      zod: 3.25.76
+
+  '@commercetools/tools-core@0.4.1':
     dependencies:
       '@commercetools/checkout-sdk': 2.0.1
       '@commercetools/platform-sdk': 9.5.0
