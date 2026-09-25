@@ -6,12 +6,12 @@
     "url": "https://github.com/commercetools/commerce-mcp",
     "source": "github"
   },
-  "version": "1.0.0",
+  "version": "4.1.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@commercetools/commerce-mcp",
-      "version": "1.0.0",
+      "version": "4.1.0",
       "transport": {
         "type": "stdio"
       },
@@ -129,8 +129,28 @@
           "format": "string",
           "isSecret": false,
           "name": "TOOLS"
+        },
+        {
+          "description": "Interface the remote server binds to (default 127.0.0.1). Referenced by the streamable-http URL.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false,
+          "name": "HOST"
+        },
+        {
+          "description": "Port the remote server listens on (default 8080). Referenced by the streamable-http URL.",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": false,
+          "name": "PORT"
         }
       ]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "http://{HOST}:{PORT}/mcp"
     }
   ]
 }

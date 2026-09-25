@@ -4,6 +4,30 @@ This repository contains both an MCP server (which you can integrate with many M
 
 # commercetools Model Context Protocol
 
+## Compatibility
+
+| | |
+| --- | --- |
+| **Protocol revisions** | `2026-07-28` (modern) and `2025-11-25` (legacy) |
+| **Transports** | stdio, and streamable HTTP via `--remote=true` |
+| **Runtime** | Node.js 20 or newer |
+| **Tool capabilities** | titles, annotations, JSON Schema inputs, `structuredContent` |
+
+Both revisions are served from the same `/mcp` endpoint, so existing clients
+keep working without changes. A 2025-era `initialize` negotiates `2025-11-25`;
+modern clients discover `2026-07-28` through `server/discover`.
+
+Two things changed with the 2026 revision:
+
+- **There are no protocol sessions.** `Mcp-Session-Id` is neither issued nor
+  accepted, and `GET /mcp` returns `405` — the endpoint was removed from the
+  spec. Credentials travel on every request instead; `--stateless=false` is
+  deprecated and warns at startup.
+- **Modern requests are stricter.** A POST must carry `Mcp-Method` (and
+  `Mcp-Name` where applicable) matching the body, plus a `_meta` envelope with
+  `protocolVersion` and `clientCapabilities`. Missing values are rejected with
+  `-32020` and `-32602`. Legacy requests are unaffected.
+
 ## Setup
 
 To run the commercetools MCP server using npx, use the following command:
@@ -597,21 +621,17 @@ You can connect to the running remote server using Claude by specifying the belo
 > SDK usage below). This is **not** recommended for network-exposed deployments.
 >
 > The startup credentials are frozen at construction and every request derives its own
-> copy, so one request can never influence the credentials used by the next. In stateful
-> mode (`--stateless=false`) a session additionally remembers the token it was opened
-> with — knowing a session ID is not enough to continue someone else's session, and a
-> mismatch is rejected with `403 Forbidden`. Callers that rotate their token mid-session
-> should open a new session.
+> copy, so one request can never influence the credentials used by the next.
 
 > [!WARNING]
-> **Stateful session mode is deprecated.** The 2026-07-28 MCP specification removes
-> protocol sessions and the `Mcp-Session-Id` header, so this mode has no equivalent in
-> the new protocol and will be removed in a future major release.
+> **Stateful session mode is gone.** The 2026-07-28 specification removes protocol
+> sessions and the `Mcp-Session-Id` header, so the server no longer issues or accepts
+> session ids and `GET /mcp` answers `405`.
 >
-> The remote server still defaults to stateful today, and that default will flip. Nothing
-> is kept between calls beyond the session's own auth binding, which per-request
-> credentials already provide, so switching is a configuration change rather than a
-> behavioural one. Pass `--stateless=true` to adopt the future default now.
+> Nothing was kept between calls except the binding that tied a session to the token
+> that opened it, and per-request credentials already provide that guarantee — every
+> request is authenticated on its own. `--stateless=false` is accepted but inert, warns
+> at startup, and will be removed in the next major release.
 
 You can also use the Streamable HTTP server with the Commerce Agent like an SDK and develop on it.
 
@@ -650,16 +670,12 @@ const getAgentServer = async () => {
 };
 
 const serverStreamable = new CommercetoolsCommerceAgentStreamable({
-  stateless: false, // make the MCP server stateless/stateful
   server: getAgentServer,
   app: expressApp, // optional express app instance
   // By default every request must send an `Authorization: Bearer <token>`
   // header (otherwise it is rejected with 401). If your `getAgentServer`
   // factory already handles authentication, set this to false to opt out.
   // enforceAuthHeader: false,
-  streamableHttpOptions: {
-    sessionIdGenerator: undefined,
-  },
 });
 
 serverStreamable.listen(8888, function () {
@@ -693,11 +709,7 @@ const server = new CommercetoolsCommerceAgentStreamable({
     },
   },
 
-  stateless: false,
   app: expressApp,
-  streamableHttpOptions: {
-    sessionIdGenerator: undefined,
-  },
 });
 
 server.listen(8888, function () {
