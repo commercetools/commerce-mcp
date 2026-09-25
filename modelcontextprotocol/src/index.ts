@@ -544,9 +544,6 @@ export async function main() {
       stateless: env.stateless,
       allowedHosts: resolveAllowedHosts(env),
       allowedOrigins: env.allowedOrigins,
-      streamableHttpOptions: {
-        sessionIdGenerator: undefined,
-      },
     });
 
     const port = env.port || 8080;

@@ -11,7 +11,10 @@ import {
   LOOPBACK_HOSTNAMES,
   normalizeBindHost,
 } from '../shared/constants';
-import {createMcpHandler} from '@modelcontextprotocol/server';
+import {
+  createMcpHandler,
+  validateHostHeader,
+} from '@modelcontextprotocol/server';
 import {toNodeHandler} from '@modelcontextprotocol/node';
 import {IApp, IStreamServerOptions} from '../types/configuration';
 import {ExistingTokenAuth as E} from '../types/auth';
@@ -21,11 +24,11 @@ export default class CommercetoolsCommerceAgentStreamable {
   private readonly authConfig: AuthConfig;
   private server: (sessionId?: string) => Promise<CommercetoolsCommerceAgent>;
   /**
-   * Retained for API compatibility only. The 2026-07-28 spec has no protocol
-   * sessions, so the handler always serves statelessly (DEVX-888); the value
-   * is still reported to tools through `context.mode`.
+   * Accepted for API compatibility and otherwise unused. The 2026-07-28 spec
+   * has no protocol sessions, so the handler always serves statelessly
+   * (DEVX-888) whatever this says.
    */
-  private stateless: boolean;
+  private readonly stateless: boolean;
   private enforceAuthHeader: boolean;
   /** Hostnames (no port) this server answers for; `*` disables the check. */
   private allowedHosts: string[];
@@ -190,26 +193,35 @@ export default class CommercetoolsCommerceAgentStreamable {
     );
   }
 
+  /**
+   * Delegates `Host` parsing and matching to the SDK's `validateHostHeader`,
+   * which has the same port-agnostic, hostname-allowlist semantics we had
+   * (including bracketed IPv6). The wildcard and our message wording stay
+   * here, so `--allowedHosts` behaves exactly as before.
+   */
   private findUntrustedHost(host?: string | string[]): string | undefined {
     if (this.allowedHosts.includes('*')) return undefined;
 
-    if (typeof host !== 'string' || host.trim().length === 0) {
-      return 'Forbidden: missing Host header';
-    }
+    const header = typeof host === 'string' ? host : undefined;
+    const result = validateHostHeader(header, this.allowedHosts);
+    if (result.ok) return undefined;
 
-    let hostname: string;
-    try {
-      // The URL parser handles IPv4, bracketed IPv6 and plain hostnames.
-      hostname = new URL(`http://${host}`).hostname;
-    } catch {
-      return `Forbidden: malformed Host header`;
+    switch (result.errorCode) {
+      case 'missing_host':
+        return 'Forbidden: missing Host header';
+      case 'invalid_host_header':
+        return 'Forbidden: malformed Host header';
+      default:
+        return `Forbidden: Host "${result.hostname ?? header}" is not an allowed host for this server`;
     }
-
-    return this.isAllowed(hostname, this.allowedHosts)
-      ? undefined
-      : `Forbidden: Host "${hostname}" is not an allowed host for this server`;
   }
 
+  /**
+   * Deliberately not delegated to the SDK's `validateOriginHeader`: that one
+   * matches on hostname only, so a list of `https://app.example.com` would
+   * start accepting `http://app.example.com` and any port. Our
+   * `--allowedOrigins` values are full origins and are compared as such.
+   */
   private findUntrustedOrigin(origin?: string | string[]): string | undefined {
     // Non-browser MCP clients send no Origin, and have nothing to spoof.
     if (typeof origin !== 'string' || origin.trim().length === 0)
@@ -238,7 +250,10 @@ export default class CommercetoolsCommerceAgentStreamable {
         ...this.configuration,
         context: {
           ...this.configuration.context,
-          mode: this.stateless ? 'stateless' : 'stateful',
+          // Always stateless: the 2026-07-28 handler has no sessions, so
+          // reporting 'stateful' because the inert flag says so would put a
+          // mode the server never serves into tool context and its logs.
+          mode: 'stateless',
           sessionId: id,
         },
       },
