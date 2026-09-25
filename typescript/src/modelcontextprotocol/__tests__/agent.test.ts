@@ -6,7 +6,7 @@ import {isToolAllowed} from '../../shared/configuration';
 import {Configuration, Context} from '../../types/configuration';
 import {scopesToActions} from '../../utils/scopes';
 import {transformToolOutput} from '@commercetools/processors';
-import {SERVER_VERSION} from '../../shared/version';
+import pkg from '../../../package.json';
 
 // Mock dependencies
 jest.mock('@modelcontextprotocol/server', () => {
@@ -153,7 +153,7 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
       expect.objectContaining({
         name: 'Commercetools',
         // Was hardcoded to 0.4.0 while the package sat at 4.x (DEVX-885).
-        version: SERVER_VERSION,
+        version: pkg.version,
         description: expect.any(String),
       }),
       expect.objectContaining({instructions: expect.any(String)})

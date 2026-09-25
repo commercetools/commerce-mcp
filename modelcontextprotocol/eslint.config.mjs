@@ -16,7 +16,14 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default [...compat.extends("plugin:prettier/recommended"), {
+export default [
+// Generated build output and coverage reports; gitignored, so CI never
+// sees them. Without this, linting after a local `pnpm build` reports
+// errors in emitted `.d.ts` files. Mirrors .gitignore.
+{
+    ignores: ["dist/**", "coverage/**"],
+},
+...compat.extends("plugin:prettier/recommended"), {
     plugins: {
         prettier,
         import: fixupPluginRules(_import),
