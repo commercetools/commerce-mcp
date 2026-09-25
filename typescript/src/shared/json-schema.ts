@@ -57,10 +57,14 @@ function allowUnknownKeys(node: unknown): unknown {
  */
 export function toJsonSchema(schema: ZodTypeAny): Record<string, unknown> {
   const converted = zodToJsonSchema(schema, {
-    // 2020-12 is MCP's default dialect and the closest target the generator
-    // offers; with `$schema` stripped the difference is not observable for
-    // the shapes our tools use.
-    target: 'jsonSchema2019-09',
+    // MCP's default dialect is 2020-12. The generator has no 2020-12 target,
+    // and its `jsonSchema2019-09` one is the wrong choice despite the closer
+    // name: for `.positive()` / `.gt()` it emits the draft-4 spelling
+    // `{minimum: n, exclusiveMinimum: true}`, which every draft-6-or-later
+    // validator rejects with `exclusiveMinimum value must be ["number"]`.
+    // `jsonSchema7` emits the numeric `{exclusiveMinimum: n}` that 2020-12
+    // also expects, and matches 2020-12 on every other keyword our tools use.
+    target: 'jsonSchema7',
     // Inline everything: no `$defs`, so clients never have to resolve `$ref`.
     $refStrategy: 'none',
   }) as Record<string, unknown>;
