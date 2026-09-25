@@ -14,7 +14,7 @@ import {
 jest.mock('@commercetools/commerce-agent/modelcontextprotocol', () => ({
   ...jest.requireActual('@commercetools/commerce-agent/modelcontextprotocol'),
 }));
-jest.mock('@modelcontextprotocol/sdk/server/stdio.js');
+jest.mock('@modelcontextprotocol/server/stdio');
 
 describe('parseArgs function', () => {
   describe('success cases', () => {

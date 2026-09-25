@@ -1,8 +1,7 @@
 {
   "name": "@commercetools/processors",
   "version": "0.0.0",
-  "mcpName": "io.github.commercetools/processors",
-  "homepage": "https://github.com/commercetools/processors",
+  "homepage": "https://github.com/commercetools/commerce-mcp",
   "description": "A collection of output processors for commercetools MCP server",
   "types": "dist/index.d.ts",
   "main": "dist/index.js",
@@ -42,6 +41,7 @@
     "commercetools",
     "field-filtering",
     "transformations",
+    "redaction",
     "transform",
     "tools"
   ],

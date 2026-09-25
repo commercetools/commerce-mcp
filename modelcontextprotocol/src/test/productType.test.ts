@@ -4,12 +4,12 @@ import {
   CommercetoolsCommerceAgent,
   Configuration,
 } from '@commercetools/commerce-agent/modelcontextprotocol';
-import {StdioServerTransport} from '@modelcontextprotocol/sdk/server/stdio.js';
+import {StdioServerTransport} from '@modelcontextprotocol/server/stdio';
 
 jest.mock('@commercetools/commerce-agent/modelcontextprotocol', () => ({
   ...jest.requireActual('@commercetools/commerce-agent/modelcontextprotocol'),
 }));
-jest.mock('@modelcontextprotocol/sdk/server/stdio.js');
+jest.mock('@modelcontextprotocol/server/stdio');
 
 describe('Product Type Tools', () => {
   beforeEach(() => {
