@@ -70,6 +70,12 @@ describe('tool annotations (DEVX-885)', () => {
     expect(tools[name].annotations).toMatchObject(expected);
   });
 
+  it('marks tools open-world, since they reach a live remote project', async () => {
+    // The catalogue reports false; we override it deliberately.
+    const tools = registered(await build());
+    expect(tools.read_carts.annotations).toMatchObject({openWorldHint: true});
+  });
+
   it('titles a tool the way the catalogue does', async () => {
     const tools = registered(await build());
     expect(tools.read_carts.title).toBe('Read Carts');

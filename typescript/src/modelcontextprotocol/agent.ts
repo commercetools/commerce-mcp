@@ -25,6 +25,16 @@ import {contextToBulkTools} from '../shared/bulk/tools';
 import {DYNAMIC_TOOL_LOADING_THRESHOLD} from '../shared/constants';
 import {SERVER_VERSION} from '../shared/version';
 import {toolInputJsonSchema} from '../shared/json-schema';
+
+/**
+ * Every tool reaches a live commercetools project over the network, so the
+ * set of entities it can touch is open: another client, or a background
+ * process, can change what a call sees between one request and the next.
+ *
+ * `@commercetools/tools-core` reports `false` here. We override it, because
+ * that reading only holds for a closed, fully-defined domain.
+ */
+const OPEN_WORLD_HINT = true;
 import {
   LEGACY_PROTOCOL_VERSION,
   MODERN_PROTOCOL_VERSION,
@@ -250,10 +260,25 @@ class CommercetoolsCommerceAgent extends McpServer {
    * writes and destroys — the reading that makes a client ask first.
    */
   private titleAndAnnotationsFor(tool: Tool) {
-    if (toolVerb(tool.method) !== undefined) {
-      return titleAndAnnotations(tool.method);
-    }
+    const derived =
+      toolVerb(tool.method) !== undefined
+        ? titleAndAnnotations(tool.method)
+        : this.conservativeTitleAndAnnotations(tool);
 
+    return {
+      ...derived,
+      annotations: {...derived.annotations, openWorldHint: OPEN_WORLD_HINT},
+    };
+  }
+
+  /**
+   * Annotations for a tool the catalogue does not describe: the
+   * dynamic-loading meta-tools and any custom tool an embedder supplies.
+   * `titleAndAnnotations` throws on an unrecognised verb, so these take the
+   * conservative reading — assume the tool writes and destroys, which is what
+   * makes a client ask before calling — and log once.
+   */
+  private conservativeTitleAndAnnotations(tool: Tool) {
     const title = tool.name || deriveToolTitle(tool.method);
     const annotations = deriveToolAnnotationsOrConservative(tool.method, () => {
       console.error(
