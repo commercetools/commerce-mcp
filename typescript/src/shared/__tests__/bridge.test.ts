@@ -100,6 +100,18 @@ describe('bridge tool building', () => {
     expect(methods(tools)).toContain('create_transactions');
   });
 
+  it('exposes MCP servers and the read-only MCP server type catalogue', () => {
+    const resources = contextToResourceTools({isAdmin: true});
+    expect(methods(resources['mcp-server']).sort()).toEqual([
+      'create_mcp_servers',
+      'read_mcp_servers',
+      'update_mcp_servers',
+    ]);
+    expect(methods(resources['mcp-server-type'])).toEqual([
+      'read_mcp_server_types',
+    ]);
+  });
+
   it('bulk tools are create/update and separate from contextToTools', () => {
     expect(methods(contextToBulkTools()).sort()).toEqual([
       'create_bulk',
@@ -123,8 +135,18 @@ describe('bridge execution mapping', () => {
     });
     // delete is not implemented/exposed.
     expect(resolveMethod('delete_customers')).toBeUndefined();
+    // `mcp_servers` must not swallow `mcp_server_types` (or vice versa).
+    expect(resolveMethod('read_mcp_server_types')).toMatchObject({
+      op: 'read',
+      def: {nsKey: 'mcp-server-type'},
+    });
+    expect(resolveMethod('update_mcp_servers')).toMatchObject({
+      op: 'update',
+      def: {nsKey: 'mcp-server'},
+    });
     // create on a read-only resource is not exposed.
     expect(resolveMethod('create_product_search')).toBeUndefined();
+    expect(resolveMethod('create_mcp_server_types')).toBeUndefined();
     expect(resolveMethod('not_a_tool')).toBeUndefined();
   });
 

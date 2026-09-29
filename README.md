@@ -168,6 +168,10 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 | `read_states`              | [Read State](https://docs.commercetools.com/api/projects/states#query-states)                                                      |
 | `create_states`            | [Create State](https://docs.commercetools.com/api/projects/states#create-state)                                                    |
 | `update_states`            | [Update State](https://docs.commercetools.com/api/projects/states#update-state-by-id)                                              |
+| `read_mcp_servers`         | [Read MCP Server](https://docs.commercetools.com/api/projects/managed-mcp-servers#query-mcp-servers)                               |
+| `create_mcp_servers`       | [Create MCP Server](https://docs.commercetools.com/api/projects/managed-mcp-servers#create-mcp-server)                             |
+| `update_mcp_servers`       | [Update MCP Server](https://docs.commercetools.com/api/projects/managed-mcp-servers#update-mcp-server)                             |
+| `read_mcp_server_types`    | [Read MCP Server Type](https://docs.commercetools.com/api/projects/managed-mcp-servers#query-mcp-server-types)                     |
 | `read_products`            | [Read product information](https://docs.commercetools.com/api/projects/products#query-products)                                    |
 | `create_products`          | [Create product information](https://docs.commercetools.com/api/projects/products#create-product)                                  |
 | `update_products`          | [Update product information](https://docs.commercetools.com/api/projects/products#update-product)                                  |

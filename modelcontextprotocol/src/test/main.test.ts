@@ -103,6 +103,8 @@ describe('main function', () => {
           'product-selection-assignment': {read: true},
           'recurrence-policy': {read: true, create: true, update: true},
           states: {read: true, create: true, update: true},
+          'mcp-server': {read: true, create: true, update: true},
+          'mcp-server-type': {read: true},
         },
         context: {
           isAdmin: true,

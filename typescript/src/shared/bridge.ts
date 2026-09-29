@@ -28,6 +28,8 @@ import {
   DiscountCodesHandler,
   ExtensionsHandler,
   InventoryHandler,
+  McpServerTypesHandler,
+  McpServersHandler,
   OrderEditsHandler,
   OrdersHandler,
   PaymentIntentsHandler,
@@ -368,6 +370,18 @@ const RESOURCE_DEFS: ResourceDef[] = [
     coreNamespace: 'states',
     Handler: StatesHandler,
     baseOps: RCU,
+  },
+  {
+    nsKey: 'mcp-server',
+    coreNamespace: 'mcp-servers',
+    Handler: McpServersHandler,
+    baseOps: RCU,
+  },
+  {
+    nsKey: 'mcp-server-type',
+    coreNamespace: 'mcp-server-types',
+    Handler: McpServerTypesHandler,
+    baseOps: ['read'],
   },
 ];
 
