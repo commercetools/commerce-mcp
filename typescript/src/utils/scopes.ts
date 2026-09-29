@@ -6,6 +6,13 @@ type Permission = {[actions: string]: boolean};
 
 const adminScope = ['manage_project', 'manage_api_clients', 'view_api_clients'];
 
+// Resources without a scope of their own, keyed by the (normalized) scope
+// resource that covers them — e.g. carts are governed by the order scopes
+// (`view_orders`, `manage_orders`, `manage_my_orders`).
+const coveredResources: {[scopeResource: string]: string[]} = {
+  orders: ['cart'],
+};
+
 function normalize(str: string): string {
   return pluralize.plural(str).toLowerCase();
 }
@@ -17,16 +24,20 @@ export function scopesToActions(
   const actions: Action = configuration.actions || {};
   if (scopes.some((scope) => adminScope.includes(scope))) {
     return Object.fromEntries(
-      Object.entries(actions).map(([resource, {read, create, update}]) => {
-        return [
-          resource,
-          {
-            ...(read == undefined ? {} : {read}),
-            ...(create == undefined ? {} : {create}),
-            ...(update == undefined ? {} : {update}),
-          },
-        ];
-      })
+      Object.entries(actions).map(
+        ([resource, {read, create, update, replicate, apply}]) => {
+          return [
+            resource,
+            {
+              ...(read == undefined ? {} : {read}),
+              ...(create == undefined ? {} : {create}),
+              ...(update == undefined ? {} : {update}),
+              ...(replicate == undefined ? {} : {replicate}),
+              ...(apply == undefined ? {} : {apply}),
+            },
+          ];
+        }
+      )
     );
   }
 
@@ -47,20 +58,27 @@ export function scopesToActions(
       type == 'view'
         ? ['read']
         : ['manage', 'manage_my'].includes(type)
-          ? ['read', 'create', 'update']
+          ? ['read', 'create', 'update', 'replicate', 'apply']
           : [];
 
     const resourceKey = Object.keys(actions).find((key) => {
       return normalizedResource.startsWith(normalize(key));
     });
 
-    if (!resourceKey) return acc;
+    const resourceKeys = [
+      ...(resourceKey ? [resourceKey] : []),
+      ...(coveredResources[normalizedResource] ?? []).filter(
+        (key) => key in actions
+      ),
+    ];
 
-    acc[resourceKey] = acc[resourceKey] || {};
-    permissions.forEach((permission) => {
-      if (permission in actions[resourceKey]) {
-        acc[resourceKey][permission] = actions[resourceKey][permission];
-      }
+    resourceKeys.forEach((key) => {
+      acc[key] = acc[key] || {};
+      permissions.forEach((permission) => {
+        if (permission in actions[key]) {
+          acc[key][permission] = actions[key][permission];
+        }
+      });
     });
 
     return acc;

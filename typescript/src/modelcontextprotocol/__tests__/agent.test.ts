@@ -463,6 +463,52 @@ describe('CommercetoolsCommerceAgent (ModelContextProtocol)', () => {
       });
     });
 
+    it('should grant resource extras (replicate / apply) with a manage scope only', () => {
+      const configuredActions: Configuration = {
+        actions: {
+          cart: {read: true, replicate: true},
+          'order-edit': {read: true, apply: true},
+        },
+      };
+
+      expect(
+        scopesToActions(['manage_order_edits'], configuredActions)
+      ).toEqual({'order-edit': {read: true, apply: true}});
+      expect(scopesToActions(['view_order_edits'], configuredActions)).toEqual({
+        'order-edit': {read: true},
+      });
+      // admin scopes pass every configured action through, extras included.
+      expect(scopesToActions(['manage_project'], configuredActions)).toEqual(
+        configuredActions.actions
+      );
+    });
+
+    it('should grant carts with the order scopes (there is no cart scope)', () => {
+      const configuredActions: Configuration = {
+        actions: {
+          order: {read: true, create: true, update: true},
+          cart: {read: true, create: true, update: true, replicate: true},
+        },
+      };
+
+      expect(scopesToActions(['manage_orders'], configuredActions)).toEqual(
+        configuredActions.actions
+      );
+      expect(scopesToActions(['manage_my_orders'], configuredActions)).toEqual(
+        configuredActions.actions
+      );
+      expect(scopesToActions(['view_orders'], configuredActions)).toEqual({
+        order: {read: true},
+        cart: {read: true},
+      });
+      // a covered resource that is not configured is not conjured up.
+      expect(
+        scopesToActions(['manage_orders'], {
+          actions: {order: {read: true}},
+        })
+      ).toEqual({order: {read: true}});
+    });
+
     it('should respect admin scopes [support for all coco endpoints]', () => {
       const configuredActions: Configuration = {
         actions: {
