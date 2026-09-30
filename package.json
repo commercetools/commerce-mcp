@@ -14,7 +14,7 @@
     "@commercetools/processors": "workspace:*",
     "@commercetools/platform-sdk": "^9.4.0",
     "@commercetools/checkout-sdk": "^1.0.0",
-    "@commercetools/tools-core": "^0.3.0",
+    "@commercetools/tools-core": "^0.5.0",
     "@commercetools/ts-client": "^5.0.2",
     "@types/pluralize": "^0.0.33"
   },
