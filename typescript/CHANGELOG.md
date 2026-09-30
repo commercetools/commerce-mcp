@@ -1,5 +1,22 @@
 # @commercetools/commerce-agent
 
+## 4.3.0
+
+### Minor Changes
+
+- [#77](https://github.com/commercetools/commerce-mcp/pull/77) [`698072f`](https://github.com/commercetools/commerce-mcp/commit/698072f3ef925c419fba23bf4886e574b90e38bf) Thanks [@cneijenhuis](https://github.com/cneijenhuis)! - Expose the Managed MCP Server tools from `@commercetools/tools-core`: `read_mcp_servers`, `create_mcp_servers` and `update_mcp_servers` (scope key `mcp-server`), plus the read-only `read_mcp_server_types` catalogue (scope key `mcp-server-type`).
+
+- [#77](https://github.com/commercetools/commerce-mcp/pull/77) [`698072f`](https://github.com/commercetools/commerce-mcp/commit/698072f3ef925c419fba23bf4886e574b90e38bf) Thanks [@cneijenhuis](https://github.com/cneijenhuis)! - Expose the remaining `@commercetools/tools-core` tools:
+
+  - attribute groups: `read_attribute_groups`, `create_attribute_groups`, `update_attribute_groups` (scope key `attribute-group`)
+  - `read_messages` (scope key `message`), `read_product_projections` (scope key `product-projection`) and `read_customer_search` (scope key `customer-search`)
+  - Checkout applications and payment integrations: `read/create/update_applications` (scope key `application`) and `read/create/update_payment_integrations` (scope key `payment-integration`)
+  - `replicate_carts` and `apply_order_edits`, gated by their own `replicate` / `apply` actions rather than `create` / `update`
+
+### Patch Changes
+
+- [#77](https://github.com/commercetools/commerce-mcp/pull/77) [`698072f`](https://github.com/commercetools/commerce-mcp/commit/698072f3ef925c419fba23bf4886e574b90e38bf) Thanks [@cneijenhuis](https://github.com/cneijenhuis)! - Grant the cart tools to tokens with the order scopes (`view_orders`, `manage_orders`, `manage_my_orders`). commercetools has no cart scope, so a scoped (non-admin) token previously lost every cart tool, including `replicate_carts`.
+
 ## 4.2.0
 
 ### Minor Changes
