@@ -160,7 +160,8 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 | `update_associate_roles`    | [Update Associate Role](https://docs.commercetools.com/api/projects/associate-roles#update-associate-role-by-id)                   |
 | `read_order_edits`          | [Read Order Edit](https://docs.commercetools.com/api/projects/order-edits#query-orderedits)                                        |
 | `create_order_edits`        | [Create Order Edit](https://docs.commercetools.com/api/projects/order-edits#create-orderedit)                                      |
-| `update_order_edits`        | [Update or Apply Order Edit](https://docs.commercetools.com/api/projects/order-edits#update-orderedit-by-id)                       |
+| `update_order_edits`        | [Update Order Edit](https://docs.commercetools.com/api/projects/order-edits#update-orderedit-by-id)                                |
+| `apply_order_edits`        | [Apply Order Edit](https://docs.commercetools.com/api/projects/order-edits#apply-orderedit)                                          |
 | `read_product_selection_assignments` | [Read Products in Product Selection](https://docs.commercetools.com/api/projects/product-selections#query-productselection-products) |
 | `read_recurrence_policies`   | [Read Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#query-recurrencepolicies)                 |
 | `create_recurrence_policies` | [Create Recurrence Policy](https://docs.commercetools.com/api/projects/recurrence-policies#create-recurrencepolicy)                |
@@ -168,6 +169,22 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 | `read_states`              | [Read State](https://docs.commercetools.com/api/projects/states#query-states)                                                      |
 | `create_states`            | [Create State](https://docs.commercetools.com/api/projects/states#create-state)                                                    |
 | `update_states`            | [Update State](https://docs.commercetools.com/api/projects/states#update-state-by-id)                                              |
+| `read_mcp_servers`         | [Read MCP Server](https://docs.commercetools.com/api/projects/managed-mcp-servers#query-mcp-servers)                               |
+| `create_mcp_servers`       | [Create MCP Server](https://docs.commercetools.com/api/projects/managed-mcp-servers#create-mcp-server)                             |
+| `update_mcp_servers`       | [Update MCP Server](https://docs.commercetools.com/api/projects/managed-mcp-servers#update-mcp-server)                             |
+| `read_mcp_server_types`    | [Read MCP Server Type](https://docs.commercetools.com/api/projects/managed-mcp-servers#query-mcp-server-types)                     |
+| `read_attribute_groups`    | [Read Attribute Group](https://docs.commercetools.com/api/projects/attribute-groups#query-attributegroups)                           |
+| `create_attribute_groups`  | [Create Attribute Group](https://docs.commercetools.com/api/projects/attribute-groups#create-attributegroup)                         |
+| `update_attribute_groups`  | [Update Attribute Group](https://docs.commercetools.com/api/projects/attribute-groups#update-attributegroup)                         |
+| `read_messages`            | [Read Message](https://docs.commercetools.com/api/projects/messages#query-messages)                                                  |
+| `read_product_projections` | [Read Product Projection](https://docs.commercetools.com/api/projects/productProjections#query-productprojections)                   |
+| `read_customer_search`     | [Search customers](https://docs.commercetools.com/api/projects/customer-search#search-customers)                                     |
+| `read_applications`        | [Read Checkout Application](https://docs.commercetools.com/checkout/applications-api#query-applications)                             |
+| `create_applications`      | [Create Checkout Application](https://docs.commercetools.com/checkout/applications-api#create-application)                           |
+| `update_applications`      | [Update Checkout Application](https://docs.commercetools.com/checkout/applications-api#update-application)                           |
+| `read_payment_integrations` | [Read Payment Integration](https://docs.commercetools.com/checkout/payment-integrations-api#query-paymentintegrations)               |
+| `create_payment_integrations` | [Create Payment Integration](https://docs.commercetools.com/checkout/payment-integrations-api#create-paymentintegration)             |
+| `update_payment_integrations` | [Update Payment Integration](https://docs.commercetools.com/checkout/payment-integrations-api#update-paymentintegration)             |
 | `read_products`            | [Read product information](https://docs.commercetools.com/api/projects/products#query-products)                                    |
 | `create_products`          | [Create product information](https://docs.commercetools.com/api/projects/products#create-product)                                  |
 | `update_products`          | [Update product information](https://docs.commercetools.com/api/projects/products#update-product)                                  |
@@ -188,6 +205,7 @@ Add the following to your `claude_desktop_config.json`. See [here](https://model
 | `read_carts`                | [Read cart information](https://docs.commercetools.com/api/projects/carts#get-cart-by-id)                                          |
 | `create_carts`              | [Create cart](https://docs.commercetools.com/api/projects/carts#create-cart)                                                       |
 | `update_carts`              | [Update cart information](https://docs.commercetools.com/api/projects/carts#update-cart)                                           |
+| `replicate_carts`          | [Replicate cart](https://docs.commercetools.com/api/projects/carts#replicate-cart)                                                   |
 | `read_customers`            | [Read customer information](https://docs.commercetools.com/api/projects/customers#query-customers)                                 |
 | `create_customers`          | [Create customer](https://docs.commercetools.com/api/projects/customers#create-customer)                                           |
 | `update_customers`          | [Update customer information](https://docs.commercetools.com/api/projects/customers#update-customer)                               |

@@ -1,5 +1,9 @@
 import * as platformSdk from '@commercetools/platform-sdk';
-import {CustomersHandler} from '@commercetools/tools-core';
+import {
+  CartsHandler,
+  CustomersHandler,
+  OrderEditsHandler,
+} from '@commercetools/tools-core';
 import CommercetoolsAPI from '../api';
 import type {AuthConfig} from '../../types/auth';
 
@@ -62,6 +66,36 @@ describe('CommercetoolsAPI.run bridge dispatch', () => {
 
     const ctx = executeSpy.mock.calls[0][0];
     expect(ctx.parameters).toMatchObject({storeKey: 'store-1'});
+  });
+
+  it('routes replicate_carts to the core CartsHandler replicate operation', async () => {
+    const replicateSpy = jest
+      .spyOn(CartsHandler.prototype, 'replicate')
+      .mockResolvedValue({id: 'cart-copy'} as never);
+
+    const api = new CommercetoolsAPI(authConfig, {isAdmin: true});
+    const result = await api.run('replicate_carts', {
+      reference: {id: 'cart-1', typeId: 'cart'},
+    });
+
+    expect(result).toEqual({id: 'cart-copy'});
+    expect(replicateSpy).toHaveBeenCalledTimes(1);
+    expect(replicateSpy.mock.calls[0][0].toolName).toBe('replicate_carts');
+  });
+
+  it('routes apply_order_edits to the core OrderEditsHandler apply operation', async () => {
+    const applySpy = jest
+      .spyOn(OrderEditsHandler.prototype, 'apply')
+      .mockResolvedValue({id: 'edit-1'} as never);
+
+    const api = new CommercetoolsAPI(authConfig, {isAdmin: true});
+    await api.run('apply_order_edits', {
+      id: 'edit-1',
+      editVersion: 1,
+      resourceVersion: 3,
+    });
+
+    expect(applySpy).toHaveBeenCalledTimes(1);
   });
 
   it('passes a custom execute function through unchanged', async () => {

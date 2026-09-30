@@ -60,6 +60,29 @@ describe('applyResolvedToolsToConfiguration', () => {
     expect(configuration.actions?.products?.create).toBeUndefined();
   });
 
+  it('read_all leaves out resource extras (replicate / apply)', () => {
+    const configuration: Configuration = {actions: {}, context: {}};
+    applyResolvedToolsToConfiguration(
+      configuration,
+      {mode: 'read_all', explicitTools: []},
+      ACCEPTED_TOOLS
+    );
+    expect(configuration.actions?.cart).toEqual({read: true});
+    expect(configuration.actions?.['order-edit']).toEqual({read: true});
+  });
+
+  it('an explicit resource extra enables only that action', () => {
+    const configuration: Configuration = {actions: {}, context: {}};
+    applyResolvedToolsToConfiguration(configuration, {
+      mode: 'explicit',
+      explicitTools: ['replicate_carts', 'apply_order_edits'],
+    });
+    expect(configuration.actions).toEqual({
+      cart: {replicate: true},
+      'order-edit': {apply: true},
+    });
+  });
+
   it('maps underscore method names to namespace/action actions', () => {
     const configuration: Configuration = {actions: {}, context: {}};
     applyResolvedToolsToConfiguration(configuration, {

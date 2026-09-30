@@ -100,6 +100,70 @@ describe('bridge tool building', () => {
     expect(methods(tools)).toContain('create_transactions');
   });
 
+  it('exposes MCP servers and the read-only MCP server type catalogue', () => {
+    const resources = contextToResourceTools({isAdmin: true});
+    expect(methods(resources['mcp-server']).sort()).toEqual([
+      'create_mcp_servers',
+      'read_mcp_servers',
+      'update_mcp_servers',
+    ]);
+    expect(methods(resources['mcp-server-type'])).toEqual([
+      'read_mcp_server_types',
+    ]);
+  });
+
+  it('exposes read-only views (messages, projections, customer search) as read only', () => {
+    const resources = contextToResourceTools({isAdmin: true});
+    expect(methods(resources.message)).toEqual(['read_messages']);
+    expect(methods(resources['product-projection'])).toEqual([
+      'read_product_projections',
+    ]);
+    expect(methods(resources['customer-search'])).toEqual([
+      'read_customer_search',
+    ]);
+    expect(methods(resources['attribute-group']).sort()).toEqual([
+      'create_attribute_groups',
+      'read_attribute_groups',
+      'update_attribute_groups',
+    ]);
+  });
+
+  it('exposes checkout applications and payment integrations', () => {
+    const resources = contextToResourceTools({isAdmin: true});
+    expect(methods(resources.application).sort()).toEqual([
+      'create_applications',
+      'read_applications',
+      'update_applications',
+    ]);
+    expect(methods(resources['payment-integration']).sort()).toEqual([
+      'create_payment_integrations',
+      'read_payment_integrations',
+      'update_payment_integrations',
+    ]);
+  });
+
+  it('exposes replicate carts and apply order-edits under their own action', () => {
+    const resources = contextToResourceTools({isAdmin: true});
+    const replicate = resources.cart.find(
+      (t) => t.method === 'replicate_carts'
+    )!;
+    const apply = resources['order-edit'].find(
+      (t) => t.method === 'apply_order_edits'
+    )!;
+
+    expect(replicate.actions).toEqual({cart: {replicate: true}});
+    expect(apply.actions).toEqual({'order-edit': {apply: true}});
+    // Neither extra is reachable through the create / update permission.
+    expect(
+      isToolAllowed(replicate, {actions: {cart: {create: true, update: true}}})
+    ).toBe(false);
+    expect(
+      isToolAllowed(apply, {actions: {'order-edit': {update: true}}})
+    ).toBe(false);
+    expect(typeof replicate.description).toBe('string');
+    expect(replicate.parameters.shape.reference).toBeDefined();
+  });
+
   it('bulk tools are create/update and separate from contextToTools', () => {
     expect(methods(contextToBulkTools()).sort()).toEqual([
       'create_bulk',
@@ -123,8 +187,29 @@ describe('bridge execution mapping', () => {
     });
     // delete is not implemented/exposed.
     expect(resolveMethod('delete_customers')).toBeUndefined();
+    // `mcp_servers` must not swallow `mcp_server_types` (or vice versa).
+    expect(resolveMethod('read_mcp_server_types')).toMatchObject({
+      op: 'read',
+      def: {nsKey: 'mcp-server-type'},
+    });
+    expect(resolveMethod('update_mcp_servers')).toMatchObject({
+      op: 'update',
+      def: {nsKey: 'mcp-server'},
+    });
     // create on a read-only resource is not exposed.
     expect(resolveMethod('create_product_search')).toBeUndefined();
+    expect(resolveMethod('create_mcp_server_types')).toBeUndefined();
+    expect(resolveMethod('replicate_carts')).toMatchObject({
+      op: 'replicate',
+      def: {nsKey: 'cart'},
+    });
+    expect(resolveMethod('apply_order_edits')).toMatchObject({
+      op: 'apply',
+      def: {nsKey: 'order-edit'},
+    });
+    // resource extras are only exposed on the resource that implements them.
+    expect(resolveMethod('replicate_orders')).toBeUndefined();
+    expect(resolveMethod('apply_carts')).toBeUndefined();
     expect(resolveMethod('not_a_tool')).toBeUndefined();
   });
 

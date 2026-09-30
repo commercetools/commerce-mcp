@@ -13,9 +13,11 @@ import {
   type Configuration as CoreConfiguration,
   type IApiClientFactory,
   type ToolExecutionContext,
+  ApplicationsHandler,
   ApprovalFlowsHandler,
   ApprovalRulesHandler,
   AssociateRolesHandler,
+  AttributeGroupsHandler,
   BulkHandler,
   BusinessUnitsHandler,
   CartDiscountsHandler,
@@ -24,16 +26,22 @@ import {
   ChannelsHandler,
   CustomObjectsHandler,
   CustomerGroupsHandler,
+  CustomerSearchHandler,
   CustomersHandler,
   DiscountCodesHandler,
   ExtensionsHandler,
   InventoryHandler,
+  McpServerTypesHandler,
+  McpServersHandler,
+  MessagesHandler,
   OrderEditsHandler,
   OrdersHandler,
+  PaymentIntegrationsHandler,
   PaymentIntentsHandler,
   PaymentMethodsHandler,
   PaymentsHandler,
   ProductDiscountsHandler,
+  ProductProjectionsHandler,
   ProductSearchHandler,
   ProductSelectionAssignmentsHandler,
   ProductSelectionsHandler,
@@ -62,7 +70,7 @@ import type {Tool} from '../types/tools';
 import type {AuthConfig} from '../types/auth';
 import type {Context} from '../types/configuration';
 
-export type Op = 'read' | 'create' | 'update';
+export type Op = 'read' | 'create' | 'update' | 'replicate' | 'apply';
 type Branch = 'associate' | 'customer' | 'store' | 'admin';
 type ApiKind = 'platform' | 'checkout';
 
@@ -92,7 +100,8 @@ const RCU: Op[] = ['read', 'create', 'update'];
  *
  * Notes:
  * - `delete` is never exposed (core stubs it; parity with legacy commerce-mcp).
- * - resource extras (replicate carts, apply order-edits) are not yet exposed.
+ * - resource extras (`replicate` carts, `apply` order-edits) are their own
+ *   operations, so enabling them never implies `create` / `update`.
  */
 const RESOURCE_DEFS: ResourceDef[] = [
   {
@@ -105,7 +114,7 @@ const RESOURCE_DEFS: ResourceDef[] = [
     nsKey: 'cart',
     coreNamespace: 'carts',
     Handler: CartsHandler,
-    baseOps: RCU,
+    baseOps: [...RCU, 'replicate'],
   },
   {
     nsKey: 'cart-discount',
@@ -349,7 +358,7 @@ const RESOURCE_DEFS: ResourceDef[] = [
     nsKey: 'order-edit',
     coreNamespace: 'order-edits',
     Handler: OrderEditsHandler,
-    baseOps: RCU,
+    baseOps: [...RCU, 'apply'],
   },
   {
     nsKey: 'product-selection-assignment',
@@ -368,6 +377,56 @@ const RESOURCE_DEFS: ResourceDef[] = [
     coreNamespace: 'states',
     Handler: StatesHandler,
     baseOps: RCU,
+  },
+  {
+    nsKey: 'mcp-server',
+    coreNamespace: 'mcp-servers',
+    Handler: McpServersHandler,
+    baseOps: RCU,
+  },
+  {
+    nsKey: 'mcp-server-type',
+    coreNamespace: 'mcp-server-types',
+    Handler: McpServerTypesHandler,
+    baseOps: ['read'],
+  },
+  {
+    nsKey: 'attribute-group',
+    coreNamespace: 'attribute-groups',
+    Handler: AttributeGroupsHandler,
+    baseOps: RCU,
+  },
+  {
+    nsKey: 'message',
+    coreNamespace: 'messages',
+    Handler: MessagesHandler,
+    baseOps: ['read'],
+  },
+  {
+    nsKey: 'product-projection',
+    coreNamespace: 'product-projections',
+    Handler: ProductProjectionsHandler,
+    baseOps: ['read'],
+  },
+  {
+    nsKey: 'customer-search',
+    coreNamespace: 'customer-search',
+    Handler: CustomerSearchHandler,
+    baseOps: ['read'],
+  },
+  {
+    nsKey: 'application',
+    coreNamespace: 'applications',
+    Handler: ApplicationsHandler,
+    baseOps: RCU,
+    apiKind: 'checkout',
+  },
+  {
+    nsKey: 'payment-integration',
+    coreNamespace: 'payment-integrations',
+    Handler: PaymentIntegrationsHandler,
+    baseOps: RCU,
+    apiKind: 'checkout',
   },
 ];
 
@@ -508,7 +567,7 @@ export function buildBulkTools(_context?: Context): Tool[] {
 export function resolveMethod(
   method: string
 ): {def: ResourceDef; op: Op} | undefined {
-  const match = /^(read|create|update)_(.+)$/.exec(method);
+  const match = /^(read|create|update|replicate|apply)_(.+)$/.exec(method);
   if (!match) return undefined;
   const op = match[1] as Op;
   const coreNamespace = match[2];
