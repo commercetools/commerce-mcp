@@ -1,0 +1,23 @@
+{
+  "skill_name": "sync-prompts",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "The category namespace in Python still has inline description strings in __init__.py instead of using prompt constants from a prompts.py file. Fix it to match the TypeScript pattern.",
+      "expected_output": "Creates python/commerce_mcp/tools/category/prompts.py with READ_CATEGORY_PROMPT, CREATE_CATEGORY_PROMPT, UPDATE_CATEGORY_PROMPT constants sourced from typescript/src/shared/category/prompts.ts, and updates __init__.py to import and use them.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "Sync prompts for the products namespace — the Python __init__.py has one-liner descriptions but TypeScript has a full prompts.ts.",
+      "expected_output": "Creates python/commerce_mcp/tools/products/prompts.py with LIST_PRODUCTS_PROMPT (or similar), CREATE_PRODUCTS_PROMPT, UPDATE_PRODUCTS_PROMPT from typescript/src/shared/products/prompts.ts, and updates __init__.py.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Port prompts to Python for the carts namespace.",
+      "expected_output": "Correctly maps Python 'carts' → TypeScript 'cart', creates prompts.py from typescript/src/shared/cart/prompts.ts, updates __init__.py.",
+      "files": []
+    }
+  ]
+}
