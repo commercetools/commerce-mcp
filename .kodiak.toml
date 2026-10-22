@@ -1,0 +1,11 @@
+# Kodiak merges a PR labelled `automerge` once it is approved. The release
+# workflow adds the label to the version PR.
+# https://kodiakhq.com/docs/config-reference
+version = 1
+
+[merge]
+method = "squash"
+show_missing_automerge_label_message = false
+
+[merge.message]
+title = "pull_request_title"

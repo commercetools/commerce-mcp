@@ -66,3 +66,12 @@ jobs:
           commitMode: "github-api"
         env:
           GITHUB_TOKEN: ${{ steps.generate_github_token.outputs.token }}
+
+      # Kodiak (.kodiak.toml) merges a PR labelled `automerge` once it is
+      # approved, so approving the version PR is enough to release.
+      - name: Label the version PR for automerge
+        if: steps.changesets.outputs.pullRequestNumber
+        env:
+          GH_TOKEN: ${{ steps.generate_github_token.outputs.token }}
+          PR: ${{ steps.changesets.outputs.pullRequestNumber }}
+        run: gh pr edit "$PR" --add-label automerge
