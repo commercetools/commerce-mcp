@@ -117,7 +117,8 @@ class CommercetoolsCommerceAgent extends McpServer {
     } catch (err: unknown) {
       throw new Error(
         (err as Error).message ??
-          'Unable to initialze `CommercetoolsCommerceAgent`'
+          'Unable to initialze `CommercetoolsCommerceAgent`',
+        {cause: err}
       );
     }
   }
