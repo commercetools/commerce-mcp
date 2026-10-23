@@ -1,5 +1,11 @@
 # @commercetools/processors
 
+## 0.1.1
+
+### Patch Changes
+
+- [#86](https://github.com/commercetools/commerce-mcp/pull/86) [`2ba2825`](https://github.com/commercetools/commerce-mcp/commit/2ba28255740b7b6ae56cc4321d6b6f45bdd26892) Thanks [@ajimae](https://github.com/ajimae)! - Update dependencies to their latest versions (TypeScript 6, Jest 30, ESLint 10, tsup 9, and others). `zod` stays on 3.x.
+
 ## 0.1.0
 
 ### Minor Changes

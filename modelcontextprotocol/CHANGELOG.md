@@ -1,5 +1,14 @@
 # @commercetools/commerce-mcp
 
+## 4.2.3
+
+### Patch Changes
+
+- [#86](https://github.com/commercetools/commerce-mcp/pull/86) [`2ba2825`](https://github.com/commercetools/commerce-mcp/commit/2ba28255740b7b6ae56cc4321d6b6f45bdd26892) Thanks [@ajimae](https://github.com/ajimae)! - Update dependencies to their latest versions (TypeScript 6, Jest 30, ESLint 10, tsup 9, and others). `zod` stays on 3.x.
+- Updated dependencies [[`2ea87e5`](https://github.com/commercetools/commerce-mcp/commit/2ea87e5d938fe8c7d737f90fd186c980a1c1e96c), [`2ba2825`](https://github.com/commercetools/commerce-mcp/commit/2ba28255740b7b6ae56cc4321d6b6f45bdd26892)]:
+  - @commercetools/commerce-agent@4.3.2
+  - @commercetools/processors@0.1.1
+
 ## 4.2.2
 
 ### Patch Changes
