@@ -260,7 +260,8 @@ function tryParseFieldFiltering(
     fieldFilteringConfig = JSON.parse(fieldFilteringString);
   } catch (error) {
     throw new Error(
-      `Invalid argument: fieldFiltering. Error parsing JSON: ${error}`
+      `Invalid argument: fieldFiltering. Error parsing JSON: ${error}`,
+      {cause: error}
     );
   }
   if (
