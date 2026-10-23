@@ -3,6 +3,8 @@
   "display": "Default",
   "compilerOptions": {
     "outDir": "./dist",
+    "rootDir": ".",
+    "types": ["node", "jest"],
     "target": "es2022",
     "moduleDetection": "force",
     "esModuleInterop": true,

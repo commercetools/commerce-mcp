@@ -54,8 +54,9 @@ export const transformToolOutput = (args: {
   // negative tabCount to offset first level data transformation
   const transformedData = transformData({data, tabCount: -1});
 
-  return (transformedDataAggregate +=
-    transformedData ?? emptyObjectTransformValue);
+  return (
+    transformedDataAggregate + (transformedData ?? emptyObjectTransformValue)
+  );
 };
 
 const transformTitle = (title: string) =>
@@ -230,7 +231,7 @@ const transformObjectOrArrayContent = (args: {
     transformedDataAggregate += `\n`;
   }
 
-  return (transformedDataAggregate += transformedValue);
+  return transformedDataAggregate + transformedValue;
 };
 
 const isArrayWithoutObjectsOrArrays = (array: Array<unknown>): boolean => {

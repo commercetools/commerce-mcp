@@ -8,14 +8,14 @@
     "test": "pnpm run -r test"
   },
   "dependencies": {
-    "@changesets/changelog-github": "0.5.1",
-    "@changesets/cli": "^2.29.4",
+    "@changesets/changelog-github": "1.0.1",
+    "@changesets/cli": "^3.0.3",
+    "@commercetools/checkout-sdk": "^2.1.0",
     "@commercetools/commerce-agent": "workspace:*",
+    "@commercetools/platform-sdk": "^9.7.0",
     "@commercetools/processors": "workspace:*",
-    "@commercetools/platform-sdk": "^9.4.0",
-    "@commercetools/checkout-sdk": "^1.0.0",
     "@commercetools/tools-core": "^0.6.2",
-    "@commercetools/ts-client": "^5.0.2",
+    "@commercetools/ts-client": "^5.1.1",
     "@types/pluralize": "^0.0.33"
   },
   "packageManager": "pnpm@9.11.0"
