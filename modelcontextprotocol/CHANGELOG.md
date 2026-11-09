@@ -1,5 +1,12 @@
 # @commercetools/commerce-mcp
 
+## 4.2.4
+
+### Patch Changes
+
+- Updated dependencies [[`206401a`](https://github.com/commercetools/commerce-mcp/commit/206401a529e54f29542e1e4688451acc503bf13c)]:
+  - @commercetools/commerce-agent@4.3.3
+
 ## 4.2.3
 
 ### Patch Changes
