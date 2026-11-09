@@ -14,7 +14,7 @@
     "@commercetools/commerce-agent": "workspace:*",
     "@commercetools/platform-sdk": "^9.7.0",
     "@commercetools/processors": "workspace:*",
-    "@commercetools/tools-core": "^0.6.2",
+    "@commercetools/tools-core": "^0.7.1",
     "@commercetools/ts-client": "^5.1.1",
     "@types/pluralize": "^0.0.33"
   },
