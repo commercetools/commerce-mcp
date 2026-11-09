@@ -1,5 +1,11 @@
 # @commercetools/commerce-agent
 
+## 4.3.3
+
+### Patch Changes
+
+- [#92](https://github.com/commercetools/commerce-mcp/pull/92) [`206401a`](https://github.com/commercetools/commerce-mcp/commit/206401a529e54f29542e1e4688451acc503bf13c) Thanks [@ajimae](https://github.com/ajimae)! - Upgrade `@commercetools/tools-core` to `^0.7.1`.
+
 ## 4.3.2
 
 ### Patch Changes
