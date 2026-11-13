@@ -16,6 +16,6 @@
     "@modelcontextprotocol/node": "^2.1.0",
     "@modelcontextprotocol/server": "^2.3.1",
     "express": "^5.1.0",
-    "hono": "^4.13.8"
+    "hono": "^4.13.18"
   }
 }
